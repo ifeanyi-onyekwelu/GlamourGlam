@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Ashion Template" />
+    <meta name="keywords" content="Ashion, unica, creative, html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+        GlamourGlam | Elevate Your Style, Embrace Glamour || {% block title %}{%endblock title %}
+    </title>
+
+    <link rel="shortcut icon" href="{% static 'img/gg favicon.png' %}" type="image/x-icon">
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/elegant-icons.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+
+</head>
+
+<body>
+    <!-- Page Preloder -->
+    <div id="preloder">
+        <div class="loader"></div>
+    </div>
+
+    
+    <!-- Offcanvas Menu Begin -->
+    <div class="offcanvas-menu-overlay"></div>
+    <div class="offcanvas-menu-wrapper">
+        <div class="offcanvas__close">+</div>
+        <ul class="offcanvas__widget">
+            <li><span class="icon_search search-switch"></span></li>
+            {% if request.user.is_authenticated %}
+            <li>
+                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                    <div class="tip">{% block cart_num_offcanvas %}{% endblock cart_num_offcanvas %}</div>
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                    <div class="tip">0</div>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="offcanvas__logo">
+            <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt="" /></a>
+        </div>
+        <div id="mobile-menu-wrap"></div>
+        
+        {% if not request.user.is_authenticated %}
+        <div class="offcanvas__auth">
+            <a href="{% url 'app:login_page' %}">Login</a>
+            <a href="{% url 'app:register_page' %}">Register</a>
+        </div>
+        {% endif %}
+            
+    </div>
+    <!-- Offcanvas Menu End -->
+
+    <!-- Header Section Begin -->
+    
+    {% url 'app:login_page' as login_page %}
+    {% url 'app:register_page' as register_page %}
+    {% if login_page == request.path or register_page == request.path %}
+    {% else %}
+    <header class="header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-3 col-lg-2">
+                    <div class="header__logo">
+                        <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
+                                width="200" /></a>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-7">
+                    <nav class="header__menu">
+                        <ul>
+                            {% url 'app:home_page' as home_page %}
+                            <li class="{% if home_page == request.path %} active {% endif %}">
+                                <a href="{{ home_page }}">Home</a>
+                            </li>
+
+                            {% url 'app:women_page' as women_page %}
+                            <li class="{% if women_page == request.path %} active {% endif %}">
+                                <a href="{{women_page}}">Women’s</a>
+                            </li>
+                            {% url 'app:men_page' as men_page %}
+                            <li class="{% if men_page == request.path %} active {% endif %}">
+                                <a href="{{ men_page }}">Men’s</a>
+                            </li>
+                            {% url 'app:kids_page' as kids_page %}
+                            <li class="{% if kids_page == request.path %} active {% endif %}">
+                                <a href="{{ kids_page }}">Kid's</a>
+                            </li>
+                            {% url 'app:accessories_page' as accessories_page %}
+                            <li class="{% if accessories_page == request.path %} active {% endif %}">
+                                <a href="{{ accessories_page }}">Accessories</a>
+                            </li>
+                            {% url 'app:shop_page' as shop_page %}
+                            <li class="{% if shop_page == request.path %} active {% endif %}">
+                                <a href="{{ shop_page }}">Shop</a>
+                            </li>
+                            {% url 'app:contact_page' as contact_page %}
+                            <li class="{% if contact_page == request.path %} active {% endif %}">
+                                <a href="{{ contact_page }}">Contact</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="header__right">
+                        {% if not request.user.is_authenticated %}
+                        <div class="header__right__auth">
+                            <a href="{% url 'app:login_page' %}">Login</a>
+                            <a href="{% url 'app:register_page' %}">Register</a>
+                        </div>
+                        {% endif %}
+                        <ul class="header__right__widget">
+                            <li><span class="icon_search search-switch"></span></li>
+                            <li>
+                                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                                    <div class="tip">{% block cart_num %}{% endblock cart_num %}</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+        
+    <!-- Header Section End -->
+
+    {% block content %} {% endblock content %}
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-7">
+                    <div class="footer__about">
+                        <div class="footer__logo">
+                            <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt="" width="300"/></a>
+                        </div>
+                        <p>
+                            Discover your style at GlamourGlam - Your ultimate destination for fashion-forward finds. Shop the latest trends, exclusive collections.
+                        </p>
+                        <div class="footer__payment">
+                            <a href="#"><img src="{% static 'img/payment/payment-1.png' %}" alt="" /></a>
+                            <a href="#"><img src="{% static 'img/payment/payment-2.png' %}" alt="" /></a>
+                            <a href="#"><img src="{% static 'img/payment/payment-4.png' %}" alt="" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-5">
+                    <div class="footer__widget">
+                        <h6>Quick links</h6>
+                        <ul>
+                            <li><a href="#">About</a></li>
+                            <li><a href="{% url 'app:contact_page' %}">Contact</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <div class="footer__widget">
+                        <h6>Account</h6>
+                        <ul>
+                            <li><a href="#">My Account</a></li>
+                            <li><a href="{% url 'app:checkout_page' %}">Checkout</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-8 col-sm-8">
+                    <div class="footer__newslatter">
+                        <h6>NEWSLETTER</h6>
+                        <form action="{% url 'app:handleSubscribeToNewsLetter' %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="email" id="email" placeholder="Email"/>
+                            <button type="submit" class="site-btn">Subscribe</button>
+                        </form>
+                        <div class="footer__social">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="https://www.instagram.com/glam_ourglam/"><i class="fa fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    <div class="footer__copyright__text">
+                        <p>
+                            Copyright &copy;
+                            <script>
+                                document.write(new Date().getFullYear())
+                            </script>
+                            All rights reserved | GlamourGlam
+                        </p>
+                    </div>
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/mixitup.min.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Footer Section Begin -->
+
+    {% block javascript %} 
+    {% endblock javascript %}
+</body>
+
+</html>

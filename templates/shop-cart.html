@@ -1,0 +1,258 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+    
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block title %}Cart{% endblock title %}
+
+
+{% block content %}
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+<!-- Shop Cart Section Begin -->
+<section class="shop-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="shop__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {% if request.user.is_authenticated %}
+                            {% for cart_item in cart_items %}
+                            <tr id="cart-item-{{ cart_item.id }}">
+                                <td class="cart__product__item">
+                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}" style="width: 100px; height: 100px; object-fit: contain;">
+                                    <div class="cart__product__item__title">
+                                        <h6>{{ cart_item.product.name }}</h6>
+                                        <div class="rating">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
+                                <td class="cart__quantity">
+                                    <div class="pro-qty">
+                                        <form class="quantity-form" data-product-id="{{ cart_item.product.id }}" id="form-{{ cart_item.id }}">
+                                            {% csrf_token %}
+                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1">
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="cart__total">&#8358; {{ cart_item.subtotal|intcomma }}</td>
+                                <td class="cart__action">
+                                    <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item" data-cart-item-id="{{ cart_item.id }}">
+                                        <span class="fa fa-remove"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            {% for cart_item in cart_items %}
+                            <tr id="cart-item-{{ cart_item.id }}">
+                                <td class="cart__product__item">
+                                    <img src="{{ cart_item.product.first_image }}" alt="{{ cart_item.product.name }}" style="width: 100px; height: 100px; object-fit: contain;">
+                                    <div class="cart__product__item__title">
+                                        <h6>{{ cart_item.product.name }}</h6>
+                                        <div class="rating">
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
+                                <td class="cart__quantity">
+                                    <div class="pro-qty">
+                                        <form class="quantity-form" data-product-id="{{ cart_item.product.id }}" id="form-{{ cart_item.id }}">
+                                            {% csrf_token %}
+                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1">
+                                        </form>
+                                    </div>
+                                </td>
+                                <td class="cart__total">&#8358; {{ cart_item.subtotal|intcomma }}</td>
+                                {% if request.user.is_authenticated %}
+                                <td class="cart__action">
+                                    <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item" data-cart-item-id="{{ cart_item.id }}">
+                                        <span class="fa fa-remove"></span>
+                                    </a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="cart__btn">
+                    <a href="{% url 'app:shop_page' %}">Continue Shopping</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="cart__btn update__btn">
+                    <a href="" id="update-button" data-form-id="all"><span class="icon_loading"></span> Update cart</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="discount__content">
+                    <h6>Discount codes</h6>
+                    <form action="#">
+                        <input type="text" placeholder="Enter your coupon code">
+                        <button type="submit" class="site-btn">Apply</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4 offset-lg-2">
+                <div class="cart__total__procced">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li>Shipping <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                        <li>Subtotal <span>&#8358; {{ total_amount|intcomma }}</span></li>
+                        <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
+                    </ul>
+                    <a href="{% url 'app:checkout_page' %}" class="primary-btn">Proceed to checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Cart Section End -->
+
+
+<!-- Search Begin -->
+<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch">+</div>
+        <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+            {% csrf_token %}
+            <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+        </form>
+    </div>
+</div>
+<!-- Search End -->
+
+{% endblock content %}
+
+{% block javascript %} 
+<script>
+    $(document).ready(function(){
+        $("#update-button").click(function(e){
+            e.preventDefault();
+
+            let formId = $(this).data('form-id');
+
+            if (formId == 'all') {
+                $('.quantity-form').each(function() {
+                    $(this).submit();
+                })
+            }
+        });
+
+        $('.quantity-form').submit(function(e) {
+            e.preventDefault();
+
+            let product_id = $(this).data('product-id');
+            let quantity = $(this).find('input[name="quantity"]').val()
+
+            $.ajax({
+                type: "POST",
+                // url: '/update-quantity/',
+                url: '{% url "app:handleUpdateCart" %}',
+                data: {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    $("#cart-item-" + product_id + ' input[name="quantity"]').val(data.quantity);
+                    location.reload();
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        // Function to handle the remove cart item Ajax request
+        function handleRemoveCartItem(cartItemId) {
+            $.ajax({
+                type: 'POST',
+                url: `/delete-item/${cartItemId}/`,
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                    success: function (response) {
+                        $(`#cart-item-${cartItemId}`).remove();
+                        const newTotalAmount = response.total_amount;
+                        $('.cart__total__procced li span').html('&#8358;' + newTotalAmount);
+
+                    },
+                error: function (xhr, textStatus, errorThrown) {
+                    // Handle the error if the request fails.
+                    console.error('Error:', errorThrown);
+                }
+            });
+        }
+
+        // Attach click event handler to the remove buttons
+        $('.remove-cart-item').on('click', function (event) {
+            event.preventDefault();
+            const cartItemId = $(this).data('cart-item-id');
+            handleRemoveCartItem(cartItemId);
+        });
+    });
+</script>
+{% endblock javascript %}

@@ -1,0 +1,47 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Size{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Sizes</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+
+        <a href="{% url 'my_admin:add_product' %}" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Sub-category</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for size in sizes %}
+                            <tr>
+                                <td><a href="{% url 'my_admin:size_detail' size.id %}">{{ size.name }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

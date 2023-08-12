@@ -1,0 +1,296 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+    
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block title %}{{ product.name }}{% endblock title %}
+
+
+{% block content %}
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>{{ product.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__left product__thumb nice-scroll">
+                            {% for image in product_image %}
+                            <a class="pt active" href="#product-{{ image.id }}">
+                                <img src="{{ image.image.url }}" alt="">
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="product__details__slider__content">
+                            <div class="product__details__pic__slider owl-carousel">
+                                {% for image in product_image %}
+                                <img data-hash="product-{{ image.id }}" class="product__big__img" src="{{ image.image.url }}" alt="">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text">
+                        <h3>{{ product.name }} <span>Category: {{ product.category.name }}</span></h3>
+                        <div class="rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <span>( 138 reviews )</span>
+                        </div>
+                        <div class="product__details__price">$ {{ product.price|intcomma }} <span>{{ price_with_increase|floatformat:2|intcomma }}</span></div>
+                        <p>{{ product.description }}</p>
+                        <div class="product__details__button">
+                            <a href="{% url 'app:handleAddToCart' product.id %}" class="cart-btn add-to-cart-link" data-product-id="{{ product.id }}"><span class="icon_bag_alt"></span> Add to cart</a>
+                        </div>
+                        <div class="product__details__widget">
+                            <ul>
+                                <li>
+                                    <span>Available color:</span>
+                                    <div class="color__checkbox">
+                                        <label for="red">
+                                            <input type="radio" name="color__radio" id="red" checked>
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label for="black">
+                                            <input type="radio" name="color__radio" id="black">
+                                            <span class="checkmark black-bg"></span>
+                                        </label>
+                                        <label for="grey">
+                                            <input type="radio" name="color__radio" id="grey">
+                                            <span class="checkmark grey-bg"></span>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Available size:</span>
+                                    <div class="size__btn">
+                                        {% if product.sizes == '1' %}
+                                        <label for="lg-btn" class="active">
+                                            <input type="radio" id="lg-btn">
+                                            lg
+                                        </label>
+                                        {% elif product.sizes == '2' %}
+                                        <label for="m-btn" class="active">
+                                            <input type="radio" id="m-btn">
+                                            m
+                                        </label>
+                                        <label for="lg-btn">
+                                            <input type="radio" id="lg-btn">
+                                            lg
+                                        </label>
+                                        {% elif product.sizes == '3' %}
+                                        <label for="s-btn" class="active">
+                                            <input type="radio" id="s-btn">
+                                            s
+                                        </label>
+                                        <label for="m-btn">
+                                            <input type="radio" id="m-btn">
+                                            m
+                                        </label>
+                                        <label for="xs-btn">
+                                            <input type="radio" id="xs-btn">
+                                            lg
+                                        </label>
+                                        {% elif product.sizes == '4' %}
+                                        <label for="s-btn" class="active">
+                                            <input type="radio" id="s-btn">
+                                            s
+                                        </label>
+                                        <label for="m-btn">
+                                            <input type="radio" id="m-btn">
+                                            m
+                                        </label>
+                                        <label for="lg-btn">
+                                            <input type="radio" id="lg-btn">
+                                            lg
+                                        </label>
+                                        <label for="xl-btn">
+                                            <input type="radio" id="xl-btn">
+                                            xl
+                                        </label>
+                                        {% elif product.sizes == '5' %}
+                                        <label for="s-btn" class="active">
+                                            <input type="radio" id="s-btn">
+                                            s
+                                        </label>
+                                        <label for="m-btn">
+                                            <input type="radio" id="m-btn">
+                                            m
+                                        </label>
+                                        <label for="lg-btn">
+                                            <input type="radio" id="lg-btn">
+                                            lg
+                                        </label>
+                                        <label for="xl-btn">
+                                            <input type="radio" id="xl-btn">
+                                            xl
+                                        </label>
+                                        <label for="xxl-btn">
+                                            <input type="radio" id="xxl-btn">
+                                            xxl
+                                        </label>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <h6>Description</h6>
+                                <p>{{ product.description }}</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-2" role="tabpanel">
+                                <h6>Specification</h6>
+                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
+                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
+                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
+                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
+                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
+                                    consequat massa quis enim.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
+                                    quis, sem.</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                {% for review in product.reviews.all %}
+                                <h6 style="margin: 0;">{{ review.author.first_name }} {{ review.author.last_name }}</h6>
+                                <p>{{ review.review }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="related__title">
+                        <h5>RELATED PRODUCTS</h5>
+                    </div>
+                </div>
+                {% for related_product in related_products %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        {% with image=related_product.productimage_set.first %}
+                        <div class="product__item__pic set-bg" data-setbg="{{ image.image.url }}">
+                            <div class="label new">New</div>
+                            <ul class="product__hover">
+                                <li><a href="{{ image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' related_product.id %}" data-product-id="{{ related_product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' related_product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        {% endwith %}
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' related_product.id %}">{{ related_product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">{{ related_product.price|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+                {% csrf_token %}
+                <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+    
+{% endblock content %}
+    
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-link').click(function(e) {
+            e.preventDefault();
+
+            let link = $(this);
+            let product_id = link.data('product-id');
+            let quantity = 1;
+
+            $.ajax({
+                type: 'POST',
+                url: '/add-to-cart/' + product_id + '/',
+                data: {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    location.reload()
+                },
+                error: function(xhr, status, errorThrown) {
+                    console.log(errorThrown);
+                }
+            })
+        })
+    })
+</script>
+{% endblock javascript %}
