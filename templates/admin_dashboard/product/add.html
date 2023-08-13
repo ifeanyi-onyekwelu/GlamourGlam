@@ -55,11 +55,18 @@
             <label for="size">Size:</label>
             <input type="text" name="size" class="form-control" required>
           </div>
+          <button type="button" id="add-size" class="btn btn-warning btn-sm mb-3">Add Size</button>
+
+          <div class="form-group" id="color-fields">
+            <label for="color">Color:</label>
+            <input type="text" name="color" class="form-control" required>
+          </div>
+          <button type="button" id="add-color" class="btn btn-info btn-sm mb-3">Add Color</button>
+
           <div class="form-group">
             <label for="images">Images:</label>
             <input type="file" name="image" class="form-control" multiple>
           </div>
-          <button type="button" id="add-size" class="btn btn-warning btn-sm">Add Size</button>
 
           <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <input type="submit" value="CREATE" class="btn custom-background m-auto">
@@ -77,6 +84,10 @@
   $(document).ready(function() {
     $("#add-size").click(function() {
       $("#size-fields").append('<label for="size">Size:</label><input type="text" name="size" class="form-control" required>');
+    });
+
+    $("#add-color").click(function() {
+      $("#color-fields").append('<label for="color">Color:</label><input type="text" name="color" class="form-control" required>');
     });
   });
 </script>

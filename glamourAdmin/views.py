@@ -185,6 +185,7 @@ def add_product(request):
         category = request.POST.get('category')
         category_matched = Category.objects.get(name=category)
         sizes = request.POST.getlist('size')
+        colors = request.POST.getlist('color')
         images = request.FILES.getlist('image')
         product = Product.objects.create(
             name=name,
@@ -195,7 +196,7 @@ def add_product(request):
         )
 
         for size_name in sizes:
-            size, created = ProductSize.objects.get_or_create(name=size_name, product=product)
+            size = ProductSize.objects.create(name=size_name, product=product)
             product.sizes.add(size)
             size.save()
             product.save()
@@ -204,6 +205,12 @@ def add_product(request):
             img = ProductImage.objects.create(product=product, image=image)
             product.images.add(img)
             img.save()
+            product.save()
+
+        for color in colors:
+            col = ProductColor.objects.create(product=product, color=color)
+            product.colors.add(col)
+            col.save()
             product.save()
 
         return redirect('my_admin:product_detail', product_id=product.pk)
@@ -292,26 +299,6 @@ def delete_sub_category(request, sub_category_id):
 def delete_all_sub_category(request):
     SubCategory.objects.all().delete()
     return redirect('my_admin:sub_categories')
-
-
-# ########################################
-# Sizes
-# ########################################
-@admin_only_login
-@staff_member_required()
-def all_sizes(request):
-    sizes = ProductSize.objects.all()
-    return render(request, "admin_dashboard/size/all.html", {'sizes': sizes})
-
-def delete_size(request, size_id):
-    size = get_object_or_404(ProductSize, id=size_id)
-    size.delete()
-    return redirect('my_admin:sizes')
-
-@admin_only_login
-def delete_all_sizes(request):
-    ProductSize.objects.all().delete()
-    return redirect('my_admin:sizes')
 
 
 # ########################################

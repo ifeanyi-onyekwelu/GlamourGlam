@@ -39,13 +39,6 @@ urlpatterns = [
     path('sub-category/delete/all/', delete_all_sub_category, name="delete_all_sub_category"),
 
     # ########################################
-    # Size urls
-    # ########################################
-    path('sizes/', all_sizes, name="sizes"),
-    path('size/delete/<int:size_id>', delete_size, name="delete_size"),
-    path('size/delete/all/', delete_all_sizes, name="delete_all_sizes"),
-
-    # ########################################
     # Order urls
     # ########################################
     path('orders', all_order, name="orders"),

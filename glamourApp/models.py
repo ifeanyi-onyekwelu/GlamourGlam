@@ -32,7 +32,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
-    sizes = models.ManyToManyField('ProductSize', related_name='products', null=True, blank=True)
+    sizes = models.ManyToManyField('ProductSize', related_name='products')
+    colors = models.ManyToManyField('ProductColor', related_name='products')
     images = models.ManyToManyField('ProductImage', related_name='products')
 
     def __str__(self):
