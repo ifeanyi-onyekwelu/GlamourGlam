@@ -1,0 +1,127 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block title %}Men{% endblock title %}
+
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Search results</span>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Shop Section Begin -->
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="row property__gallery">
+                    {% if products %}
+                    {% for product in products %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix men-shirt">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product.image.image.url }}">
+                                <div class="label new">New</div>
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product.product.id %}" data-product-id="{{ product.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product.product.id  %}">{{ product.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <h3>No results found.</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Section End -->
+
+<!-- Search Begin -->
+<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch">+</div>
+        <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+            {% csrf_token %}
+            <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+        </form>
+    </div>
+</div>
+<!-- Search End -->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-link').click(function(e) {
+            e.preventDefault();
+
+            let link = $(this);
+            let product_id = link.data('product-id');
+            let quantity = 1;
+
+            $.ajax({
+                type: 'POST',
+                url: '/add-to-cart/' + product_id + '/',
+                data: {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    location.reload()
+                },
+                error: function(xhr, status, errorThrown) {
+                    console.log(errorThrown);
+                }
+            })
+        })
+    })
+</script>
+{% endblock javascript %}

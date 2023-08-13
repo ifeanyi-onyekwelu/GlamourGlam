@@ -1,0 +1,503 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+    
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+    <!-- Categories Section Begin -->
+    <section class="categories">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 p-0">
+                    <div class="categories__item categories__large__item set-bg"
+                        data-setbg="{% static 'img/Mine/italian-wierdo.jpg' %}" style="background-position: center;">
+                        <div class="categories__text">
+                            <h1>Women’s fashion</h1>
+                            <p class="text-white">Discover your signature style with our stunning women's<br> outfit selection</p>
+                            <a href="{% url 'app:women_page' %}">Shop now</a>
+                        </div>  
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-6 col-sm-6 p-0">
+                            <div class="categories__item set-bg" data-setbg="{% static 'img/Mine/italan-man-suit-black.jpg' %}">
+                                <div class="categories__text">
+                                    <h4>Men’s fashion</h4>
+                                    <a href="{% url 'app:men_page' %}">Shop now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                            <div class="categories__item set-bg" data-setbg="{% static 'img/Mine/kid.jpg' %}">
+                                <div class="categories__text">
+                                    <h4>Kid’s fashion</h4>
+                                    <a href="{% url 'app:kids_page' %}">Shop now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                            <div class="categories__item set-bg" data-setbg="{% static 'img/Mine/accessories-1.jpg' %}">
+                                <div class="categories__text">
+                                    <h4>Accessories</h4>
+                                    <a href="{% url 'app:accessories_page' %}">Shop now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Categories Section End -->
+
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4">
+                    <div class="section-title">
+                        <h4>New product</h4>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8">
+                    <ul class="filter__controls">
+                        <li class="active" data-filter="*">All</li>
+                        <li data-filter=".women">Women’s</li>
+                        <li data-filter=".men">Men’s</li>
+                        <li data-filter=".kid">Kid’s</li>
+                        <li data-filter=".unisex">Unisex</li>
+                        <li data-filter=".accessories">Accessories</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row property__gallery">
+                {% for product_info in products %}
+                {% if product_info.product.category.name == 'Men' %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix men">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                            {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                            <div class="label new">New</div>
+                            {% endif %}
+                            <ul class="product__hover">
+                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% elif product_info.product.category.name == 'Women'%}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix women">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                            {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                            <div class="label new">New</div>
+                            {% endif %}                            <ul class="product__hover">
+                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% elif product_info.product.category.name == 'Kids' %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix kid">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                            {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                            <div class="label new">New</div>
+                            {% endif %}                            <ul class="product__hover">
+                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% elif product_info.product.category.name == 'Accessories' %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix accessories">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                            {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                            <div class="label new">New</div>
+                            {% endif %}                            <ul class="product__hover">
+                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% elif product_info.product.category.name == 'Unisex' %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mix unisex">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                            {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                            <div class="label new">New</div>
+                            {% endif %}
+                            <ul class="product__hover">
+                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
+
+    <!-- Banner Section Begin -->
+    <section class="banner set-bg" data-setbg="{% static 'img/Mine/collection.jpg' %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-7 col-lg-8 m-auto">
+                    <div class="banner__slider owl-carousel">
+                        <div class="banner__item">
+                            <div class="banner__text">
+                                <span>The Glamour Collection</span>
+                                <h1>The Project Jacket</h1>
+                                <a href="{% url 'app:shop_page' %}">Shop now</a>
+                            </div>
+                        </div>
+                        <div class="banner__item">
+                            <div class="banner__text">
+                                <span>The Glamour Collection</span>
+                                <h1>The Project Jacket</h1>
+                                <a href="{% url 'app:shop_page' %}">Shop now</a>
+                            </div>
+                        </div>
+                        <div class="banner__item">
+                            <div class="banner__text">
+                                <span>The Glamour Collection</span>
+                                <h1>The Project Jacket</h1>
+                                <a href="{% url 'app:shop_page' %}">Shop now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Banner Section End -->
+
+    <!-- Trend Section Begin -->
+    <section class="trend spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-6">
+                    <div class="trend__content">
+                        <div class="section-title">
+                            <h4>Hot Trend</h4>
+                        </div>
+                        {% for product in hot_trends %}
+                        <div class="trend__item">
+                            <div class="trend__item__pic">
+                                <a href="{% url 'app:product_detail_page' product.product.id  %}">
+                                    <img src="{{ product.image.image.url }}" alt="" width="100">
+                                </a>
+                            </div>
+                            <div class="trend__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product.product.id  %}" style="color: #000;">{{ product.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-6">
+                    <div class="trend__content">
+                        <div class="section-title">
+                            <h4>Best seller</h4>
+                        </div>
+                        {% for product in best_sellers %}
+                        <div class="trend__item">
+                            <div class="trend__item__pic">
+                                <a href="{% url 'app:product_detail_page' product.product.id  %}">
+                                    <img src="{{ product.image.image.url }}" alt="" width="100">
+                                </a>
+                            </div>
+                            <div class="trend__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product.product.id  %}" style="color: #000;">{{ product.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-6">
+                    <div class="trend__content">
+                        <div class="section-title">
+                            <h4>Feature</h4>
+                        </div>
+                        {% for product in features %}
+                        <div class="trend__item">
+                            <div class="trend__item__pic">
+                                <a href="{% url 'app:product_detail_page' product.product.id  %}">
+                                    <img src="{{ product.image.image.url }}" alt="" width="100">
+                                </a>
+                            </div>
+                            <div class="trend__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product.product.id  %}" style="color: #000;">{{ product.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Trend Section End -->
+
+    <!-- Discount Section Begin -->
+    <section class="discount">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 p-0">
+                    <div class="discount__pic">
+                        <img src="{% static 'img/Mine/discount.jpg' %}" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-6 p-0">
+                    <div class="discount__text">
+                        <div class="discount__text__title">
+                            <span>Discount</span>
+                            <h2>Summer 2024</h2>
+                            <h5><span>Sale</span> 50%</h5>
+                        </div>
+                        <div class="discount__countdown" id="countdown-time">
+                            <div class="countdown__item">
+                                <span>22</span>
+                                <p>Days</p>
+                            </div>
+                            <div class="countdown__item">
+                                <span>18</span>
+                                <p>Hour</p>
+                            </div>
+                            <div class="countdown__item">
+                                <span>46</span>
+                                <p>Min</p>
+                            </div>
+                            <div class="countdown__item">
+                                <span>05</span>
+                                <p>Sec</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'app:shop_page' %}">Shop now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Discount Section End -->
+
+    <!-- Services Section Begin -->
+    <section class="services spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="services__item">
+                        <i class="fa fa-car"></i>
+                        <h6>Free Shipping</h6>
+                        <p>For all orders over &#8358;300,000</p>
+                    </div>
+                </div> 
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="services__item">
+                        <i class="fa fa-money"></i>
+                        <h6>Money Back Guarantee</h6>
+                        <p>If goods have Problems</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="services__item">
+                        <i class="fa fa-support"></i>
+                        <h6>Online Support 24/7</h6>
+                        <p>Dedicated support</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="services__item">
+                        <i class="fa fa-headphones"></i>
+                        <h6>Payment Secure</h6>
+                        <p>100% secure payment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Services Section End -->
+
+    <!-- Instagram Begin -->
+    <div class="instagram">
+        <div class="container-fluid">
+            <div class="row">
+                {% for product in features %}
+                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                    <div class="instagram__item set-bg" data-setbg="{{ product.image.image.url }}">
+                        <div class="instagram__text">
+                            <i class="fa fa-instagram"></i>
+                            <a href="https://www.instagram.com/glam_ourglam/">@ glamour_glam</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% for product in best_sellers %}
+                <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                    <div class="instagram__item set-bg" data-setbg="{{ product.image.image.url }}">
+                        <div class="instagram__text">
+                            <i class="fa fa-instagram"></i>
+                            <a href="https://www.instagram.com/glam_ourglam/">@ glamour_glam</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Instagram End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+                {% csrf_token %}
+                <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-link').click(function(e) {
+            e.preventDefault();
+
+            let link = $(this);
+            let product_id = link.data('product-id');
+            let quantity = 1;
+
+            $.ajax({
+                type: 'POST',
+                url: '/add-to-cart/' + product_id + '/',
+                data: {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    location.reload()
+                },
+                error: function(xhr, status, errorThrown) {
+                    console.log(errorThrown);
+                }
+            })
+        })
+    })
+</script>
+{% endblock javascript %}
+</body>
+
+</html>

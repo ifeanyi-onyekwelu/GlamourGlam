@@ -1,0 +1,57 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Categories{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Categories</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+
+        <div>
+            <a href="{% url 'my_admin:add_category' %}" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Category</a>
+            <a href="{% url 'my_admin:delete_all_category' %}" class="btn btn-danger btn-sm">Delete All</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in categories %}
+                            <tr>
+                                <td><a href="{% url 'my_admin:category_detail' category.id %}">{{ category.name }}</a></td>
+                                <td>{{ category.description }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm custom-background">Detail</a>
+                                    <a href="{% url 'my_admin:delete_category' category.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

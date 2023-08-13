@@ -1,0 +1,403 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block title %}Women{% endblock title %}
+
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Women</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Shop Section Begin -->
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <div class="shop__sidebar">
+                    <div class="sidebar__categories">
+                        <div class="section-title">
+                            <h4>Categories</h4>
+                        </div>
+                        <div class="categories__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <ul style="display: block; cursor: pointer;">
+                                            <li data-filter="*">All</li>
+                                            <li data-filter=".woman-shirt">Shirts</li>
+                                            <li data-filter=".woman-jackets">Jackets</li>
+                                            <li data-filter=".woman-t-shirt">T-Shirts</li>
+                                            <li data-filter=".woman-trousers">Trousers</li>
+                                            <li data-filter=".woman-joggers">Joggers</li>
+                                            <li data-filter=".woman-coats">Coats</li>
+                                            <li data-filter=".woman-hoodies">Hoodies</li>
+                                            <li data-filter=".woman-socks">Socks</li>
+                                            <li data-filter=".woman-sleeveless">Sleeveless</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9">
+                <div class="row property__gallery">
+                    {% for product_info in all_products %}
+                    {% if product_info.product.sub_category == 'Shirts' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-shirt">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Jackets'%}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-jackets">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %} <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'T-Shirts' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-t-shirt">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %} <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Trousers' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-trousers">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %} <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Joggers' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-joggers">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Coats' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-coats">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Hoodies' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-hoodies">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Socks' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-socks">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif product_info.product.sub_category == 'Sleeveless' %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mix woman-sleeveless">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
+                                {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
+                                <div class="label new">New</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
+                                                class="arrow_expand"></span></a></li>
+                                    <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' product_info.product.id %}" data-product-id="{{ product_info.product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                                class="icon_link_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
+                                        product_info.product.name }}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                    <div class="col-lg-12 text-center">
+                        <div class="pagination__option">
+                            {% if all_products.has_previous %}
+                            <a href="?page={{ all_products.previous_page_number }}"><i class="fa fa-angle-left"></i></a>
+                            {% endif %}
+
+                            {% if all_products.has_next %}
+                            <a href="?page={{ all_products.next_page_number }}"><i class="fa fa-angle-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Section End -->
+
+<!-- Search Begin -->
+<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch">+</div>
+        <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+            {% csrf_token %}
+            <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+        </form>
+    </div>
+</div>
+<!-- Search End -->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-link').click(function(e) {
+            e.preventDefault();
+
+            let link = $(this);
+            let product_id = link.data('product-id');
+            let quantity = 1;
+
+            $.ajax({
+                type: 'POST',
+                url: '/add-to-cart/' + product_id + '/',
+                data: {
+                    'product_id': product_id,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    location.reload()
+                },
+                error: function(xhr, status, errorThrown) {
+                    console.log(errorThrown);
+                }
+            })
+        })
+    })
+</script>
+{% endblock javascript %}
