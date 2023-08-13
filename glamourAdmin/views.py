@@ -8,7 +8,7 @@ from .decorators import admin_only_login
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
 from glamourApp.models import *
-from .utils import update_order_delivery_status, update_user_status, get_products_with_images, send_message
+from .utils import update_order_delivery_status, update_user_status, get_products_with_images, send_message, get_all_notifications, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .forms import CategoryForm, CouponForm, SubCategoryForm, SizeForm
 import string
@@ -113,6 +113,7 @@ def dashboard(request):
         'total_income_last_month': total_income_last_month,
         'total_income_this_month': total_income_this_month,
         'random_orders': random_orders,
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/index.html', context)
 
@@ -455,6 +456,7 @@ def admin_login(request):
 
             if user.check_password(password):
                 login(request, user)
+                create_notification(title="Login", notification="You logged in", notification_type="ACTIVITY")
                 return redirect(reverse('my_admin:dashboard'))
             else:
                 messages.error(request, "Account does not exists")
@@ -471,6 +473,7 @@ def admin_login(request):
 
 def admin_logout(request):
     logout(request)
+    create_notification(title="Logout", notification="You logged out", notification_type="ACTIVITY")
     return redirect(reverse('app:home_page'))
 
 

@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout, authenticate, get_user_model
-from .utils import get_products_with_images, send_message
+from .utils import get_products_with_images, send_message, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import TemplateView, DetailView, ListView, CreateView
 from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem

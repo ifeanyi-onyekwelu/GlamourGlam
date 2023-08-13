@@ -178,3 +178,23 @@ class DiscountCode(models.Model):
             self.active = False
 
         super(DiscountCode, self).save(*args, **kwargs)
+
+class Notification(models.Model):
+    NOTIFICATION_TYPE = (
+        ('REPORTS', 'Reports'),
+        ('FINANCE', 'Finance'),
+        ('ALERT', 'Alert'),
+        ('REGISTRATION', 'Registration'),
+        ('ORDER', 'Order'),
+        ('ACTIVITY', 'Activity'),
+    )
+    title = models.CharField(max_length=255)
+    notification = models.CharField(max_length=255)
+    notification_type = models.CharField(max_length=255, choices=NOTIFICATION_TYPE, default='Reports')
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title + ' ' + self.notification
+
+    def formatted_datetime(self):
+        return self.date_created.strftime("%B %d, %Y")

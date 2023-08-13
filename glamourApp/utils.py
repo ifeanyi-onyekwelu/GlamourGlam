@@ -24,3 +24,11 @@ def send_message(subject, message, sender, reciepient):
         fail_silently=False
     )
 
+def create_notification(title, notification, notification_type='Reports'):
+    new_notification = Notification(
+        title=title,
+        notification=notification,
+        notification_type=notification_type,
+    )
+    new_notification.save()
+

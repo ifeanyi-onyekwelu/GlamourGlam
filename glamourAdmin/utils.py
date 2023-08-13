@@ -1,6 +1,6 @@
 from glamourApp.models import Order, Product, SubCategory, Category, ProductSize
 from users.models import CustomUser
-from glamourApp.models import ProductImage
+from glamourApp.models import ProductImage, Notification
 from django.core.mail import send_mail # Import the TextIOWrapper class
 
 
@@ -35,3 +35,15 @@ def update_order_delivery_status(order_id, status):
     order = Order.objects.get(pk=order_id)
     order.delivery_status = status
     order.save()
+
+def get_all_notifications():
+    notifications = Notification.objects.order_by('-date_created')[:3]
+    return notifications
+
+def create_notification(title, notification, notification_type='Reports'):
+    new_notification = Notification(
+        title=title,
+        notification=notification,
+        notification_type=notification_type,
+    )
+    new_notification.save()
