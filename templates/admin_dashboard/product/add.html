@@ -51,13 +51,15 @@
               {% endfor %}
             </select>
           </div>
-          <div class="form-group">
-            <span>Sizes</span>
-            {% for size in sizes %}
-              <label for="{{ size.name }}">{{ size.name }}</label>
-              <input type="checkbox" name="{{ size.name }}" id="size" value="{{ size.id }}">
-            {% endfor %}
+          <div class="form-group" id="size-fields">
+            <label for="size">Size:</label>
+            <input type="text" name="size" class="form-control" required>
           </div>
+          <div class="form-group">
+            <label for="images">Images:</label>
+            <input type="file" name="image" class="form-control" multiple>
+          </div>
+          <button type="button" id="add-size" class="btn btn-warning btn-sm">Add Size</button>
 
           <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <input type="submit" value="CREATE" class="btn custom-background m-auto">
@@ -69,3 +71,13 @@
 </div>
 <!---Container Fluid-->
 {% endblock content %}
+
+{% block javascript %}
+<script>
+  $(document).ready(function() {
+    $("#add-size").click(function() {
+      $("#size-fields").append('<label for="size">Size:</label><input type="text" name="size" class="form-control" required>');
+    });
+  });
+</script>
+{% endblock javascript %}

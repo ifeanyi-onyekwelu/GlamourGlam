@@ -106,30 +106,15 @@
             </div>
         </li>
         <li class="nav-item">
-            <a aria-controls="collapseSize" aria-expanded="true" class="nav-link collapsed" data-target="#collapseSize"
-               data-toggle="collapse" href="#">
-                <i class="fa fa-folder-open"></i>
+            <a class="nav-link" href="{% url 'my_admin:sizes' %}">
+                <i class="fa fa-tshirt"></i>
                 <span>Sizes</span>
             </a>
-            <div aria-labelledby="headingTable" class="collapse" data-parent="#accordionSidebar" id="collapseSize">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{% url 'my_admin:sizes' %}">All Sizes</a>
-                    <a class="collapse-item" href="{% url 'my_admin:add_size' %}">Add Sizes</a>
-                </div>
-            </div>
-        </li>
-        <li class="nav-item">
-            <a aria-controls="collapseDiscounts" aria-expanded="true" class="nav-link collapsed" data-target="#collapseDiscounts"
-               data-toggle="collapse" href="#">
-                <i class="fa fa-tag"></i>
+        </li><li class="nav-item">
+            <a class="nav-link" href="{% url 'my_admin:discount_codes' %}">
+                <i class="fa fa-tags"></i>
                 <span>Discounts &amp; Coupons</span>
             </a>
-            <div aria-labelledby="headingTable" class="collapse" data-parent="#accordionSidebar" id="collapseDiscounts">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{% url 'my_admin:discount_codes' %}">All Discounts &amp; Coupons</a>
-                    <a class="collapse-item" href="{% url 'my_admin:create_coupon' %}">Add Discounts &amp; Coupons</a>
-                </div>
-            </div>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'my_admin:shipping_addresses' %}">
@@ -352,12 +337,16 @@
     <i class="fas fa-angle-up"></i>
 </a>
 
+
 <script src="{% static 'admin_dashboard/vendor/jquery/jquery.min.js' %}"></script>
 <script src="{% static 'admin_dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'admin_dashboard/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 <script src="{% static 'admin_dashboard/js/ruang-admin.min.js' %}"></script>
 <script src="{% static 'admin_dashboard/vendor/chart.js/Chart.min.js' %}"></script>
 <script src="{% static 'admin_dashboard/js/demo/chart-area-demo.js' %}"></script>
+
+{% block javascript %}
+{% endblock javascript %}
 </body>
 
 </html>

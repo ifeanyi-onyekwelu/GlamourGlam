@@ -9,7 +9,7 @@ def admin_only_login(f):
         if not request.user.is_authenticated:
             return redirect(reverse('my_admin:login'))
         elif not request.user.is_superuser:
-            return redirect(reverse('my_admin:admin_only'))
+            return redirect(reverse('my_admin:login'))
         else:
             return f(request, *args, **kwargs)
     return wrapper

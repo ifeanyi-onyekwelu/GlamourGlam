@@ -1,7 +1,8 @@
-from glamourApp.models import Order
+from glamourApp.models import Order, Product, SubCategory, Category, ProductSize
 from users.models import CustomUser
 from glamourApp.models import ProductImage
-from django.core.mail import send_mail
+from django.core.mail import send_mail # Import the TextIOWrapper class
+
 
 def get_products_with_images(products_list):
     products_with_images = []

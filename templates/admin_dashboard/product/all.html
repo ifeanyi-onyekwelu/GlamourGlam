@@ -14,7 +14,9 @@
             <li class="breadcrumb-item active" aria-current="page">All</li>
         </ol>
 
-        <a href="" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Product</a>
+        <div>
+            <a href="{% url 'my_admin:add_product' %}" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Product</a>
+        </div>
     </div>
 
     <div class="row">
@@ -57,3 +59,8 @@
 </div>
 <!---Container Fluid-->
 {% endblock content %}
+
+
+{% block javascript %}
+
+{% endblock javascript %}

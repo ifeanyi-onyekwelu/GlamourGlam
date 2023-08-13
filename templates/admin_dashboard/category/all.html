@@ -14,7 +14,10 @@
             <li class="breadcrumb-item active" aria-current="page">All</li>
         </ol>
 
-        <a href="{% url 'my_admin:add_category' %}" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Category</a>
+        <div>
+            <a href="{% url 'my_admin:add_category' %}" class="btn btn custom-background btn-sm"><i class="fa fa-plus"></i> Add Category</a>
+            <a href="{% url 'my_admin:delete_all_category' %}" class="btn btn-danger btn-sm">Delete All</a>
+        </div>
     </div>
 
     <div class="row">
@@ -36,8 +39,8 @@
                                 <td><a href="{% url 'my_admin:category_detail' category.id %}">{{ category.name }}</a></td>
                                 <td>{{ category.description }}</td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-primary">Detail</a>
-                                    <a href="#" class="btn btn-sm btn-danger">Delete</a>
+                                    <a href="#" class="btn btn-sm custom-background">Detail</a>
+                                    <a href="{% url 'my_admin:delete_category' category.id %}" class="btn btn-danger btn-sm">Delete</a>
                                 </td>
                             </tr>
                             {% endfor %}

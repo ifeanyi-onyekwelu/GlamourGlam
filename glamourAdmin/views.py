@@ -1,6 +1,9 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
 from django.contrib import messages
+import os
+from dotenv import load_dotenv
 from .decorators import admin_only_login
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
@@ -13,6 +16,8 @@ import random
 from django.utils import timezone
 from datetime import timedelta
 import calendar
+
+load_dotenv()
 
 @admin_only_login
 def dashboard(request):
@@ -130,13 +135,13 @@ def user_detail(request, user_id):
 @staff_member_required
 def mark_user_as_active(request, user_id):
     update_user_status(user_id, True)
-    return redirect('user_detail', user_id=user_id)
+    return redirect('my_admin:users')
 
 @admin_only_login
 @staff_member_required
 def mark_user_as_suspended(request, user_id):
     update_user_status(user_id, False)
-    return redirect('user_detail', user_id=user_id)
+    return redirect('my_admin:users')
 
 # ########################################
 # Product
@@ -144,15 +149,11 @@ def mark_user_as_suspended(request, user_id):
 @admin_only_login
 def all_products(request):
     products = Product.objects.all()
-    paginator = Paginator(products, 9)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
 
     products_with_images = get_products_with_images(products)
 
     context = {
         'products': products_with_images,
-        'page_obj': page_obj,
     }
 
     return render(request, 'admin_dashboard/product/all.html', context)
@@ -175,24 +176,42 @@ def product_detail(request, product_id):
 
 @admin_only_login
 def add_product(request):
-    sub_categories = SubCategory.objects.all()
-    categories = Category.objects.all()
-    sizes = ProductSize.objects.all()
-
     if request.method == 'POST':
         name = request.POST.get('name')
         sub_category = request.POST.get('sub_category')
+        sub_category_matched = SubCategory.objects.get(name=sub_category)
         description = request.POST.get('description')
         price = request.POST.get('price')
         category = request.POST.get('category')
-        sizes = [x.name for x in ProductSize.objects.all()]
-        size_ids = []
-        for x in sizes:
-            size_ids.append(request.POST.get(x))
-        print(size_ids)
-    else:
-        return render(request, 'admin_dashboard/product/add.html')
+        category_matched = Category.objects.get(name=category)
+        sizes = request.POST.getlist('size')
+        images = request.FILES.getlist('image')
+        product = Product.objects.create(
+            name=name,
+            sub_category=sub_category_matched,
+            description=description,
+            price=price,
+            category=category_matched
+        )
 
+        for size_name in sizes:
+            size, created = ProductSize.objects.get_or_create(name=size_name, product=product)
+            product.sizes.add(size)
+            size.save()
+            product.save()
+
+        for image in images:
+            img = ProductImage.objects.create(product=product, image=image)
+            product.images.add(img)
+            img.save()
+            product.save()
+
+        return redirect('my_admin:product_detail', product_id=product.pk)
+
+    sub_categories = SubCategory.objects.all()
+    categories = Category.objects.all()
+    sizes = ProductSize.objects.all()
+    print(sub_categories)
     context = {
         'sub_categories': sub_categories,
         'categories': categories,
@@ -225,6 +244,16 @@ def add_category(request):
         category_form = CategoryForm()
     return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form})
 
+def delete_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    category.delete()
+    return redirect('my_admin:categories')
+
+@admin_only_login
+def delete_all_category(request):
+    Category.objects.all().delete()
+    return redirect('my_admin:categories')
+
 
 # ########################################
 # Sub Category
@@ -249,10 +278,20 @@ def add_sub_category(request):
 
         if sub_category_form.is_valid():
             sub_category = sub_category_form.save()
-            return redirect('my_admin:sub_category_detail', sub_category_id=sub_category.id)
+            return redirect('my_admin:add_sub_category')
     else:
         sub_category_form = SubCategoryForm()
     return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form})
+
+def delete_sub_category(request, sub_category_id):
+    sub_category = get_object_or_404(SubCategory, id=sub_category_id)
+    sub_category.delete()
+    return redirect('my_admin:sub_categories')
+
+@admin_only_login
+def delete_all_sub_category(request):
+    SubCategory.objects.all().delete()
+    return redirect('my_admin:sub_categories')
 
 
 # ########################################
@@ -264,24 +303,15 @@ def all_sizes(request):
     sizes = ProductSize.objects.all()
     return render(request, "admin_dashboard/size/all.html", {'sizes': sizes})
 
-@admin_only_login
-@staff_member_required()
-def size_detail(request, size_id):
-    size = ProductSize.objects.get(id=size_id)
-    return render(request, "admin_dashboard/size/size_detail.html", {'size': size})
+def delete_size(request, size_id):
+    size = get_object_or_404(ProductSize, id=size_id)
+    size.delete()
+    return redirect('my_admin:sizes')
 
 @admin_only_login
-@staff_member_required()
-def add_size(request):
-    if request.method == 'POST':
-        size_form = SizeForm(request.POST)
-
-        if size_form.is_valid():
-            size = size_form.save()
-            return redirect('my_admin:size_detail', size_id=size.id)
-    else:
-        size_form = SizeForm()
-    return render(request, "admin_dashboard/size/add.html", {'size_form': size_form})
+def delete_all_sizes(request):
+    ProductSize.objects.all().delete()
+    return redirect('my_admin:sizes')
 
 
 # ########################################
@@ -333,13 +363,13 @@ def all_failed_delivery_orders(request):
 @staff_member_required
 def mark_order_as_shipped(request, order_id):
     update_order_delivery_status(order_id, 'S')
-    return redirect('order_detail', order_id=order_id)
+    return redirect('my_admin:orders')
 
 @admin_only_login
 @staff_member_required
 def mark_order_as_delivered(request, order_id):
     update_order_delivery_status(order_id, 'D')
-    return redirect('order_detail', order_id=order_id)
+    return redirect('my_admin:orders')
 
 @admin_only_login
 @staff_member_required
@@ -353,7 +383,13 @@ def mark_order_as_failed_delivery(request, order_id):
 @admin_only_login
 def all_coupons(request):
     coupons = DiscountCode.objects.all()
-    return render(request, 'admin_dashboard/coupons/all.html', {'coupons': coupons})
+    coupon_form = CouponForm()
+
+    context = {
+        'coupons': coupons,
+        'coupon_form': coupon_form
+    }
+    return render(request, 'admin_dashboard/coupons/all.html', context)
 
 @admin_only_login
 def coupon_detail(request, coupon_id):
@@ -365,8 +401,8 @@ def create_coupon(request):
     if request.method == 'POST':
         coupon_form = CouponForm(request.POST)
         if coupon_form.is_valid():
-            percentage = request.cleaned_data('percentage')
-            number_of_codes = int(request.cleaned_data('number_of_codes'))
+            percentage = coupon_form.cleaned_data['percentage']
+            number_of_codes = int(coupon_form.cleaned_data['number_of_codes'])
 
             for _ in range(number_of_codes):
                 code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
@@ -380,6 +416,17 @@ def create_coupon(request):
     else:
         coupon_form = CouponForm()
     return render(request, 'admin_dashboard/coupons/add.html', {'coupon_form': coupon_form})
+
+def delete_coupon(request, coupon_id):
+    coupon = get_object_or_404(DiscountCode, id=coupon_id)
+    coupon.delete()
+    return redirect('my_admin:discount_codes')
+
+@admin_only_login
+def delete_all_coupons(request):
+    DiscountCode.objects.all().delete()
+    return redirect('my_admin:discount_codes')
+
 
 # ########################################
 # Shipping
@@ -395,6 +442,17 @@ def all_shipping_address(request):
 def shipping_detail(request, shipping_id):
     shipping_address = ShippingAddress.objects.get(id=shipping_id)
     return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address})
+
+def delete_shipping_address(request, shipping_id):
+    shipping_address = get_object_or_404(ShippingAddress, id=shipping_id)
+    shipping_address.delete()
+    return redirect('my_admin:shipping_addresses')
+
+@admin_only_login
+def delete_all_shipping_addresses(request):
+    ShippingAddress.objects.all().delete()
+    return redirect('my_admin:shipping_addresses')
+
 
 # ########################################
 # Admin Authentication
@@ -427,3 +485,19 @@ def admin_login(request):
 def admin_logout(request):
     logout(request)
     return redirect(reverse('app:home_page'))
+
+
+# Error handling
+def error404(request, e):
+    APP_NAME = os.getenv('APP_NAME')
+    context = {
+        'APP_NAME': APP_NAME,
+    }
+    return render(request, '404.html', context)
+    
+def error500(request):
+    APP_NAME = os.getenv('APP_NAME')
+    context = {
+        'APP_NAME': APP_NAME,
+    }
+    return render(request, '500.html', context)

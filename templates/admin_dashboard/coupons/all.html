@@ -1,0 +1,71 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Coupons{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Coupons</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+
+        <div class="left d-flex" style="gap: 10px;">
+            <form method="post" class="d-flex align-items-center" style="gap:5px;" action="{% url 'my_admin:create_coupon' %}">
+                {% csrf_token %}
+                {{ coupon_form }}
+
+                <input type="submit" class="btn btn-sm custom-background" value="CREATE">
+            </form>
+            <a href="{% url 'my_admin:delete_all_coupons' %}" class="btn btn-sm btn-danger">Delete All</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Code</th>
+                                <th>Percentage</th>
+                                <th>Valid From</th>
+                                <th>Valid To</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for coupon in coupons %}
+                            <tr>
+                                <td>{{ coupon.code }}</td>
+                                <td>{{ coupon.percentage }}%</td>
+                                <td>{{ coupon.valid_from|date:"F d, Y" }}</td>
+                                <td>{{ coupon.valid_to|date:"F d, Y" }}</td>
+                                {% if coupon.active != True %}
+                                <td class="text-danger">Coupon has expired</td>
+                                {% elif coupon.is_used == True %}
+                                <td class="text-danger">Coupon has been used</td>
+                                {% else %}
+                                <td class="text-success">Legit</td>
+                                {% endif %}
+                                <td><a href="{% url 'my_admin:delete_coupon' coupon.id %}" class="btn btn-sm btn-danger">Delete</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

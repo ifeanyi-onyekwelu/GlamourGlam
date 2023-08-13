@@ -29,10 +29,9 @@ class SizeForm(forms.ModelForm):
 
 
 class CouponForm(forms.ModelForm):
-    percentage = forms.FloatField(max_value=10, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    number_of_codes = forms.IntegerField(max_value=10, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    valid_to = forms.DateTimeField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    percentage = forms.FloatField(max_value=100)
+    number_of_codes = forms.IntegerField(max_value=100)
 
     class Meta:
         model = DiscountCode
-        fields = ['percentage', 'valid_to']
+        fields = ['percentage']

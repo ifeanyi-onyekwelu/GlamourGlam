@@ -1,0 +1,82 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Orders{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Orders</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Items</th>
+                                <th>Total Price</th>
+                                <th>Date Ordered</th>
+                                <th>Payment Atatus</th>
+                                <th>Delivery Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                                {% if order.items.count > 1 %}
+                                <td>{{ order.items.first.product.name }} with {{ order.items.count|add:"-1" }} more items</td>
+                                {% else %}
+                                <td>{{ order.items.first.product.name }}</td>
+                                {% endif %}
+
+                                <td>&#8358;{{ order.total_price }}</td>
+                                <td>{{ order.created_at|date:"F d, Y" }}</td>
+
+                                {% if order.payment_status == 'Pending' %}
+                                <td><span class="badge badge-warning">Not Paid</span></td>
+                                {% elif order.payment_status == 'Paid' %}
+                                <td><span class="badge badge-success">Paid</span></td>
+                                {% else %}
+                                <td><span class="badge badge-danger">Cancelled</span></td>
+                                {% endif %}
+                                
+                                {% if order.delivery_status == 'P' %}
+                                <td><span class="badge badge-warning">Pending</span></td>
+                                {% elif order.delivery_status == 'S' %}
+                                <td><span class="badge badge-primary">Shipped</span></td>
+                                {% elif order.delivery_status == 'D' %}
+                                <td><span class="badge badge-success">Delivered</span></td>
+                                {% elif order.delivery_status == 'F' %}
+                                <td><span class="badge badge-danger">Failed Delivery</span></td>
+                                {% endif %}
+                                <td class="d-flex" style="gap: 6px;">
+                                    <a href="{% url 'my_admin:mark_order_as_shipped' order.id %}" class="btn btn-sm bg-info">Shipped</a>
+                                    <a href="{% url 'my_admin:mark_order_as_delivered' order.id %}" class="btn btn-sm bg-success">Delivered</a>
+                                    <!-- <a href="#" class="btn btn-sm custom-background">Detail</a> -->
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

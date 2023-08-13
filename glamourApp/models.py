@@ -19,7 +19,6 @@ class SubCategory(models.Model):
     def __str__(self):
         return self.name
 
-
 class Product(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -33,23 +32,30 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
-    sizes = models.ManyToManyField('ProductSize', related_name='products')
+    sizes = models.ManyToManyField('ProductSize', related_name='products', null=True, blank=True)
+    images = models.ManyToManyField('ProductImage', related_name='products')
 
     def __str__(self):
         return f'{self.name} for {self.category.name}, price: {self.price}'
 
-
 class ProductSize(models.Model):
     name = models.CharField(max_length=20)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return self.name
 
+class ProductColor(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    color = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.color
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
-
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
@@ -60,7 +66,6 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.author.first_name} {self.author.last_name} says the product: '{self.product}' is {self.review}"
 
-
 class Cart(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,7 +73,6 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart for {self.user.first_name} {self.user.last_name}"
-
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
@@ -81,7 +85,6 @@ class CartItem(models.Model):
 
     def subtotal(self):
         return self.product.price * self.quantity
-
 
 class Order(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -113,7 +116,6 @@ class Order(models.Model):
 
         super(Order, self).save(*args, **kwargs)
 
-
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -125,7 +127,6 @@ class OrderItem(models.Model):
 
     def subtotal(self):
         return self.item_price * self.quantity
-
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -141,7 +142,6 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} order to be shipped to {self.country} {self.state} {self.address}"
 
-
 class Return(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     reason = models.TextField()
@@ -154,7 +154,6 @@ class Return(models.Model):
 
     def __str__(self):
         return self.order.user.first_name + ' ' + self.order.user.last_name + ' ' + self.reason
-
 
 class DiscountCode(models.Model):
     code = models.CharField(max_length=20, default="")

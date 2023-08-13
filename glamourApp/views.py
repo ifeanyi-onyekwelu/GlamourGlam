@@ -1,5 +1,7 @@
 import random
 import re
+import os
+from dotenv import load_dotenv
 from random import sample
 from django.db.models import Sum
 from django.conf import settings
@@ -17,13 +19,15 @@ from django.views.generic import TemplateView, DetailView, ListView, CreateView
 from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem
 from django.core.mail import send_mail
 
+load_dotenv()
+
 # Create your views here.
 class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             # Fetch all products ordered by date_created (latest first)
-            products = Product.objects.order_by('-date_created')[:8]
-            # Fetch hot trends, best sellers, and features using random sampling
+            products = Product.objects.order_by('-date_created')[:5]
+            # Fetch hot trends, bestsellers, and features using random sampling
             hot_trends = sample(list(products), 3)
             best_sellers = sample(list(products), 3)
             features = sample(list(products), 3)
@@ -71,7 +75,7 @@ class WomenPageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = self.get_queryset()
-
+        
         cart = None
         total_items = 0
         if self.request.user.is_authenticated:
@@ -430,8 +434,20 @@ def handleUserRegistration(request):
             return JsonResponse({'message': 'Passwords do not match!'})
         
         new_user = CustomUser.objects.create(username=username, first_name=firstName, last_name=lastName, email=email, password=hased_password)
+
+
+        # HANDLE SEND EMAIL AFTER REGISTRATION
+        subject = ""
+        APP_NAME = os.getenv('APP_NAME')
+        APP_URL = os.getenv('APP_URL')
+        context = {
+            'firstName':firstName, 
+            'APP_NAME': APP_NAME,
+            'APP_URL': APP_URL
+        }
+        body = render(request, 'email/welcome.html', context)
+        send_message(subject, body, settings.DEFAULT_EMAIL, email)
         new_user.save()
-        send_message('Registration succeful!', f'Welcome to GlamourGlur {firstName} {lastName}', email, settings.DEFAULT_EMAIL)
         login(request, new_user)
         
         return redirect(reverse('app:home_page'))
@@ -512,8 +528,16 @@ def handleContactForm(request):
     email = request.POST.get('email')
     message = request.POST.get('message')
 
-    subject = f"Sent from {name} through GlamourGlur website"
-    send_message(subject, message, settings.DEFAULT_EMAIL, email)
+    subject = ""
+    APP_NAME = "GlamourGlam"
+    context = {
+        'APP_NAME':APP_NAME,
+        'name': name,
+        'email': email,
+        'message': message
+    }
+    body = render(request, '', context)
+    send_message(subject, body, email, settings.DEFAULT_EMAIL)
     return redirect(reverse('app:contact_page'))
 
 def handleSearchForm(request):
@@ -580,9 +604,30 @@ def handleSubscribeToNewsLetter(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         
-        email_subject = "Thanks for subscribing"
-        email_body = "Thanks for subscribing to our newsletter"
-        send_message(email_subject, email_body, email, settings.DEFAULT_EMAIL)
+        subject = ""
+        APP_NAME = os.getenv('APP_NAME')
+        APP_URL = os.getenv('APP_URL')
+        context = {
+            'APP_NAME':APP_NAME,
+            'APP_URL':APP_URL,
+            'email': email,
+        }
+        body = render(request, 'email/newsletter.html', context)
+        send_message(subject, body, settings.DEFAULT_EMAIL, email)
         return JsonResponse({'success': True, 'message': 'Subscribe to newsletter'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+def error404(request, e):
+    APP_NAME = os.getenv('APP_NAME')
+    context = {
+        'APP_NAME': APP_NAME,
+    }
+    return render(request, '404.html', context)
+    
+def error500(request):
+    APP_NAME = os.getenv('APP_NAME')
+    context = {
+        'APP_NAME': APP_NAME,
+    }
+    return render(request, '500.html', context)

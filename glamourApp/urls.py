@@ -27,4 +27,8 @@ urlpatterns = [
     path('subscribe-to-newsletter/', handleSubscribeToNewsLetter, name="handleSubscribeToNewsLetter"),
     path('update-item/', handleUpdateCart, name="handleUpdateCart"),
     path('logout/', handleUserLogout, name="handleUserLogout"),
+
+    # Error handling
+    # path('error-404/', error404, name="error404"),
+    # path('error-500/', error500, name="error500"),
 ]
