@@ -10,7 +10,7 @@ from django.contrib.auth import login, logout, authenticate
 from glamourApp.models import *
 from .utils import update_order_delivery_status, update_user_status, get_products_with_images, send_message, get_all_notifications, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from .forms import CategoryForm, CouponForm, SubCategoryForm, SizeForm
+from .forms import CategoryForm, CouponForm, SubCategoryForm, SizeForm, ColorForm
 import string
 import random
 from django.utils import timezone
@@ -209,21 +209,23 @@ def add_product(request):
             product.save()
 
         for color in colors:
-            col = ProductColor.objects.create(product=product, color=color)
+            col, created = ProductColor.objects.get_or_create(color=color)
             product.colors.add(col)
             col.save()
             product.save()
 
-        return redirect('my_admin:product_detail', product_id=product.pk)
+        return redirect('my_admin:add_product')
 
     sub_categories = SubCategory.objects.all()
     categories = Category.objects.all()
     sizes = ProductSize.objects.all()
+    colors = ProductColor.objects.all()
     print(sub_categories)
     context = {
         'sub_categories': sub_categories,
         'categories': categories,
-        'sizes': sizes
+        'sizes': sizes,
+        'colors': colors,
     }
     return render(request, 'admin_dashboard/product/add.html', context)
 
@@ -262,6 +264,38 @@ def delete_all_category(request):
     Category.objects.all().delete()
     return redirect('my_admin:categories')
 
+
+# ########################################
+# Color
+# ########################################
+@admin_only_login
+def all_product_color(request):
+    colors = ProductColor.objects.all()
+    print(colors)
+    color_form = ColorForm()
+    return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form})
+
+@admin_only_login
+def add_color(request):
+    if request.method == 'POST':
+        color_form = ColorForm(request.POST)
+
+        if color_form.is_valid():
+            color = color_form.save()
+            return redirect('my_admin:colors')
+    else:
+        color_form = ColorForm()
+    return render(request, 'admin_dashboard/color/all.html', {'color_form': color_form})
+
+def delete_color(request, color_id):
+    color = get_object_or_404(ProductColor, id=color_id)
+    color.delete()
+    return redirect('my_admin:colors')
+
+@admin_only_login
+def delete_all_colors(request):
+    ProductColor.objects.all().delete()
+    return redirect('my_admin:colors')
 
 # ########################################
 # Sub Category

@@ -1979,6 +1979,36 @@ ol {
   opacity: 1;
 }
 
+.product__details__widget ul li .color__checkbox label input:checked ~ .custom-checkmark:after {
+  border-color: black;
+  opacity: 1;
+}
+
+.product__details__widget ul li .color__checkbox label .custom-checkmark:after {
+  position: absolute;
+  left: 3px;
+  top: 5px;
+  width: 13px;
+  height: 6px;
+  border: solid black;
+  border-width: 1.5px 1.5px 0px 0px;
+  -webkit-transform: rotate(127deg);
+  -ms-transform: rotate(127deg);
+  transform: rotate(127deg);
+  opacity: 0;
+  content: '';
+}
+
+.product__details__widget ul li .color__checkbox label .custom-checkmark {
+  position: absolute;
+  left: 0;
+  top: -10px;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  content: '';
+}
+
 .product__details__widget ul li .color__checkbox label .checkmark {
   position: absolute;
   left: 0;

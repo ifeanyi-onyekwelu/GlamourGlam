@@ -30,6 +30,14 @@ urlpatterns = [
     path('category/delete/all/', delete_all_category, name="delete_all_category"),
 
     # ########################################
+    # Color urls
+    # ########################################
+    path('color/', all_product_color, name="colors"),
+    path('color/add/', add_color, name="add_color"),  
+    path('color/delete/<int:color_id>', delete_color, name="delete_color"),
+    path('color/delete/all/', delete_all_colors, name="delete_all_colors"),  
+
+    # ########################################
     # Sub Category urls
     # ########################################
     path('sub-category/', all_sub_category, name="sub_categories"),

@@ -1,0 +1,57 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Colors{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <div class="left d-flex align-items-center" style="gap: 10px;">
+            <form method="post" class="d-flex align-items-center" style="gap:5px;" action="{% url 'my_admin:add_color' %}">
+                {% csrf_token %}
+                {{ color_form.color }}
+
+                <input type="submit" class="btn btn-sm custom-background" value="CREATE">
+            </form>
+        </div>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Colors</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Color</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for color in colors %}
+                            <tr>
+                                <td>{{ color.color }}</td>
+                                <td>
+                                    <a href="{% url 'my_admin:delete_color' color.id %}"  class="btn btn-outline-danger">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

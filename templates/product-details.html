@@ -75,96 +75,43 @@
                         <div class="product__details__price">$ {{ product.price|intcomma }} <span>{{ price_with_increase|floatformat:2|intcomma }}</span></div>
                         <p>{{ product.description }}</p>
                         <div class="product__details__button">
-                            <a href="{% url 'app:handleAddToCart' product.id %}" class="cart-btn add-to-cart-link" data-product-id="{{ product.id }}"><span class="icon_bag_alt"></span> Add to cart</a>
+                            <div class="quantity">
+                                <span>Quantity:</span>
+                                <div class="pro-qty">
+                                    <input type="number" value="1">
+                                </div>
+                            </div>
+                            <a href="" class="cart-btn" data-product-id="{{ product.id }}" id="add-to-cart-button"><span class="icon_bag_alt"></span> Add to cart</a>
                         </div>
                         <div class="product__details__widget">
                             <ul>
                                 <li>
                                     <span>Available color:</span>
                                     <div class="color__checkbox">
-                                        <label for="red">
-                                            <input type="radio" name="color__radio" id="red" checked>
-                                            <span class="checkmark"></span>
+                                        {% for color in product.colors.all %}
+                                        {% if color.color == "White" %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}" {% if forloop.first %}checked{% endif %}>
+                                            <span class="custom-checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
                                         </label>
-                                        <label for="black">
-                                            <input type="radio" name="color__radio" id="black">
-                                            <span class="checkmark black-bg"></span>
+                                        {% else %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}" {% if forloop.first %}checked{% endif %}>
+                                            <span class="checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
                                         </label>
-                                        <label for="grey">
-                                            <input type="radio" name="color__radio" id="grey">
-                                            <span class="checkmark grey-bg"></span>
-                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
                                     </div>
                                 </li>
                                 <li>
                                     <span>Available size:</span>
                                     <div class="size__btn">
-                                        {% if product.sizes == '1' %}
-                                        <label for="lg-btn" class="active">
-                                            <input type="radio" id="lg-btn">
-                                            lg
+                                        {% for size in product.sizes.all %}
+                                        <label for="{{ size.name }}-btn" class="{% if forloop.first %}active{% endif %}">
+                                            <input type="radio" id="{{ size.name }}-btn" name="size__radio" {% if forloop.first %}checked{% endif %}>
+                                            {{ size.name }}
                                         </label>
-                                        {% elif product.sizes == '2' %}
-                                        <label for="m-btn" class="active">
-                                            <input type="radio" id="m-btn">
-                                            m
-                                        </label>
-                                        <label for="lg-btn">
-                                            <input type="radio" id="lg-btn">
-                                            lg
-                                        </label>
-                                        {% elif product.sizes == '3' %}
-                                        <label for="s-btn" class="active">
-                                            <input type="radio" id="s-btn">
-                                            s
-                                        </label>
-                                        <label for="m-btn">
-                                            <input type="radio" id="m-btn">
-                                            m
-                                        </label>
-                                        <label for="xs-btn">
-                                            <input type="radio" id="xs-btn">
-                                            lg
-                                        </label>
-                                        {% elif product.sizes == '4' %}
-                                        <label for="s-btn" class="active">
-                                            <input type="radio" id="s-btn">
-                                            s
-                                        </label>
-                                        <label for="m-btn">
-                                            <input type="radio" id="m-btn">
-                                            m
-                                        </label>
-                                        <label for="lg-btn">
-                                            <input type="radio" id="lg-btn">
-                                            lg
-                                        </label>
-                                        <label for="xl-btn">
-                                            <input type="radio" id="xl-btn">
-                                            xl
-                                        </label>
-                                        {% elif product.sizes == '5' %}
-                                        <label for="s-btn" class="active">
-                                            <input type="radio" id="s-btn">
-                                            s
-                                        </label>
-                                        <label for="m-btn">
-                                            <input type="radio" id="m-btn">
-                                            m
-                                        </label>
-                                        <label for="lg-btn">
-                                            <input type="radio" id="lg-btn">
-                                            lg
-                                        </label>
-                                        <label for="xl-btn">
-                                            <input type="radio" id="xl-btn">
-                                            xl
-                                        </label>
-                                        <label for="xxl-btn">
-                                            <input type="radio" id="xxl-btn">
-                                            xxl
-                                        </label>
-                                        {% endif %}
+                                        {% endfor %}
                                     </div>
                                 </li>
                             </ul>
@@ -226,7 +173,7 @@
                             <div class="label new">New</div>
                             <ul class="product__hover">
                                 <li><a href="{{ image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a class="add-to-cart-link" href="{% url 'app:handleAddToCart' related_product.id %}" data-product-id="{{ related_product.id }}"><span class="icon_bag_alt"></span></a></li>
+                                <li><a class="add-to-cart-link" href="" data-product-id="{{ related_product.id }}"><span class="icon_bag_alt"></span></a></li>
                                 <li><a href="{% url 'app:product_detail_page' related_product.id %}"><span class="icon_link_alt"></span></a></li>
                             </ul>
                         </div>
@@ -267,30 +214,31 @@
     
 {% block javascript %}
 <script>
-    $(document).ready(function() {
-        $('.add-to-cart-link').click(function(e) {
-            e.preventDefault();
+    document.addEventListener("DOMContentLoaded", function() {
+        const addToCartButton = document.getElementById("add-to-cart-button");
+        
+        addToCartButton.addEventListener("click", function(event) {
+            event.preventDefault();
 
-            let link = $(this);
-            let product_id = link.data('product-id');
-            let quantity = 1;
+            const productId = "{{ product.id }}";
+            console.log(productId);
+            const selectedColorElement = document.querySelector('input[name="color__radio"]:checked');
+            console.log(selectedColorElement);
+            const selectedSizeElement = document.querySelector('input[name="size__radio"]:checked');
+            console.log(selectedSizeElement);
+            const selectedQuantity = document.querySelector('.pro-qty input').value;
+            console.log(selectedQuantity);
 
-            $.ajax({
-                type: 'POST',
-                url: '/add-to-cart/' + product_id + '/',
-                data: {
-                    'product_id': product_id,
-                    'quantity': quantity,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function(data) {
-                    location.reload()
-                },
-                error: function(xhr, status, errorThrown) {
-                    console.log(errorThrown);
-                }
-            })
-        })
-    })
+            const selectedColor = selectedColorElement.id;
+            console.log(selectedColor)
+            const selectedSize = selectedSizeElement.id;
+            console.log(selectedSize)
+
+            const addToCartUrl = `/add-to-cart/${productId}/${selectedColor}/${selectedSize}/${selectedQuantity}/`;
+
+            // Redirect to the generated URL
+            window.location.href = addToCartUrl;
+        });
+    });
 </script>
 {% endblock javascript %}

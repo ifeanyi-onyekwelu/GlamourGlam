@@ -20,7 +20,7 @@ urlpatterns = [
     # Handler urls
     path('handle-registration/', handleUserRegistration, name="handleUserRegistration"),
     path('handle-login/', handleUserLogin, name="handleUserLogin"),
-    path('add-to-cart/<uuid:product_id>/', handleAddToCart, name="handleAddToCart"),
+    path('add-to-cart/<uuid:product_id>/<str:color_selected>/<str:size_selected>/<int:quantity_selected>/', handleAddToCart, name="handleAddToCart"),
     path('delete-item/<int:cart_item_id>/', handleRemoveCartItem, name="handleRemoveCartItem"),
     path('send-message/', handleContactForm, name="handleContactForm"),
     path('search/', handleSearchForm, name="handleSearchForm"),

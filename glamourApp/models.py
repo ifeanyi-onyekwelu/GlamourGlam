@@ -15,6 +15,7 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=255, default="")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
 
     def __str__(self):
         return self.name
@@ -48,7 +49,6 @@ class ProductSize(models.Model):
         return self.name
 
 class ProductColor(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     color = models.CharField(max_length=255)
 
     def __str__(self):
@@ -80,6 +80,8 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    color = models.CharField(max_length=20, default="")
+    size = models.CharField(max_length=10, default="")
 
     def __str__(self):
         return f"{self.quantity} {self.product} in cart"

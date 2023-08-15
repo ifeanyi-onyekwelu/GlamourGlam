@@ -3,6 +3,7 @@ import re
 import os
 from dotenv import load_dotenv
 from random import sample
+from django.template.loader import render_to_string
 from django.db.models import Sum
 from django.conf import settings
 from django.contrib import messages
@@ -16,7 +17,7 @@ from django.contrib.auth import login, logout, authenticate, get_user_model
 from .utils import get_products_with_images, send_message, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import TemplateView, DetailView, ListView, CreateView
-from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem
+from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory
 from django.core.mail import send_mail
 
 load_dotenv()
@@ -69,8 +70,7 @@ class WomenPageView(ListView):
 
     def get_queryset(self):
         category = get_object_or_404(Category, name='Women')
-
-        return Product.objects.filter(category=category)
+        return Product.objects.filter(category=category).order_by('id')  
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -94,6 +94,10 @@ class WomenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context['all_products'] = get_products_with_images(products)
+        
+        women_and_unisex_products = Product.objects.filter(category__name__in=['Women', 'Unisex'])
+        sub_categories = SubCategory.objects.filter(product__in=women_and_unisex_products).distinct()
+        context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
         return context
 
@@ -105,8 +109,7 @@ class MenPageView(ListView):
 
     def get_queryset(self):
         category = get_object_or_404(Category, name='Men')
-
-        return Product.objects.filter(category=category)
+        return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -130,6 +133,10 @@ class MenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context['all_products'] = get_products_with_images(products)
+
+        men_and_unisex_products = Product.objects.filter(category__name__in=['Men', 'Unisex'])
+        sub_categories = SubCategory.objects.filter(product__in=men_and_unisex_products).distinct()
+        context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
         return context
 
@@ -141,8 +148,7 @@ class KidsPageView(ListView):
 
     def get_queryset(self):
         category = get_object_or_404(Category, name='Kids')
-
-        return Product.objects.filter(category=category)
+        return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -167,6 +173,10 @@ class KidsPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context['all_products'] = get_products_with_images(products)
+
+        kids_and_unisex_products = Product.objects.filter(category__name__in=['Kids'])
+        sub_categories = SubCategory.objects.filter(product__in=kids_and_unisex_products).distinct()
+        context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
         return context
 
@@ -178,8 +188,7 @@ class AccessoriesPageView(ListView):
 
     def get_queryset(self):
         category = get_object_or_404(Category, name='Accessories')
-
-        return Product.objects.filter(category=category)
+        return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -203,12 +212,16 @@ class AccessoriesPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context['all_products'] = get_products_with_images(products)
+
+        accessories_and_unisex_products = Product.objects.filter(category__name__in=['Accessories'])
+        sub_categories = SubCategory.objects.filter(product__in=accessories_and_unisex_products).distinct()
+        context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
         return context
 
 class ShopPageView(TemplateView):
     def get(self, request, *args, **kwargs):
-        all_products = Product.objects.all()
+        all_products = Product.objects.all().order_by('id')
         paginator = Paginator(all_products, 9)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -222,11 +235,13 @@ class ShopPageView(TemplateView):
 
 
         products_with_images = get_products_with_images(page_obj)
+        categories = Category.objects.prefetch_related('subcategories').all()
         
         context = {
             'products': products_with_images,
             'page_obj': page_obj,
             'total_items_in_cart': total_items,
+            'categories': categories,
         }
         return render(request, 'shop.html', context)
 
@@ -424,7 +439,7 @@ def handleUserRegistration(request):
         username = str(firstName) + str(lastName)
         hased_password = make_password(password)
 
-        if CustomUser.objects.filter(username=username).exists():
+        if CustomUser.objects.filter(username=username).exists() and not CustomUser.objects.filter(email=email).exists():
             new_user = CustomUser.objects.create(username=username + str(password), first_name=firstName, last_name=lastName, email=email, password=hased_password)
         
         if CustomUser.objects.filter(email=email).exists():
@@ -434,19 +449,18 @@ def handleUserRegistration(request):
             return JsonResponse({'message': 'Passwords do not match!'})
         
         new_user = CustomUser.objects.create(username=username, first_name=firstName, last_name=lastName, email=email, password=hased_password)
-
+        create_notification(title="User joined", notification="A user just created an account", notification_type="REGISTRATION")
 
         # HANDLE SEND EMAIL AFTER REGISTRATION
-        subject = ""
         APP_NAME = os.getenv('APP_NAME')
+        subject = f"🎉 Welcome to {APP_NAME}! 🛍️"
         APP_URL = os.getenv('APP_URL')
         context = {
-            'firstName':firstName, 
             'APP_NAME': APP_NAME,
             'APP_URL': APP_URL
         }
-        body = render(request, 'email/welcome.html', context)
-        send_message(subject, body, settings.DEFAULT_EMAIL, email)
+        body = render_to_string('email/welcome.html', context)
+        send_message(subject, '', body, settings.DEFAULT_EMAIL, email)
         new_user.save()
         login(request, new_user)
         
@@ -476,34 +490,21 @@ def handleUserLogout(request):
     logout(request)
     return redirect(reverse('app:home_page'))
 
-def handleAddToCart(request, product_id):
+def handleAddToCart(request, product_id, color_selected="White", size_selected="xl", quantity_selected=1):
     product = get_object_or_404(Product, id=product_id)
     user = request.user
 
     product_price = product.price
 
     # If the user is authenticated, handle their cart
-    if user.is_authenticated:
-        cart, created = Cart.objects.get_or_create(user=user)
+    cart, created = Cart.objects.get_or_create(user=user)
 
-        try:
-            cart_item = CartItem.objects.get(cart=cart, product=product)
-            cart_item.quantity += 1
-            cart_item.save()
-        except CartItem.DoesNotExist:
-            cart_item = CartItem.objects.create(cart=cart, product=product, quantity=1, price=product_price)
-    else:
-        # For guest users, store the cart in the session
-        cart = request.session.get('cart', {})
-        cart_item = cart.get(str(product.id))
-
-        if cart_item:
-            cart_item['quantity'] += 1
-        else:
-            cart_item = {'quantity': 1}
-
-        cart[str(product.id)] = cart_item
-        request.session['cart'] = cart
+    try:
+        cart_item = CartItem.objects.get(cart=cart, product=product, color=color_selected, size=size_selected)
+        cart_item.quantity += int(quantity_selected)
+        cart_item.save()
+    except CartItem.DoesNotExist:
+        cart_item = CartItem.objects.create(cart=cart, product=product, color=color_selected, size=size_selected, quantity=int(quantity_selected), price=product_price)
 
     return JsonResponse({'success': 'Product added successfully'})
 
@@ -604,16 +605,16 @@ def handleSubscribeToNewsLetter(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         
-        subject = ""
+        # HANDLE SEND EMAIL AFTER REGISTRATION
+        subject = "💌 Thanks for Joining Our Newsletter! 🎉"
         APP_NAME = os.getenv('APP_NAME')
         APP_URL = os.getenv('APP_URL')
         context = {
-            'APP_NAME':APP_NAME,
-            'APP_URL':APP_URL,
-            'email': email,
+            'APP_NAME': APP_NAME,
+            'APP_URL': APP_URL
         }
-        body = render(request, 'email/newsletter.html', context)
-        send_message(subject, body, settings.DEFAULT_EMAIL, email)
+        body = render_to_string('email/newsletter.html', context)
+        send_message(subject, '', body, settings.DEFAULT_EMAIL, email)
         return JsonResponse({'success': True, 'message': 'Subscribe to newsletter'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request'})

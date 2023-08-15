@@ -58,10 +58,14 @@
           <button type="button" id="add-size" class="btn btn-warning btn-sm mb-3">Add Size</button>
 
           <div class="form-group" id="color-fields">
-            <label for="color">Color:</label>
-            <input type="text" name="color" class="form-control" required>
+            {% for color in colors %}
+            <label for="{{ color.color }}">
+              <input type="checkbox" name="color" id="color" value="{{ color.color }}">
+              {{ color.color }}
+            </label>
+            {% endfor %}
           </div>
-          <button type="button" id="add-color" class="btn btn-info btn-sm mb-3">Add Color</button>
+          <!-- <button type="button" id="add-color" class="btn btn-info btn-sm mb-3">Add Color</button> -->
 
           <div class="form-group">
             <label for="images">Images:</label>

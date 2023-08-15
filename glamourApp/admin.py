@@ -11,7 +11,8 @@ from .models import (
     ProductImage,
     DiscountCode,
     ProductSize, 
-    Notification
+    Notification,
+    ProductColor
 )
 
 # Register your models here.
@@ -45,6 +46,10 @@ class CategoryAdmin(admin.ModelAdmin):
 class NotificationAdmin(admin.ModelAdmin):
     model = Notification
     list_display = ["title", "notification_type", 'notification', 'date_created']
+
+class ColorAdmin(admin.ModelAdmin):
+    model = ProductColor
+    list_display = ["color"]
 
 
 class CartItemInline(admin.TabularInline):
@@ -117,3 +122,4 @@ admin.site.register(Cart, CartAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(DiscountCode, DiscountAdmin)
 admin.site.register(Notification, NotificationAdmin)
+admin.site.register(ProductColor, ColorAdmin)

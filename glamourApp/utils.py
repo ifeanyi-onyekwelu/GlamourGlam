@@ -1,5 +1,5 @@
 from random import sample
-from .models import ProductImage
+from .models import ProductImage, Notification
 from django.core.mail import send_mail
 
 def get_products_with_images(products_list):
@@ -15,12 +15,13 @@ def get_products_with_images(products_list):
     return products_with_images
 
 
-def send_message(subject, message, sender, reciepient):
+def send_message(subject, message, html_message, sender, reciepient):
     send_mail(
         subject,
         message,
         sender,
         [reciepient],
+        html_message=html_message,
         fail_silently=False
     )
 
