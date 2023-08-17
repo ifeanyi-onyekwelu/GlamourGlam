@@ -31,7 +31,7 @@
             <label for="sub_category">Sub Category</label>
             <select class="form-control" name="sub_category">
               {% for sub_category in sub_categories %}
-              <option value="{{ sub_category.name }}" class="form-control">{{ sub_category.name }}</option>
+              <option value="{{ sub_category.name }}" class="form-control">{{ sub_category.name }} for {{ sub_category.category.name }}</option>
               {% endfor %}
             </select>
           </div>

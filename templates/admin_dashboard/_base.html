@@ -19,6 +19,9 @@
         type="text/css">
     <link href="{% static 'admin_dashboard/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'admin_dashboard/css/ruang-admin.css' %}" rel="stylesheet">
+    {% block customCssFiles %}
+      
+    {% endblock customCssFiles %}
 </head>
 
 <body id="page-top">
@@ -275,6 +278,8 @@
     <script src="{% static 'admin_dashboard/js/ruang-admin.min.js' %}"></script>
     <script src="{% static 'admin_dashboard/vendor/chart.js/Chart.min.js' %}"></script>
     <script src="{% static 'admin_dashboard/js/demo/chart-area-demo.js' %}"></script>
+    {% block customScriptFiles %}
+    {% endblock customScriptFiles %}
 
     {% block javascript %}
     {% endblock javascript %}

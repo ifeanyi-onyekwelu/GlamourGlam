@@ -21,7 +21,7 @@
             <div class="card">
                 <div class="table-responsive">
                     <table class="table align-items-center table-flush">
-                        <thead class="thead-light">
+                        <thead class="custom-background">
                             <tr>
                                 <th>User</th>
                                 <th>Items</th>
@@ -42,7 +42,7 @@
                                 <td>{{ order.items.first.product.name }}</td>
                                 {% endif %}
 
-                                <td>&#8358;{{ order.total_price }}</td>
+                                <td>&#8358;{{ order.total_price|intcomma }}</td>
                                 <td>{{ order.created_at|date:"F d, Y" }}</td>
 
                                 {% if order.payment_status == 'Pending' %}

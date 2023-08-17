@@ -16,9 +16,10 @@ urlpatterns = [
     # ########################################
     # Products urls
     # ########################################
-    path('products/', all_products, name="products"),
-    path('products/<uuid:product_id>', product_detail, name="product_detail"),
+    path('product/', all_products, name="products"),
+    path('product/<uuid:product_id>', product_detail, name="product_detail"),
     path('product/add/', add_product, name="add_product"),
+    path('product/edit/<uuid:product_id>/', edit_product, name="edit_product"),
 
     # ########################################
     # Category urls

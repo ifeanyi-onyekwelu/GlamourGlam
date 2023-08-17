@@ -54,9 +54,17 @@ class ProductColor(models.Model):
     def __str__(self):
         return self.color
 
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
+
+    def imageUrl(self):
+        try:
+            url = self.image.url
+        except:
+            url = "No image found"
+        return url
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')

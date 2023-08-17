@@ -21,7 +21,7 @@
             <div class="card">
                 <div class="table-responsive">
                     <table class="table align-items-center table-flush">
-                        <thead class="thead-light">
+                        <thead class="custom-background">
                             <tr>
                                 <th>User</th>
                                 <th>Total Price</th>
@@ -34,7 +34,7 @@
                             {% for order in pending_orders %}
                             <tr>
                                 <td><a href="{% url 'my_admin:order_detail' order.id %}">{{ order.user.first_name }} {{ order.user.last_name }}</a></td>
-                                <td>&#8358;{{ order.total_price }}</td>
+                                <td>&#8358;{{ order.total_price|intcomma }}</td>
                                 <td>{{ order.created_at|date:"F d, Y" }}</td>
                                 {% if order.payment_status == 'Pending' %}
                                 <td><span class="badge badge-warning">Not Paid</span></td>

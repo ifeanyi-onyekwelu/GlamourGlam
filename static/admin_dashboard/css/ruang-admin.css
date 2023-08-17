@@ -7,7 +7,7 @@
 html {
   position: relative;
   min-height: 100%;
-  font-family: Nunito
+  font-family: Nunito !important
 }
 
 body {

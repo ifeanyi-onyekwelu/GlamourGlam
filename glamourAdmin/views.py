@@ -214,7 +214,7 @@ def add_product(request):
             col.save()
             product.save()
 
-        return redirect('my_admin:add_product')
+        return redirect('my_admin:product_detail', product_id=product.id)
 
     sub_categories = SubCategory.objects.all()
     categories = Category.objects.all()
@@ -228,6 +228,82 @@ def add_product(request):
         'colors': colors,
     }
     return render(request, 'admin_dashboard/product/add.html', context)
+
+
+@admin_only_login
+def edit_product(request, product_id):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        sub_category = request.POST.get('sub_category')
+        sub_category_matched = SubCategory.objects.get(name=sub_category)
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        category = request.POST.get('category')
+        category_matched = Category.objects.get(name=category)
+        sizes = request.POST.getlist('size')
+        colors = request.POST.getlist('color')
+        images = request.FILES.getlist('image')
+        product = Product.objects.get(id=product_id)
+
+        try:
+            product.name = name
+            product.sub_category = sub_category_matched
+            product.description = description
+            product.price = price
+            product.category = category_matched
+            
+             # Handling sizes
+            for size in product.sizes.all():
+                if size.name not in sizes:
+                    product.sizes.remove(size)
+                    
+            for size_name in sizes:
+                print(size_name)
+                size, created = ProductSize.objects.get_or_create(name=size_name, product=product)
+                print("Size exists: ",created)
+                if created:
+                    product.sizes.add(size)
+                size.save()
+
+            for image in images:
+                img, created = ProductImage.objects.get_or_create(product=product, image=image)
+                print("Image exists: ", created)
+                if not created:
+                    product.images.add(img)
+                img.save()
+
+            # Handling unchecked colors
+            for color in product.colors.all():
+                if color.color not in colors:
+                    product.colors.remove(color)
+
+            for color in colors:
+                col, created = ProductColor.objects.get_or_create(color=color)
+                print("Color exists: ", created)
+                if not created:
+                    product.colors.add(col)
+                col.save()
+
+            product.save()
+            return redirect('my_admin:product_detail', product_id=product.id)
+        except Product.DoesNotExist:
+            print(Product.DoesNotExist(str(e)))
+    
+    sub_categories = SubCategory.objects.all()
+    categories = Category.objects.all()
+    sizes = ProductSize.objects.all()
+    product = Product.objects.get(id=product_id)
+    colors = ProductColor.objects.all()
+    productImages = ProductImage.objects.filter(product=product)
+    context = {
+        'sub_categories': sub_categories,
+        'categories': categories,
+        'sizes': sizes,
+        'colors': colors,
+        'product': product,
+        'productImages': productImages
+    }
+    return render(request, 'admin_dashboard/product/edit.html', context)
 
 # ########################################
 # Category

@@ -1,0 +1,211 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | Product {{ product.name }}{% endblock title %}
+
+{% block customCssFiles %}
+<link rel="stylesheet" href="{% static 'css/elegant-icons.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+{% endblock customCssFiles %}
+
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-2 ml-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Products</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </div>
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__left product__thumb nice-scroll">
+                            {% for image in productImage %}
+                            <a class="pt active" href="#product-{{ image.id }}">
+                                <img src="{{ image.image.url }}" alt="">
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="product__details__slider__content">
+                            <div class="product__details__pic__slider owl-carousel">
+                                {% for image in productImage %}
+                                <img data-hash="product-{{ image.id }}" class="product__big__img" src="{{ image.image.url }}" alt="">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text">
+                        <h3>{{ product.name }} <span>Category: {{ product.category.name }}</span></h3>
+                        <div class="rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <span>( 138 reviews )</span>
+                        </div>
+                        <div class="product__details__price">$ {{ product.price|intcomma }} <span>{{ price_with_increase|floatformat:2|intcomma }}</span></div>
+                        <p>{{ product.description }}</p>
+                        <div class="product__details__button">
+                            <a href="{% url 'my_admin:edit_product' product.id %}" class="cart-btn" id="add-to-cart-button"><span class="fa fa-cog"></span> Edit Item</a>
+                        </div>
+                        <div class="product__details__widget">
+                            <ul>
+                                <li>
+                                    <span>Available color:</span>
+                                    <div class="color__checkbox">
+                                        {% for color in product.colors.all %}
+                                        {% if color.color == "White" %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}">
+                                            <span class="custom-checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
+                                        </label>
+                                        {% else %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}">
+                                            <span class="checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
+                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Available size:</span>
+                                    <div class="size__btn">
+                                        {% for size in product.sizes.all %}
+                                        <label for="{{ size.name }}-btn">
+                                            <input type="radio" id="{{ size.name }}-btn" name="size__radio" {% if forloop.first %}checked{% endif %}>
+                                            {{ size.name }}
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <h6>Description</h6>
+                                <p>{{ product.description }}</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-2" role="tabpanel">
+                                <h6>Specification</h6>
+                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
+                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
+                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
+                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
+                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
+                                    consequat massa quis enim.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
+                                    quis, sem.</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                {% for review in product.reviews.all %}
+                                <h6 style="margin: 0;">{{ review.author.first_name }} {{ review.author.last_name }}</h6>
+                                <p>{{ review.review }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+{% endblock content %}
+
+{% block customScriptFiles %}
+<script src="{% static 'js/jquery.slicknav.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock customScriptFiles %}

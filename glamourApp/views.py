@@ -16,8 +16,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from .utils import get_products_with_images, send_message, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.views.generic import TemplateView, DetailView, ListView, CreateView
-from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory
+from django.views.generic import TemplateView, DetailView, ListView, CreateView, View
+from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory, DiscountCode
 from django.core.mail import send_mail
 
 load_dotenv()
@@ -27,7 +27,7 @@ class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             # Fetch all products ordered by date_created (latest first)
-            products = Product.objects.order_by('-date_created')[:5]
+            products = Product.objects.order_by('-date_created')[:3]
             # Fetch hot trends, bestsellers, and features using random sampling
             hot_trends = sample(list(products), 3)
             best_sellers = sample(list(products), 3)
@@ -312,41 +312,87 @@ class ShopCartPageView(TemplateView):
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
             total_amount = sum(cart_item.subtotal for cart_item in cart_items)
             total_amount_shipping = int(total_amount) + shipping_fee
-        else:
-            # For guest users, retrieve the cart from the session
-            cart = request.session.get('cart', {})
-            cart_items = []
-            total_items = 0
-            total_amount = 0
+        # else:
+        #     # For guest users, retrieve the cart from the session
+        #     cart = request.session.get('cart', {})
+        #     cart_items = []
+        #     total_items = 0
+        #     total_amount = 0
 
-            for item_id, item_info in cart.items():
-                product_id = item_id
-                quantity = item_info['quantity']
-                product = get_object_or_404(Product, id=product_id)
+        #     for item_id, item_info in cart.items():
+        #         product_id = item_id
+        #         quantity = item_info['quantity']
+        #         product = get_object_or_404(Product, id=product_id)
 
-                # For guest users, get the first image URL related to the product
-                try:
-                    product_image = ProductImage.objects.filter(product_id=product_id).first()
-                    product.first_image = product_image.image.url if product_image else None
-                except ProductImage.DoesNotExist:
-                    # Handle the case when there is no image associated with the product
-                    product.first_image = None
+        #         # For guest users, get the first image URL related to the product
+        #         try:
+        #             product_image = ProductImage.objects.filter(product_id=product_id).first()
+        #             product.first_image = product_image.image.url if product_image else None
+        #         except ProductImage.DoesNotExist:
+        #             # Handle the case when there is no image associated with the product
+        #             product.first_image = None
 
-                subtotal = product.price * quantity
-                total_items += quantity
-                total_amount += subtotal
-                total_amount_shipping = int(total_amount) + shipping_fee
+        #         subtotal = product.price * quantity
+        #         total_items += quantity
+        #         total_amount += subtotal
+        #         total_amount_shipping = int(total_amount) + shipping_fee
 
-                cart_item = {
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal,
-                }
-                cart_items.append(cart_item)
+        #         cart_item = {
+        #             'product': product,
+        #             'quantity': quantity,
+        #             'subtotal': subtotal,
+        #         }
+        #         cart_items.append(cart_item)
 
         context = {
             'total_items_in_cart': total_items,
             'cart_items': cart_items, 
+            'cart': cart,
+            'total_amount': total_amount,
+            'shipping_fee': shipping_fee,
+            'total_amount_shipping': total_amount_shipping
+        }
+
+        return render(request, 'shop-cart.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        total_amount = 0
+        total_items = 0
+        cart_items = None
+        cart = None
+        shipping_fee = 3500.00
+        total_amount_shipping = 0
+
+        # If the user is authenticated, handle their cart
+        if user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=user)
+            cart_items = cart.items.all()
+
+            for cart_item in cart_items:
+                cart_item.first_image = cart_item.product.productimage_set.first()
+                cart_item.subtotal = cart_item.quantity * cart_item.product.price
+
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+            total_amount = float(sum(cart_item.subtotal for cart_item in cart_items))
+            total_amount_shipping = int(total_amount) + shipping_fee
+
+        discount_code = request.POST.get('code')
+        try:
+            discount = DiscountCode.objects.get(code=discount_code)
+        except DiscountCode.DoesNotExist:
+            discount = None
+            return JsonResponse({'message': "Invalid code provided"})
+
+        if discount:
+            request.session['discount_code'] = discount_code
+            discount_amount = (discount.percentage / 100) * total_amount
+            total_amount -= discount_amount
+            total_amount_shipping = int(total_amount) + shipping_fee
+
+        context = {
+            'total_items_in_cart': total_items,
+            'cart_items': cart_items,
             'cart': cart,
             'total_amount': total_amount,
             'shipping_fee': shipping_fee,
@@ -367,9 +413,20 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
 
             cart_item.subtotal = cart_item.quantity * cart_item.product.price
         
-        total_amount = sum(cart_item.subtotal for cart_item in cart_items)
+        discount_code = request.session.get('discount_code', None)
+        try:
+            discount = DiscountCode.objects.get(code=discount_code)
+        except DiscountCode.DoesNotExist:
+            discount = None
 
+        total_amount = float(sum(cart_item.subtotal for cart_item in cart_items))
         total_amount_shipping = int(total_amount) + shipping_fee
+
+        if discount:
+            discount_amount = (discount.percentage / 100) * total_amount
+            total_amount -= discount_amount
+            total_amount_shipping = int(total_amount) + shipping_fee
+
         context = {
             'total_items_in_cart': total_items,
             'cart_items': cart_items, 
@@ -490,7 +547,8 @@ def handleUserLogout(request):
     logout(request)
     return redirect(reverse('app:home_page'))
 
-def handleAddToCart(request, product_id, color_selected="White", size_selected="xl", quantity_selected=1):
+@login_required
+def handleAddToCart(request, product_id, color_selected, size_selected, quantity_selected):
     product = get_object_or_404(Product, id=product_id)
     user = request.user
 
@@ -500,14 +558,15 @@ def handleAddToCart(request, product_id, color_selected="White", size_selected="
     cart, created = Cart.objects.get_or_create(user=user)
 
     try:
-        cart_item = CartItem.objects.get(cart=cart, product=product, color=color_selected, size=size_selected)
+        cart_item = CartItem.objects.get(cart=cart, product=product)
         cart_item.quantity += int(quantity_selected)
         cart_item.save()
     except CartItem.DoesNotExist:
         cart_item = CartItem.objects.create(cart=cart, product=product, color=color_selected, size=size_selected, quantity=int(quantity_selected), price=product_price)
 
-    return JsonResponse({'success': 'Product added successfully'})
+    return redirect(reverse('app:cart_page'))
 
+@login_required
 def handleRemoveCartItem(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id)
 
@@ -625,7 +684,7 @@ def error404(request, e):
         'APP_NAME': APP_NAME,
     }
     return render(request, '404.html', context)
-    
+
 def error500(request):
     APP_NAME = os.getenv('APP_NAME')
     context = {

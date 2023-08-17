@@ -1,0 +1,117 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | Edit product | {{ product.name }}{% endblock title %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="./">Home</a></li>
+            <li class="breadcrumb-item">Product</li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <form class="card mb-4" method="post" action="{% url 'my_admin:edit_product' product.id %}"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Edit Product</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" id="name" class="form-control" value="{{ product.name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="sub_category">Sub Category</label>
+                        <select class="form-control" name="sub_category">
+                            {% for sub_category in sub_categories %}
+                            {% if product.sub_category == sub_category %}
+                            <option value="{{ sub_category.name }}" class="form-control" selected>{{ sub_category.name }} for {{ sub_category.category.name }}</option>
+                            {% else %}
+                            <option value="{{ sub_category.name }}" class="form-control">{{ sub_category.name }} for {{ sub_category.category.name }}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input name="description" id="description" class="form-control" value="{{ product.description }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" id="price" name="price" class="form-control" value="{{ product.price }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select class="form-control" name="category">
+                            {% for category in categories %}
+                            {% if product.category == category %}
+                            <option value="{{ category.name }}" class="form-control" selected>{{ category.name }}
+                            </option>
+                            {% else %}
+                            <option value="{{ category.name }}" class="form-control">{{ category.name }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" id="size-fields">
+                        {% for size in product.sizes.all %}
+                        <div class="size-field">
+                            <label for="size">Size:</label>
+                            <input type="text" name="size" class="form-control" required value="{{ size.name }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="add-size" class="btn btn-warning btn-sm mb-3">Add Size</button>
+                    <button type="button" id="remove-size" class="btn btn-outline-danger btn-sm mb-3">Remove Size</button>
+
+                    <div class="form-group" id="color-fields">
+                        {% for color in colors %}
+                        <label for="{{ color.color }}">
+                            <input type="checkbox" name="color" id="{{ color.color }}" value="{{ color.color }}"
+                                {% if color in product.colors.all %}checked{% endif %}>
+                            {{ color.color }}
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="images">Images:</label><br>
+                        {% for image in product.images.all %}
+                            <img src="{{ image.imageUrl }}" alt="{{ image.imageUrl }}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                        {% endfor %}
+                        <input type="file" name="image" class="form-control">
+                    </div>
+
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <input type="submit" value="UPDATE" class="btn custom-background m-auto">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!---Container Fluid-->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $("#add-size").click(function () {
+            $("#size-fields").append('<div class="size-field"><label for="size">Size:</label><input type="text" name="size" class="form-control" required></div>');
+        });
+
+        $("#remove-size").click(function () {
+            $("#size-fields .size-field:last-child").remove();
+        });
+    });
+</script>
+{% endblock javascript %}

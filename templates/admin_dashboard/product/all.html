@@ -25,7 +25,7 @@
             <div class="card">
                 <div class="table-responsive">
                     <table class="table align-items-center table-flush">
-                        <thead class="thead-light">
+                        <thead class="custom-background">
                             <tr>
                                 <th>Name</th>
                                 <th>Sub Category</th>
@@ -37,15 +37,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for product_info in products %}
+                            {% for product_info in products reversed %}
                             <tr>
-                                <td><a href="{% url 'my_admin:user_detail' user.id %}">{{ product_info.product.name }}</a></td>
+                                <td><a href="{% url 'my_admin:product_detail' product_info.product.id %}">{{ product_info.product.name }}</a></td>
                                 <td>{{ product_info.product.sub_category }}</td>
                                 <td>{{ product_info.product.description|truncatechars:10 }}</td>
                                 <td>&#8358;{{ product_info.product.price }}</td>
                                 <td>{{ product_info.product.category }}</td>
                                 <td>{{ product_info.product.date_created|date:"F d, Y" }}</td>
-                                <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
+                                <td><a href="{% url 'my_admin:product_detail' product_info.product.id %}" class="btn btn-sm btn-primary">Detail</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

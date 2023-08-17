@@ -57,7 +57,6 @@
                         </thead>
                         <tbody>
                             
-                            {% if request.user.is_authenticated %}
                             {% for cart_item in cart_items %}
                             <tr id="cart-item-{{ cart_item.id }}">
                                 <td class="cart__product__item">
@@ -90,42 +89,6 @@
                                 </td>
                             </tr>
                             {% endfor %}
-                            {% else %}
-                            {% for cart_item in cart_items %}
-                            <tr id="cart-item-{{ cart_item.id }}">
-                                <td class="cart__product__item">
-                                    <img src="{{ cart_item.product.first_image }}" alt="{{ cart_item.product.name }}" style="width: 100px; height: 100px; object-fit: contain;">
-                                    <div class="cart__product__item__title">
-                                        <h6>{{ cart_item.product.name }}</h6>
-                                        <div class="rating">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
-                                <td class="cart__quantity">
-                                    <div class="pro-qty">
-                                        <form class="quantity-form" data-product-id="{{ cart_item.product.id }}" id="form-{{ cart_item.id }}">
-                                            {% csrf_token %}
-                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1">
-                                        </form>
-                                    </div>
-                                </td>
-                                <td class="cart__total">&#8358; {{ cart_item.subtotal|intcomma }}</td>
-                                {% if request.user.is_authenticated %}
-                                <td class="cart__action">
-                                    <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item" data-cart-item-id="{{ cart_item.id }}">
-                                        <span class="fa fa-remove"></span>
-                                    </a>
-                                </td>
-                                {% endif %}
-                            </tr>
-                            {% endfor %}
-                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -147,8 +110,9 @@
             <div class="col-lg-6">
                 <div class="discount__content">
                     <h6>Discount codes</h6>
-                    <form action="#">
-                        <input type="text" placeholder="Enter your coupon code">
+                    <form action="{% url 'app:cart_page' %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" placeholder="Enter your coupon code" name="code">
                         <button type="submit" class="site-btn">Apply</button>
                     </form>
                 </div>
