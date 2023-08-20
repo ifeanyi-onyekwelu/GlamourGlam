@@ -1979,6 +1979,22 @@ ol {
   opacity: 1;
 }
 
+.custom-background {
+  background: #bda06a !important;
+  color: white !important;
+}
+
+.custom-outline-background {
+  border: 1.3px solid #bda06a !important;
+  color: black !important;
+  transition: all .2s ease-in-out !important;
+}
+
+.custom-outline-background:hover {
+  background: #bda06a !important;
+  color: white !important;
+}
+
 .product__details__widget ul li .color__checkbox label input:checked ~ .custom-checkmark:after {
   border-color: black;
   opacity: 1;

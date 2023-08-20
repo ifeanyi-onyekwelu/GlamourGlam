@@ -16,7 +16,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from .utils import get_products_with_images, send_message, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.views.generic import TemplateView, DetailView, ListView, CreateView, View
+from django.views.generic import TemplateView, DetailView, ListView, CreateView, View, UpdateView
 from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory, DiscountCode
 from django.core.mail import send_mail
 
@@ -38,6 +38,7 @@ class HomePageView(TemplateView):
             hot_trend = get_products_with_images(hot_trends)
             best_seller = get_products_with_images(best_sellers)
             feature = get_products_with_images(features)
+            APP_NAME = os.getenv('APP_NAME')
 
             cart = None
             total_items = 0
@@ -56,10 +57,12 @@ class HomePageView(TemplateView):
                 'hot_trends': hot_trend,
                 'best_sellers': best_seller,
                 'features': feature,
-                'total_items_in_cart': total_items
+                'total_items_in_cart': total_items,
+                'APP_NAME': APP_NAME.title()
             }
             return render(request, 'index.html', context)
         except Exception as e:
+            print(e)
             return render(request, 'index.html')
 
 class WomenPageView(ListView):
@@ -75,6 +78,7 @@ class WomenPageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = self.get_queryset()
+        APP_NAME = os.getenv('APP_NAME')
         
         cart = None
         total_items = 0
@@ -99,6 +103,7 @@ class WomenPageView(ListView):
         sub_categories = SubCategory.objects.filter(product__in=women_and_unisex_products).distinct()
         context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME.title()
         return context
 
 class MenPageView(ListView):
@@ -114,6 +119,7 @@ class MenPageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = self.get_queryset()
+        APP_NAME = os.getenv('APP_NAME')
 
         cart = None
         total_items = 0
@@ -138,6 +144,7 @@ class MenPageView(ListView):
         sub_categories = SubCategory.objects.filter(product__in=men_and_unisex_products).distinct()
         context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME.title()
         return context
 
 class KidsPageView(ListView):
@@ -153,6 +160,7 @@ class KidsPageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = self.get_queryset()
+        APP_NAME = os.getenv('APP_NAME')
 
         cart = None
         total_items = 0
@@ -178,6 +186,7 @@ class KidsPageView(ListView):
         sub_categories = SubCategory.objects.filter(product__in=kids_and_unisex_products).distinct()
         context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME.title()
         return context
 
 class AccessoriesPageView(ListView):
@@ -193,6 +202,7 @@ class AccessoriesPageView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_products = self.get_queryset()
+        APP_NAME = os.getenv('APP_NAME')
 
         cart = None
         total_items = 0
@@ -217,6 +227,7 @@ class AccessoriesPageView(ListView):
         sub_categories = SubCategory.objects.filter(product__in=accessories_and_unisex_products).distinct()
         context['sub_categories'] = sub_categories
         context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME.title()
         return context
 
 class ShopPageView(TemplateView):
@@ -225,6 +236,7 @@ class ShopPageView(TemplateView):
         paginator = Paginator(all_products, 9)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+        APP_NAME = os.getenv('APP_NAME')
 
         cart = None
         total_items = 0
@@ -242,6 +254,7 @@ class ShopPageView(TemplateView):
             'page_obj': page_obj,
             'total_items_in_cart': total_items,
             'categories': categories,
+            'APP_NAME': APP_NAME,
         }
         return render(request, 'shop.html', context)
 
@@ -249,6 +262,7 @@ class ContactPageView(TemplateView):
     def get(self, request, *args, **kwargs):
         cart = None
         total_items = 0
+        APP_NAME = os.getenv('APP_NAME')
 
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
@@ -256,6 +270,7 @@ class ContactPageView(TemplateView):
 
         context = {
             'total_items_in_cart': total_items,
+            'APP_NAME': APP_NAME,
         }
         return render(request, 'contact.html', context)
 
@@ -266,7 +281,7 @@ class ProductDetailPageView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        APP_NAME = os.getenv('APP_NAME')
         try:
             product_image = ProductImage.objects.filter(product=self.object)
         except ProductImage.DoesNotExist:
@@ -288,6 +303,7 @@ class ProductDetailPageView(DetailView):
         # Get four products in the same category
         related_products = Product.objects.filter(category=self.object.category)[:4]
         context['related_products'] = related_products
+        context['APP_NAME'] = APP_NAME.title()
         return context
 
 class ShopCartPageView(TemplateView):
@@ -299,6 +315,7 @@ class ShopCartPageView(TemplateView):
         cart = None
         shipping_fee = 3500.00
         total_amount_shipping = 0
+        APP_NAME = os.getenv('APP_NAME')
 
         # If the user is authenticated, handle their cart
         if user.is_authenticated:
@@ -312,6 +329,11 @@ class ShopCartPageView(TemplateView):
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
             total_amount = sum(cart_item.subtotal for cart_item in cart_items)
             total_amount_shipping = int(total_amount) + shipping_fee
+
+        if not cart_items:
+            shipping_fee = 0.00
+            total_amount = 0.00
+            total_amount_shipping = 0.00
         # else:
         #     # For guest users, retrieve the cart from the session
         #     cart = request.session.get('cart', {})
@@ -350,7 +372,8 @@ class ShopCartPageView(TemplateView):
             'cart': cart,
             'total_amount': total_amount,
             'shipping_fee': shipping_fee,
-            'total_amount_shipping': total_amount_shipping
+            'total_amount_shipping': total_amount_shipping,
+            'APP_NAME': APP_NAME,
         }
 
         return render(request, 'shop-cart.html', context)
@@ -363,6 +386,7 @@ class ShopCartPageView(TemplateView):
         cart = None
         shipping_fee = 3500.00
         total_amount_shipping = 0
+        APP_NAME = os.getenv('APP_NAME')
 
         # If the user is authenticated, handle their cart
         if user.is_authenticated:
@@ -396,7 +420,8 @@ class ShopCartPageView(TemplateView):
             'cart': cart,
             'total_amount': total_amount,
             'shipping_fee': shipping_fee,
-            'total_amount_shipping': total_amount_shipping
+            'total_amount_shipping': total_amount_shipping,
+            'APP_NAME': APP_NAME
         }
 
         return render(request, 'shop-cart.html', context)
@@ -407,6 +432,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
         total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
         cart_items = cart.items.all()
         shipping_fee = 3500.00
+        APP_NAME = os.getenv('APP_NAME')
 
         for cart_item in cart_items:
             cart_item.first_image = cart_item.product.productimage_set.first()
@@ -433,7 +459,8 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             'cart': cart,
             'total_amount': total_amount,
             'shipping_fee': shipping_fee,
-            'total_amount_shipping': total_amount_shipping
+            'total_amount_shipping': total_amount_shipping,
+            'APP_NAME': APP_NAME,
         }
 
         return render(request, 'checkout.html', context)
@@ -445,7 +472,6 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                 address=request.POST.get('address'),
                 phone=request.POST.get('phone'),
                 country=request.POST.get('country'),
-                appartment=request.POST.get('appartment'),
                 city=request.POST.get('city'),
                 state=request.POST.get('state'),
             )
@@ -478,14 +504,98 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
         else:
             return render(request, 'checkout.html')
 
+class FAQPageView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        cart = None
+        total_items = 0
+        APP_NAME = os.getenv('APP_NAME')
+
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+
+        context = {
+            'APP_NAME': APP_NAME,
+            'total_items_in_cart': total_items,
+        }
+        return render(request, 'faqs.html', context)
+
+class AccountPageView(LoginRequiredMixin, UpdateView):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'account.html')
+
+    def post(self, request, *args, **kwargs):
+        return render(request, 'account.html')
+
+class SecurityAccountPageView(LoginRequiredMixin, UpdateView):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'security-account.html')
+
+    def post(self, request, *args, **kwargs):
+        return render(request, 'security-account.html')
+
 class LoginPageView(TemplateView):
     def get(self, request, *args, **kwargs):
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'APP_NAME': os.getenv('APP_NAME')})
 
 class RegisterPageView(TemplateView):
     def get(self, request, *args, **kwargs):
-        return render(request, 'register.html')
+        return render(request, 'register.html', {'APP_NAME': os.getenv('APP_NAME')})
 
+class OrderHistoryPage(LoginRequiredMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        orders = Order.objects.filter(user=user).order_by('-created_at')
+        cart = None
+        total_items = 0
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+
+        order_data = []
+        for order in orders:
+            order_items = OrderItem.objects.filter(order=order)
+            order_item_data = []
+            
+            for order_item in order_items:
+                first_image = order_item.product.productimage_set.first() if order_item.product.productimage_set.exists() else None
+                order_item_data.append({
+                    'order_item': order_item,
+                    'first_image': first_image
+                })
+
+            order_data.append({
+                'order': order,
+                'order_items': order_item_data,
+                'APP_NAME': APP_NAME,
+                'total_items_in_cart': total_items,
+            })
+
+        context = {'order_data': order_data}
+        return render(request, 'order_history.html', context)
+
+class OrderDetailsPage(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = 'order_details.html'
+    context_object_name = 'order'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Order, id=self.kwargs['order_id'])
+    
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     cart = None
+    #     total_items = 0
+    #     APP_NAME = os.getenv('APP_NAME')
+
+    #     cart, created = Cart.objects.get_or_create(user=self.request.user)
+    #     total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+
+    #     context['total_items_in_cart'] = total_items
+    #     context['APP_NAME'] = APP_NAME
+
+# Function based views
 def handleUserRegistration(request):
     try:
         firstName = request.POST.get('firstName')
@@ -535,14 +645,15 @@ def handleUserLogin(request):
         if user is not None:
             if user.check_password(password):
                 login(request, user)
-                return redirect(reverse('app:home_page'))
+                return JsonResponse({'success': True, 'message': 'Login successful'})
             else:
-                return JsonResponse({'message': 'Invalid password'})
+                return JsonResponse({'success': False, 'message': 'Invalid password'})
         else:
-            return JsonResponse({'message': 'Account not found'})
+            return JsonResponse({'success': False, 'message': 'Account not found'})
     except Exception as e:
-        return JsonResponse({'message': str(e)})
+        return JsonResponse({'success': False, 'message': str(e)})
 
+@login_required
 def handleUserLogout(request):
     logout(request)
     return redirect(reverse('app:home_page'))
@@ -677,6 +788,52 @@ def handleSubscribeToNewsLetter(request):
         return JsonResponse({'success': True, 'message': 'Subscribe to newsletter'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+@login_required
+def handleUpdateSecurityDetail(request):
+    try:
+        if request.method == 'POST':
+            old_password = request.POST.get('oldPassword')
+            new_password = request.POST.get('newPassword')
+            hashed_password = make_password(new_password)
+
+            user = CustomUser.objects.get(id=request.user.id)
+            
+            if not user.check_password(old_password):
+                return JsonResponse({'success': False, 'message': 'Old password is incorrect!'})
+
+            user.password = hashed_password
+            user.save()
+            return JsonResponse({'success': True, 'message': "Password updated successfully"})
+
+        return JsonResponse({'success': False, 'message': "Invalid request"})
+    except CustomUser.DoesNotExist:
+        return None
+    except Exception as e:
+        print("An error occurred: %s" % str(e))
+
+@login_required
+def handleUpdateProfileDetail(request):
+    try:
+        if request.method == 'POST':
+            first_name = request.POST.get('firstName')
+            last_name = request.POST.get('lastName')
+            email = request.POST.get('email')
+            username = request.POST.get('username')
+
+            user = CustomUser.objects.get(id=request.user.id)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.username = username
+            user.save()
+            return JsonResponse({'success': True, 'message': "Profile updated successfully"})
+        return JsonResponse({'success': False, 'message': "Invalid request"})
+    except CustomUser.DoesNotExist:
+        return None
+    except Exception as e:
+        print("An error occurred: %s" % str(e))
+
 
 def error404(request, e):
     APP_NAME = os.getenv('APP_NAME')

@@ -75,7 +75,7 @@ class OrderAdmin(admin.ModelAdmin):
         "user",
         "total_price",
         "created_at",
-        "order_id",
+        "order_number",
         "payment_status",
         "shipping_address",
         "get_order_items",

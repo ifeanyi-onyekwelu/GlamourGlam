@@ -11,11 +11,11 @@
                 <form action="{% url 'app:handleUserRegistration' %}" method="post">
                     {% csrf_token %}
                     <h1 id="signup-title">Create an Account</h1>
-                    <input type="text" id="fullname-input" name="firstName" placeholder="First Name">
-                    <input type="text" id="fullname-input" name="lastName" placeholder="Last Name">
-                    <input type="email" id="email-input" name="email" placeholder="Email Address">
-                    <input type="password" id="password-input" name="password" placeholder="Password">
-                    <input type="password" id="password-input" name="cmfpassword" placeholder="Confirm Password">
+                    <input type="text" id="fullname-input" name="firstName" placeholder="First Name" class="firstname-input">
+                    <input type="text" id="fullname-input" name="lastName" placeholder="Last Name" class="lastname-input">
+                    <input type="email" id="email-input" name="email" placeholder="Email Address" class="email-input">
+                    <input type="password" id="password-input" name="password" placeholder="Password" class="password-input">
+                    <input type="password" id="password-input" name="cmfpassword" placeholder="Confirm Password" class="cmfpassword-input">
                     <button id="signup-button" type="submit">Sign Up</button>
                     <p class="mt-3"><a href="{% url 'app:login_page' %}">Already have an account? login here</a></p>
                 </form>
@@ -24,3 +24,69 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascript %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".login_form");
+        const formInputs = form.querySelectorAll("input");
+        const firstNameinput = document.querySelector(".firstname-input");
+        const lastNameinput = document.querySelector(".lastname-input");
+        const emailinput = document.querySelector(".email-input");
+        const passwordinput = document.querySelector(".password-input");
+        const cmfpasswordinput = document.querySelector(".cmfpassword-input");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            const validationErrors = {};
+
+            // Remove existing error messages and red borders
+            formInputs.forEach(input => {
+                input.classList.remove("inputError");
+                const errorMessage = input.parentElement.querySelector(".error-message");
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            });
+
+            // Perform validation for each field
+            if (!validator.isLength(firstNameinput.value, { min: 3 })) {
+                validationErrors.firstName = "First name is too short";
+                firstNameinput.classList.add("inputError");
+                displayErrorMessage(firstNameinput, "First name is too short");
+            }
+            if (!validator.isLength(lastNameinput.value, { min: 3 })) {
+                validationErrors.lastName = "Last name is too short";
+                lastNameinput.classList.add("inputError");
+                displayErrorMessage(lastNameinput, "Last name is too short");
+            }
+            if (!validator.isLength(emailinput.value, { min: 1 })) {
+                validationErrors.email = "Email is required";
+                emailinput.classList.add("inputError");
+                displayErrorMessage(emailinput, "Email is required");
+            }
+            if (!validator.isLength(passwordinput.value, { min: 6 })) {
+                validationErrors.password = "Passcode is too short ( Should be 6 characters long )";
+                passwordinput.classList.add("inputError");
+                displayErrorMessage(passwordinput, "Passcode is too short ( Should be 6 characters long )");
+            }
+
+            // Display validation errors
+            if (Object.keys(validationErrors).length > 0) {
+                return;
+            }
+
+            // If all validations pass, submit the form
+            form.submit();
+        });
+
+        function displayErrorMessage(input, message) {
+            const errorMessage = document.createElement("span");
+            errorMessage.className = "error-message";
+            errorMessage.textContent = message;
+            input.parentElement.appendChild(errorMessage);
+        }
+    });
+</script>
+{% endblock javascript %}

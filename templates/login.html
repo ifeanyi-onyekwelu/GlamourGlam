@@ -6,11 +6,11 @@
 <div id="container">
     <div class="col-lg-12">
         <div id="signup-box">
-            <form action="{% url 'app:handleUserLogin' %}" method="post">
+            <form action="{% url 'app:handleUserLogin' %}" method="post" class="login_form">
                 {% csrf_token %}
                 <h1 id="signup-title">Login</h1>
-                <input type="email" id="email-input" name="email" placeholder="Email Address">
-                <input type="password" id="password-input" name="password" placeholder="Password">
+                <input type="email" id="email-input" name="email" placeholder="Email Address" required>
+                <input type="password" id="password-input" name="password" placeholder="Password" required>
                 <button id="signup-button" type="submit">Login</button>
                 <p class="mt-3"><a href="{% url 'app:register_page' %}">Don't have an account? Create one here</a></p>
             </form>
@@ -19,3 +19,4 @@
 </div>
 
 {% endblock %}
+

@@ -121,8 +121,8 @@
                 <div class="cart__total__procced">
                     <h6>Cart total</h6>
                     <ul>
-                        <li>Shipping <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
-                        <li>Subtotal <span>&#8358; {{ total_amount|intcomma }}</span></li>
+                        <li>Shipping Fee <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                        <li>Subtotal <span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></li>
                         <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
                     </ul>
                     <a href="{% url 'app:checkout_page' %}" class="primary-btn">Proceed to checkout</a>

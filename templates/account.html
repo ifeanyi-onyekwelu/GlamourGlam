@@ -1,0 +1,106 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}Account{% endblock title %}
+
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'assets/vendor/fonts/boxicons.css' %}" />
+<link rel="stylesheet" href="{% static 'assets/vendor/css/core.css' %}" class="template-customizer-core-css" />
+{% endblock customstyle %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Account</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Content wrapper -->
+<div class="content-wrapper">
+    <!-- Content -->
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-pills flex-column flex-md-row mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link custom-background px-3 py-1" href="javascript:void(0);"><i class="bx bx-user me-1"></i>Account</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'app:security_account_page' %}">
+                        <i class="bx bx-lock me-1"></i>Security</a>
+                    </li>
+                </ul>
+                <div class="card mb-4">
+                    <h5 class="card-header">Profile Details</h5>
+                    <!-- Account -->
+                    <hr class="my-0" />
+                    <div class="card-body">
+                        <form id="formAccountSettings" method="POST" action="{% url 'app:handleUpdateProfileDetail' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input class="form-control" type="text" id="firstName" name="firstName"
+                                        value="{{ request.user.first_name }}" placeholder="First name" />
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input class="form-control" type="text" name="lastName" id="lastName"
+                                        value="{{ request.user.last_name }}" placeholder="Last name" />
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input class="form-control" type="text" id="email" name="email"
+                                        value="{{ request.user.email }}" placeholder="john.doe@example.com" />
+                                </div>
+                                <div class="mb-3 col-md-6">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input class="form-control" type="text" id="username" name="username"
+                                        placeholder="Username" value="{{ request.user.username }}" />
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button type="submit" class="btn custom-background">Save changes</button>
+                                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /Account -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / Content -->
+</div>
+<!-- Content wrapper -->
+{% endblock content %}
+
+{% block javascript %}
+<script src="../assets/js/pages-account-settings-account.js"></script>
+{% endblock javascript %}

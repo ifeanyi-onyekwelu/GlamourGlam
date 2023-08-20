@@ -14,6 +14,11 @@ urlpatterns = [
     path('<uuid:pk>/product', ProductDetailPageView.as_view(), name="product_detail_page"),
     path('cart/', ShopCartPageView.as_view(), name="cart_page"),
     path('checkout/', CheckoutPageView.as_view(), name="checkout_page"),
+    path('faqs/', FAQPageView.as_view(), name="faqs_page"),
+    path('account/', AccountPageView.as_view(), name="account_page"),
+    path('security/', SecurityAccountPageView.as_view(), name="security_account_page"),
+    path('order-history/', OrderHistoryPage.as_view(), name="order_history"),
+    path('order-details/<int:order_id>', OrderDetailsPage.as_view(), name="order_details"),
     path('login/', LoginPageView.as_view(), name="login_page"),
     path('register/', RegisterPageView.as_view(), name="register_page"),
 
@@ -25,6 +30,8 @@ urlpatterns = [
     path('send-message/', handleContactForm, name="handleContactForm"),
     path('search/', handleSearchForm, name="handleSearchForm"),
     path('subscribe-to-newsletter/', handleSubscribeToNewsLetter, name="handleSubscribeToNewsLetter"),
+    path('update-profile/', handleUpdateProfileDetail, name="handleUpdateProfileDetail"),
+    path('change-password/', handleUpdateSecurityDetail, name="handleUpdateSecurityDetail"),
     path('update-item/', handleUpdateCart, name="handleUpdateCart"),
     path('logout/', handleUserLogout, name="handleUserLogout"),
 

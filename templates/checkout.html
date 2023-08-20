@@ -23,6 +23,20 @@
 
 {% block title %}Checkout{% endblock title %}
 
+{% block customstyle %}
+<style>
+    .inputError {
+        border: 1px solid red !important;
+        color: red;
+        /* background: rgba(253, 0, 0, 0.833); */
+    }
+    .error-message {
+        color: red;
+        font-weight: 600;
+    }
+</style>
+{% endblock customstyle %}
+
 
 {% block content %}
 <!-- Breadcrumb Begin -->
@@ -67,8 +81,6 @@
                             <div class="checkout__form__input">
                                 <p>Address <span>*</span></p>
                                 <input type="text" name="address" id="address" placeholder="Street Address">
-                                <input type="text" name="appartment" id="appartment"
-                                    placeholder="Apartment. suite, unite ect ( optinal )">
                             </div>
                             <div class="checkout__form__input">
                                 <p>Town/City <span>*</span></p>
@@ -122,8 +134,8 @@
                         </div>
                         <div class="checkout__order__total">
                             <ul>
-                                <li>Shipping <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
-                                <li>Subtotal <span>&#8358; {{ total_amount|intcomma }}</span></li>
+                                <li>Shipping Fee <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                                <li>Subtotal <span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></li>
                                 <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
                             </ul>
                         </div>
@@ -136,7 +148,7 @@
 </section>
 <!-- Checkout Section End -->
 
-    
+
 <!-- Search Begin -->
 <div class="search-model">
     <div class="h-100 d-flex align-items-center justify-content-center">
@@ -149,3 +161,81 @@
 </div>
 <!-- Search End -->
 {% endblock content %}
+
+{% block javascript %}
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".checkout__form");
+        const formInputs = form.querySelectorAll("input"); // Get all input fields
+        const phoneInput = document.getElementById("phone");
+        const countryInput = document.getElementById("country");
+        const stateInput = document.getElementById("state");
+        const addressInput = document.getElementById("address");
+        const cityInput = document.getElementById("city");
+        const zipcodeInput = document.getElementById("zipcode");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            const validationErrors = {};
+
+            // Remove existing error messages and red borders
+            formInputs.forEach(input => {
+                input.classList.remove("inputError");
+                const errorMessage = input.parentElement.querySelector(".error-message");
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            });
+
+            // Perform validation for each field
+            if (!validator.isMobilePhone(phoneInput.value, "en-NG")) {
+                validationErrors.phone = "Invalid phone number";
+                phoneInput.classList.add("inputError");
+                displayErrorMessage(phoneInput, "Invalid phone number");
+            }
+            if (!validator.isLength(countryInput.value, { min: 2 })) {
+                validationErrors.country = "Country is too short";
+                countryInput.classList.add("inputError");
+                displayErrorMessage(countryInput, "Country is too short");
+            }
+            if (!validator.isLength(stateInput.value, { min: 2 })) {
+                validationErrors.country = "State is too short";
+                stateInput.classList.add("inputError");
+                displayErrorMessage(stateInput, "State is too short");
+            }
+            if (!validator.isLength(addressInput.value, { min: 2 })) {
+                validationErrors.country = "Address is too short";
+                addressInput.classList.add("inputError");
+                displayErrorMessage(addressInput, "Address  is too short");
+            }
+            if (!validator.isLength(cityInput.value, { min: 2 })) {
+                validationErrors.country = "City is too short";
+                cityInput.classList.add("inputError");
+                displayErrorMessage(cityInput, "City is too short");
+            }
+            if (!validator.isLength(zipcodeInput.value, { min: 2 })) {
+                validationErrors.country = "Zipcode is too short";
+                zipcodeInput.classList.add("inputError");
+                displayErrorMessage(zipcodeInput, "Zipcode is too short");
+            }
+
+            // Display validation errors
+            if (Object.keys(validationErrors).length > 0) {
+                return;
+            }
+
+            // If all validations pass, submit the form
+            form.submit();
+        });
+
+        function displayErrorMessage(input, message) {
+            const errorMessage = document.createElement("span");
+            errorMessage.className = "error-message";
+            errorMessage.textContent = message;
+            input.parentElement.appendChild(errorMessage);
+        }
+    });
+
+</script> -->
+{% endblock javascript %}

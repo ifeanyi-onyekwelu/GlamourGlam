@@ -1,0 +1,82 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Order Detail{% endblock %}
+
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Order Detail</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Content wrapper -->
+<div class="content-wrapper">
+    <div class="container flex-grow-1 container-p-y mt-3">
+        <h3>Order Details</h3>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h5>Ordered Items</h5>
+
+                <ul>
+                    {% for item in order.items.all %}
+                    <li class="list-item">{{ item.product.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <h2>Order Status</h2>
+                {% if order.delivery_status == "P" %}
+                <p>Status: <span class="bg-warning" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Pending</span></p>
+                {% elif order.delivery_status == "S" %}
+                <p>Status: <span class="bg-primary" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Shipping</span></p>
+                {% elif order.delivery_status == "D" %}
+                <p>Status: <span class="bg-success" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Delivered</span></p>
+                {% else %}
+                <p>Status: <span class="bg-danger" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Failed</span></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Shipping Details</h2>
+                <p>Shipping Address: {{ order.shipping_address }}</p>
+                <!-- <p>Estimated Delivery Date: {{ order.estimated_delivery_date }}</p> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Content wrapper -->
+{% endblock %}

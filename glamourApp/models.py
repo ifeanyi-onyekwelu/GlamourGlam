@@ -102,7 +102,7 @@ class Order(models.Model):
     items = models.ManyToManyField('OrderItem', related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    order_id = models.CharField(max_length=200, default="")
+    order_number = models.CharField(max_length=200, default="")
     payment_status_choices = [
         ('PENDING', 'Pending'),
         ('PAID', 'Paid'),
@@ -122,9 +122,9 @@ class Order(models.Model):
         return f"Order #{self.id} for {self.user.first_name} {self.user.last_name}"
 
     def save(self, *args, **kwargs):
-        if not self.order_id:
-            self.order_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=30))
-
+        if not self.order_number:
+            self.order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=30))
+        
         super(Order, self).save(*args, **kwargs)
 
 class OrderItem(models.Model):
@@ -143,7 +143,7 @@ class ShippingAddress(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, default="")
     country = models.CharField(max_length=200)
-    appartment = models.CharField(max_length=200)
+    appartment = models.CharField(max_length=200, null=True, blank=True, default="None specified")
     address = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     state = models.CharField(max_length=200)

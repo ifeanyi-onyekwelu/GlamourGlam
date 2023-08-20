@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-        GlamourGlam | Elevate Your Style, Embrace Glamour || {% block title %}{%endblock title %}
+        {{ APP_NAME }} | Elevate Your Style, Embrace Glamour || {% block title %}{%endblock title %}
     </title>
 
     <link rel="shortcut icon" href="{% static 'img/gg favicon.png' %}" type="image/x-icon">
@@ -24,6 +24,61 @@
     <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}" type="text/css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
 
+    {% block customstyle %}
+
+    {% endblock customstyle %}
+    <style>
+        .user-dropdown-btn {
+            position: relative;
+            padding: 7px 10px;
+            border: 1px solid #000000;
+            border-radius: 50px;
+            transition: all .4s ease-in-out;
+        }
+        .user-dropdown-btn:hover {
+            border-color: #bda06a;
+            color: #bda06a;
+        }
+        .user-dropdown-menu {
+            transition: all .4s ease-in-out;
+            display: none;
+            position: absolute;
+            width: 150px;
+            padding: 10px;
+            border-radius: 5px;
+            flex-flow: column;
+            align-items: start;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+            background: #fff;
+            z-index: 2;
+            right: 0;
+            opacity: 0;
+        }
+        .user-dropdown-item {
+            padding: 5px;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 4px;
+        }
+        .user-dropdown-item:hover {
+            background: #bda06a;
+            color: #fff;
+        }
+        .user-dropdown-item:hover a { 
+            color: #fff;
+        }
+        .user-dropdown-item a {
+            font-size: 14px !important;
+            font-weight: 700;
+        }
+        .user-dropdown-item i {
+            font-size: 14px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -46,6 +101,20 @@
                 </a>
             </li>
             {% endif %}
+            <li class="account">
+                <span class="fa fa-user user-dropdown-btn"></span>
+                <ul class="user-dropdown-menu">
+                    {% if request.user.is_authenticated %}
+                    <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i> Order History</a></li>
+                    <li class="user-dropdown-item"><i class="fa fa-comments"></i><a href="">Messages</a></li>
+                    <li class="user-dropdown-item"><i class="fa fa-sign-out"></i><a href="{% url 'app:handleUserLogout' %}">Logout</a></li>
+                    {% else %}
+                    <li class="user-dropdown-item"><i class="fa fa-lock"></i><a href="{% url 'app:login_page' %}">Login</a></li>
+                    <li class="user-dropdown-item"><i class="fa fa-user-circle"></i><a href="{% url 'app:register_page' %}">Register</a></li>
+                    <li class="user-dropdown-item"><i class="fa fa-question-circle"></i><a href="{% url 'app:faqs_page' %}">FAQs</a></li>
+                    {% endif %}
+                </ul>
+            </li>
         </ul>
         <div class="offcanvas__logo">
             <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt="" /></a>
@@ -105,10 +174,6 @@
                             <li class="{% if shop_page == request.path %} active {% endif %}">
                                 <a href="{{ shop_page }}">Shop</a>
                             </li>
-                            {% url 'app:contact_page' as contact_page %}
-                            <li class="{% if contact_page == request.path %} active {% endif %}">
-                                <a href="{{ contact_page }}">Contact</a>
-                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -127,6 +192,20 @@
                                 <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
                                     <div class="tip">{% block cart_num %}{% endblock cart_num %}</div>
                                 </a>
+                            </li>
+                            <li class="account">
+                                <span class="fa fa-user user-dropdown-btn"></span>
+                                <ul class="user-dropdown-menu">
+                                    {% if request.user.is_authenticated %}
+                                    <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i> Order History</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i class="fa fa-user"></i> Account</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                    {% else %}
+                                    <li class="user-dropdown-item"><a href="{% url 'app:login_page' %}"><i class="fa fa-lock"></i> Login</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:register_page' %}"><i class="fa fa-user-circle"></i> Register</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:faqs_page' %}"><i class="fa fa-question-circle"></i> FAQs</a></li>
+                                    {% endif %}
+                                </ul>
                             </li>
                         </ul>
                     </div>
@@ -152,7 +231,7 @@
                             <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt="" width="300"/></a>
                         </div>
                         <p>
-                            Discover your style at GlamourGlam - Your ultimate destination for fashion-forward finds. Shop the latest trends, exclusive collections.
+                            Discover your style at {{ APP_NAME }} - Your ultimate destination for fashion-forward finds. Shop the latest trends, exclusive collections.
                         </p>
                         <div class="footer__payment">
                             <a href="#"><img src="{% static 'img/payment/payment-1.png' %}" alt="" /></a>
@@ -167,7 +246,7 @@
                         <ul>
                             <li><a href="#">About</a></li>
                             <li><a href="{% url 'app:contact_page' %}">Contact</a></li>
-                            <li><a href="#">FAQ</a></li>
+                            <li><a href="{% url 'app:faqs_page' %}">FAQ</a></li>
                         </ul>
                     </div>
                 </div>
@@ -175,8 +254,9 @@
                     <div class="footer__widget">
                         <h6>Account</h6>
                         <ul>
-                            <li><a href="#">My Account</a></li>
-                            <li><a href="{% url 'app:checkout_page' %}">Checkout</a></li>
+                            <li><a href="{% url 'app:account_page' %}">My Account</a></li>
+                            <li><a href="#">Messages</a></li>
+                            <li><a href="">Orders</a></li>
                         </ul>
                     </div>
                 </div>
@@ -185,7 +265,7 @@
                         <h6>NEWSLETTER</h6>
                         <form action="{% url 'app:handleSubscribeToNewsLetter' %}" method="post">
                             {% csrf_token %}
-                            <input type="text" name="email" id="email" placeholder="Email"/>
+                            <input type="email" name="email" id="email" placeholder="Email" required/>
                             <button type="submit" class="site-btn">Subscribe</button>
                         </form>
                         <div class="footer__social">
@@ -205,7 +285,7 @@
                             <script>
                                 document.write(new Date().getFullYear())
                             </script>
-                            All rights reserved | GlamourGlam
+                            All rights reserved | {{ APP_NAME }}
                         </p>
                     </div>
                     <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
@@ -217,6 +297,7 @@
 
     <!-- Js Plugins -->
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/js/bootstrap.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
@@ -225,8 +306,47 @@
     <script src="{% static 'js/jquery.slicknav.js' %}"></script>
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
     <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
+    <!-- <script src="{% static 'js/validator/validator.js' %}"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.11.0/validator.min.js"></script>
     <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const user_dropdown_btn = document.querySelectorAll(".user-dropdown-btn");
+            const user_dropdown_menu = document.querySelectorAll(".user-dropdown-menu");
+            let dropdown_is_visible = false;
+
+            function toggleVisibility() {
+                if (dropdown_is_visible) {
+                    user_dropdown_menu.forEach(menu => {
+                        menu.style.display = "flex";
+                        menu.style.marginTop = "20px";
+                        menu.style.opacity = "1";
+                    })
+                } else {
+                    user_dropdown_menu.forEach(menu => {
+                        menu.style.display = "none";
+                        menu.style.marginTop = "0";
+                        menu.style.opacity = "0";
+                    })
+                }
+            }
+
+            user_dropdown_btn.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    dropdown_is_visible = !dropdown_is_visible;
+                    toggleVisibility()
+                })
+            })
+
+            window.addEventListener('click', (e) => {
+                dropdown_is_visible = false;
+                toggleVisibility()
+            })
+        })
+    </script>
 
     <!-- Footer Section Begin -->
 
