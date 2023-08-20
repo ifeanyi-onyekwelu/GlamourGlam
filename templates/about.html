@@ -1,0 +1,239 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block title %}About Us{% endblock %}
+
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'utils/about.css' %}">
+<link rel="stylesheet" href="{% static 'utils/util.css' %}">
+<link rel="stylesheet" href="{% static 'utils/main.css' %}">
+{% endblock customstyle %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+
+{% block content %}
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>About Us</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<div class="site-blocks-cover inner-page" data-aos="fade">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 ml-auto order-md-2 align-self-start">
+                <div class="site-block-cover-content">
+                    <h2 class="sub-title">#New Holiday Collection <script>document.write(new Date().getFullYear())</script></h2>
+                    <h1>Shop With Us</h1>
+                    <p><a href="{% url 'app:shop_page' %}" class="btn btn-black rounded-0">Shop Now</a></p>
+                </div>
+            </div>
+            <div class="col-md-6 order-1 align-self-end">
+                <img src="{% static 'img/about/about-img.JPG' %}" alt="Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="site-section site-section-sm site-blocks-1 border-0" data-aos="fade">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-4 d-lg-flex mb-4 mb-lg-0 pl-4" data-aos="fade-up" data-aos-delay="">
+                <div class="icon mr-4 align-self-start">
+                    <span class="fa fa-truck"></span>
+                </div>
+                <div class="text">
+                    <h2 class="text-uppercase">Free Shipping</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
+                        accumsan tincidunt fringilla.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 d-lg-flex mb-4 mb-lg-0 pl-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="icon mr-4 align-self-start">
+                    <span class="fa fa-refresh"></span>
+                </div>
+                <div class="text">
+                    <h2 class="text-uppercase">Free Returns</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
+                        accumsan tincidunt fringilla.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 d-lg-flex mb-4 mb-lg-0 pl-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="icon mr-4 align-self-start">
+                    <span class="fa fa-headphones"></span>
+                </div>
+                <div class="text">
+                    <h2 class="text-uppercase">Customer Support</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
+                        accumsan tincidunt fringilla.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content page -->
+<section class="bg0 p-t-75 p-b-120">
+    <div class="container">
+        <div class="row p-b-148">
+            <div class="col-md-7 col-lg-8">
+                <div class="p-t-7 p-r-85 p-r-15-lg p-r-0-md">
+                    <h3 class="mtext-111 cl2 p-b-16">
+                        Our Story
+                    </h3>
+
+                    <p class="stext-113 cl6 p-b-26">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris consequat consequat enim, non auctor massa ultrices non. Morbi sed odio massa. Quisque at vehicula tellus, sed tincidunt augue. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas varius egestas diam, eu sodales metus scelerisque congue. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas gravida justo eu arcu egestas convallis. Nullam eu erat bibendum, tempus ipsum eget, dictum enim. Donec non neque ut enim dapibus tincidunt vitae nec augue. Suspendisse potenti. Proin ut est diam. Donec condimentum euismod tortor, eget facilisis diam faucibus et. Morbi a tempor elit.
+                    </p>
+
+                    <p class="stext-113 cl6 p-b-26">
+                        Donec gravida lorem elit, quis condimentum ex semper sit amet. Fusce eget ligula magna. Aliquam aliquam imperdiet sodales. Ut fringilla turpis in vehicula vehicula. Pellentesque congue ac orci ut gravida. Aliquam erat volutpat. Donec iaculis lectus a arcu facilisis, eu sodales lectus sagittis. Etiam pellentesque, magna vel dictum rutrum, neque justo eleifend elit, vel tincidunt erat arcu ut sem. Sed rutrum, turpis ut commodo efficitur, quam velit convallis ipsum, et maximus enim ligula ac ligula. 
+                    </p>
+
+                    <p class="stext-113 cl6 p-b-26">
+                        Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us on (+1) 96 716 6879
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-11 col-md-5 col-lg-4 m-lr-auto">
+                <div class="how-bor1 ">
+                    <div class="hov-img0">
+                        <img src="{% static 'img/about/duo.JPG' %}" alt="IMG">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="order-md-2 col-md-7 col-lg-8 p-b-30">
+                <div class="p-t-7 p-l-85 p-l-15-lg p-l-0-md">
+                    <h3 class="mtext-111 cl2 p-b-16">
+                        Our Mission
+                    </h3>
+
+                    <p class="stext-113 cl6 p-b-26">
+                        Mauris non lacinia magna. Sed nec lobortis dolor. Vestibulum rhoncus dignissim risus, sed consectetur erat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam maximus mauris sit amet odio convallis, in pharetra magna gravida. Praesent sed nunc fermentum mi molestie tempor. Morbi vitae viverra odio. Pellentesque ac velit egestas, luctus arcu non, laoreet mauris. Sed in ipsum tempor, consequat odio in, porttitor ante. Ut mauris ligula, volutpat in sodales in, porta non odio. Pellentesque tempor urna vitae mi vestibulum, nec venenatis nulla lobortis. Proin at gravida ante. Mauris auctor purus at lacus maximus euismod. Pellentesque vulputate massa ut nisl hendrerit, eget elementum libero iaculis.
+                    </p>
+
+                    <div class="bor16 p-l-29 p-b-9 m-t-22">
+                        <p class="stext-114 cl6 p-r-40 p-b-11">
+                            Creativity is just connecting things. When you ask creative people how they did something, they feel a little guilty because they didn't really do it, they just saw something. It seemed obvious to them after a while.
+                        </p>
+
+                        <span class="stext-111 cl8">
+                            - Steve Job’s 
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-md-1 col-11 col-md-5 col-lg-4 m-lr-auto p-b-30">
+                <div class="how-bor2">
+                    <div class="hov-img0">
+                        <img src="{% static 'img/about/all_black.JPG' %}" alt="IMG">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>	
+
+<div class="site-section custom-border-bottom" data-aos="fade">
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-7 site-section-heading text-center pt-4">
+                <h2>The Team</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+
+                <div class="block-38 text-center">
+                    <div class="block-38-img">
+                        <div class="block-38-header">
+                            <img src="{% static 'img/about/all_black.JPG' %}" alt="Image placeholder" class="mb-4">
+                            <h3 class="block-38-heading h4">Elizabeth Graham</h3>
+                            <p class="block-38-subheading">CEO/Co-Founder</p>
+                        </div>
+                        <div class="block-38-body">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aut minima nihil sit
+                                distinctio recusandae doloribus ut fugit officia voluptate soluta. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="block-38 text-center">
+                    <div class="block-38-img">
+                        <div class="block-38-header">
+                            <img src="{% static 'img/about/all_black.JPG' %}" alt="Image placeholder" class="mb-4">
+                            <h3 class="block-38-heading h4">Jennifer Greive</h3>
+                            <p class="block-38-subheading">Co-Founder</p>
+                        </div>
+                        <div class="block-38-body">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aut minima nihil sit
+                                distinctio recusandae doloribus ut fugit officia voluptate soluta. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="block-38 text-center">
+                    <div class="block-38-img">
+                        <div class="block-38-header">
+                            <img src="{% static 'img/about/all_black.JPG' %}" alt="Image placeholder" class="mb-4">
+                            <h3 class="block-38-heading h4">Patrick Marx</h3>
+                            <p class="block-38-subheading">Marketing</p>
+                        </div>
+                        <div class="block-38-body">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aut minima nihil sit
+                                distinctio recusandae doloribus ut fugit officia voluptate soluta. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="block-38 text-center">
+                    <div class="block-38-img">
+                        <div class="block-38-header">
+                            <img src="{% static 'img/about/all_black.JPG' %}" alt="Image placeholder" class="mb-4">
+                            <h3 class="block-38-heading h4">Mike Coolbert</h3>
+                            <p class="block-38-subheading">Sales Manager</p>
+                        </div>
+                        <div class="block-38-body">
+                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae aut minima nihil sit
+                                distinctio recusandae doloribus ut fugit officia voluptate soluta. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

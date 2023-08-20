@@ -65,6 +65,57 @@ class HomePageView(TemplateView):
             print(e)
             return render(request, 'index.html')
 
+class AboutPageView(TemplateView):
+    template_name = 'about.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+class PrivacyPolicyPageView(TemplateView):
+    template_name = 'privacy_policy.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+class TermsOfServicePageView(TemplateView):
+    template_name = 'terms_of_service.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
 class WomenPageView(ListView):
     model = Product
     template_name = 'women.html'
@@ -568,11 +619,13 @@ class OrderHistoryPage(LoginRequiredMixin, TemplateView):
             order_data.append({
                 'order': order,
                 'order_items': order_item_data,
-                'APP_NAME': APP_NAME,
-                'total_items_in_cart': total_items,
             })
 
-        context = {'order_data': order_data}
+        context = {
+            'order_data': order_data,
+            'APP_NAME': APP_NAME,
+            'total_items_in_cart': total_items,
+        }
         return render(request, 'order_history.html', context)
 
 class OrderDetailsPage(LoginRequiredMixin, DetailView):
@@ -583,17 +636,59 @@ class OrderDetailsPage(LoginRequiredMixin, DetailView):
     def get_object(self, queryset=None):
         return get_object_or_404(Order, id=self.kwargs['order_id'])
     
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     cart = None
-    #     total_items = 0
-    #     APP_NAME = os.getenv('APP_NAME')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cart = None
+        total_items = 0
+        APP_NAME = os.getenv('APP_NAME')
 
-    #     cart, created = Cart.objects.get_or_create(user=self.request.user)
-    #     total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
 
-    #     context['total_items_in_cart'] = total_items
-    #     context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME
+        return context
+
+class OrderCompletePageView(LoginRequiredMixin, DetailView):
+     def get(self, request, *args, **kwargs):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        cart_items = cart.items.all()
+        shipping_fee = 3500.00
+        APP_NAME = os.getenv('APP_NAME')
+
+        for cart_item in cart_items:
+            cart_item.first_image = cart_item.product.productimage_set.first()
+
+            cart_item.subtotal = cart_item.quantity * cart_item.product.price
+        
+        discount_code = request.session.get('discount_code', None)
+        discount = None
+        try:
+            discount = DiscountCode.objects.get(code=discount_code)
+            discount_percentage = discount.percentage
+        except DiscountCode.DoesNotExist:
+            discount = None
+
+        total_amount = float(sum(cart_item.subtotal for cart_item in cart_items))
+        total_amount_shipping = int(total_amount) + shipping_fee
+
+        if discount:
+            discount_amount = (discount.percentage / 100) * total_amount
+            total_amount -= discount_amount
+            total_amount_shipping = int(total_amount) + shipping_fee
+
+        context = {
+            'total_items_in_cart': total_items,
+            'cart_items': cart_items, 
+            'cart': cart,
+            'total_amount': total_amount,
+            'shipping_fee': shipping_fee,
+            'total_amount_shipping': total_amount_shipping,
+            'APP_NAME': APP_NAME,
+        }
+
+        return render(request, 'order_complete.html', context)
 
 # Function based views
 def handleUserRegistration(request):

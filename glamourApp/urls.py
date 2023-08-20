@@ -5,6 +5,9 @@ app_name = 'app'
 
 urlpatterns = [
     path('', HomePageView.as_view(), name="home_page"),
+    path('about', AboutPageView.as_view(), name="about_page"),
+    path('privacy-policy',PrivacyPolicyPageView.as_view(), name="privacy_policy_page"),
+    path('terms-of-service', TermsOfServicePageView.as_view(), name="terms_of_service_page"),
     path('women/', WomenPageView.as_view(), name="women_page"),
     path('men/', MenPageView.as_view(), name="men_page"),
     path('shop/', ShopPageView.as_view(), name="shop_page"),
@@ -19,6 +22,7 @@ urlpatterns = [
     path('security/', SecurityAccountPageView.as_view(), name="security_account_page"),
     path('order-history/', OrderHistoryPage.as_view(), name="order_history"),
     path('order-details/<int:order_id>', OrderDetailsPage.as_view(), name="order_details"),
+    path('order-complete/<int:order_id>', OrderCompletePageView.as_view(), name="order_complete"),
     path('login/', LoginPageView.as_view(), name="login_page"),
     path('register/', RegisterPageView.as_view(), name="register_page"),
 
