@@ -8,7 +8,7 @@ from django.db.models import Sum
 from django.conf import settings
 from django.contrib import messages
 from users.models import CustomUser
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404, HttpResponsePermanentRedirect
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,6 +19,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import TemplateView, DetailView, ListView, CreateView, View, UpdateView
 from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory, DiscountCode
 from django.core.mail import send_mail
+from django.utils.decorators import method_decorator
+from .decorators import prevent_authenticated_access
 
 load_dotenv()
 
@@ -27,7 +29,7 @@ class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             # Fetch all products ordered by date_created (latest first)
-            products = Product.objects.order_by('-date_created')[:3]
+            products = Product.objects.order_by('-date_created')[:6]
             # Fetch hot trends, bestsellers, and features using random sampling
             hot_trends = sample(list(products), 3)
             best_sellers = sample(list(products), 3)
@@ -525,6 +527,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                 country=request.POST.get('country'),
                 city=request.POST.get('city'),
                 state=request.POST.get('state'),
+                zipcode=request.POST.get('zipcode'),
             )
 
             cart = Cart.objects.get(user=request.user)
@@ -550,8 +553,9 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
 
             cart.delete()
             cart.save()
-
-            return render(request, 'checkout.html')
+            
+            send_order_email(order)
+            return redirect('app:order_complete', order_id=order.id)
         else:
             return render(request, 'checkout.html')
 
@@ -585,10 +589,12 @@ class SecurityAccountPageView(LoginRequiredMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         return render(request, 'security-account.html')
 
+@method_decorator(prevent_authenticated_access('app:home_page'), name='dispatch')
 class LoginPageView(TemplateView):
     def get(self, request, *args, **kwargs):
         return render(request, 'login.html', {'APP_NAME': os.getenv('APP_NAME')})
 
+@method_decorator(prevent_authenticated_access('app:home_page'), name='dispatch')
 class RegisterPageView(TemplateView):
     def get(self, request, *args, **kwargs):
         return render(request, 'register.html', {'APP_NAME': os.getenv('APP_NAME')})
@@ -651,26 +657,25 @@ class OrderDetailsPage(LoginRequiredMixin, DetailView):
 
 class OrderCompletePageView(LoginRequiredMixin, DetailView):
      def get(self, request, *args, **kwargs):
+        order = get_object_or_404(Order, id=kwargs['order_id'])
         cart, created = Cart.objects.get_or_create(user=request.user)
         total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
-        cart_items = cart.items.all()
+        order_items = order.items.all()
         shipping_fee = 3500.00
         APP_NAME = os.getenv('APP_NAME')
 
-        for cart_item in cart_items:
-            cart_item.first_image = cart_item.product.productimage_set.first()
-
-            cart_item.subtotal = cart_item.quantity * cart_item.product.price
+        for order_item in order_items:
+            order_item.first_image = order_item.product.productimage_set.first()
+            order_item.subtotal = order_item.quantity * order_item.product.price
         
         discount_code = request.session.get('discount_code', None)
-        discount = None
         try:
             discount = DiscountCode.objects.get(code=discount_code)
             discount_percentage = discount.percentage
         except DiscountCode.DoesNotExist:
             discount = None
 
-        total_amount = float(sum(cart_item.subtotal for cart_item in cart_items))
+        total_amount = float(sum(order_item.subtotal for order_item in order_items))
         total_amount_shipping = int(total_amount) + shipping_fee
 
         if discount:
@@ -680,8 +685,8 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
 
         context = {
             'total_items_in_cart': total_items,
-            'cart_items': cart_items, 
-            'cart': cart,
+            'order_items': order_items, 
+            'order': order,
             'total_amount': total_amount,
             'shipping_fee': shipping_fee,
             'total_amount_shipping': total_amount_shipping,
@@ -705,10 +710,10 @@ def handleUserRegistration(request):
             new_user = CustomUser.objects.create(username=username + str(password), first_name=firstName, last_name=lastName, email=email, password=hased_password)
         
         if CustomUser.objects.filter(email=email).exists():
-            return JsonResponse({'message': 'Email already exists'})
+            return JsonResponse({'success': False, 'message': 'Email already exists'})
 
         if password != cmfpassword:
-            return JsonResponse({'message': 'Passwords do not match!'})
+            return JsonResponse({'success': False, 'message': 'Passwords do not match!'})
         
         new_user = CustomUser.objects.create(username=username, first_name=firstName, last_name=lastName, email=email, password=hased_password)
         create_notification(title="User joined", notification="A user just created an account", notification_type="REGISTRATION")
@@ -726,7 +731,7 @@ def handleUserRegistration(request):
         new_user.save()
         login(request, new_user)
         
-        return redirect(reverse('app:home_page'))
+        return JsonResponse({'success': False, 'message': "Registration successful"})
 
     except Exception as e:
         return JsonResponse({'message': str(e)})
@@ -736,17 +741,19 @@ def handleUserLogin(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        user = CustomUser.objects.get(email=email)
+        user = get_object_or_404(CustomUser, email=email)
         if user is not None:
             if user.check_password(password):
                 login(request, user)
                 return JsonResponse({'success': True, 'message': 'Login successful'})
             else:
-                return JsonResponse({'success': False, 'message': 'Invalid password'})
+                return JsonResponse({'success': False, 'message': 'Invalid username or password'})
         else:
             return JsonResponse({'success': False, 'message': 'Account not found'})
+    except Http404:
+        return JsonResponse({'success': False, 'message': 'Account not found!'})
     except Exception as e:
-        return JsonResponse({'success': False, 'message': str(e)})
+        return JsonResponse({'success': False, 'message': 'An error occurred'})
 
 @login_required
 def handleUserLogout(request):
@@ -930,16 +937,16 @@ def handleUpdateProfileDetail(request):
         print("An error occurred: %s" % str(e))
 
 
-def error404(request, e):
+def custom_error_404(request, exception):
     APP_NAME = os.getenv('APP_NAME')
     context = {
         'APP_NAME': APP_NAME,
     }
-    return render(request, '404.html', context)
+    return render(request, '404.html', context, status=404)
 
-def error500(request):
+def custom_error_500(request):
     APP_NAME = os.getenv('APP_NAME')
     context = {
         'APP_NAME': APP_NAME,
     }
-    return render(request, '500.html', context)
+    return render(request, '500.html', context, status=500)

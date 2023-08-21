@@ -179,12 +179,12 @@ def product_detail(request, product_id):
 def add_product(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        sub_category = request.POST.get('sub_category')
-        sub_category_matched = SubCategory.objects.get(name=sub_category)
         description = request.POST.get('description')
         price = request.POST.get('price')
         category = request.POST.get('category')
         category_matched = Category.objects.get(name=category)
+        sub_category = request.POST.get('sub_category')
+        sub_category_matched = SubCategory.objects.get(name=sub_category, category=category_matched)
         sizes = request.POST.getlist('size')
         colors = request.POST.getlist('color')
         images = request.FILES.getlist('image')

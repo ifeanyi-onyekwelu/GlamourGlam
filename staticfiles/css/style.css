@@ -978,9 +978,9 @@ ol {
   display: inline-block;
   height: 40px;
   width: 40px;
-  background: #e1e1e1;
+  background: #bda06a;
   font-size: 15px;
-  color: #111111;
+  color: #fff;
   line-height: 40px;
   text-align: center;
   border-radius: 50%;
@@ -1977,6 +1977,52 @@ ol {
   ~ .checkmark:after {
   border-color: #ffffff;
   opacity: 1;
+}
+
+.custom-background {
+  background: #bda06a !important;
+  color: white !important;
+}
+
+.custom-outline-background {
+  border: 1.3px solid #bda06a !important;
+  color: black !important;
+  transition: all .2s ease-in-out !important;
+}
+
+.custom-outline-background:hover {
+  background: #bda06a !important;
+  color: white !important;
+}
+
+.product__details__widget ul li .color__checkbox label input:checked ~ .custom-checkmark:after {
+  border-color: black;
+  opacity: 1;
+}
+
+.product__details__widget ul li .color__checkbox label .custom-checkmark:after {
+  position: absolute;
+  left: 3px;
+  top: 5px;
+  width: 13px;
+  height: 6px;
+  border: solid black;
+  border-width: 1.5px 1.5px 0px 0px;
+  -webkit-transform: rotate(127deg);
+  -ms-transform: rotate(127deg);
+  transform: rotate(127deg);
+  opacity: 0;
+  content: '';
+}
+
+.product__details__widget ul li .color__checkbox label .custom-checkmark {
+  position: absolute;
+  left: 0;
+  top: -10px;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  content: '';
 }
 
 .product__details__widget ul li .color__checkbox label .checkmark {

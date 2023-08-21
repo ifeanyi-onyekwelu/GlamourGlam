@@ -1,5 +1,6 @@
 {% extends "_base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Order Complete{% endblock %}
 
@@ -50,10 +51,10 @@
 					<div class="details_item">
 						<h4>Order Info</h4>
 						<ul class="list">
-							<li><a href="#"><span>Order number</span> : 60235</a></li>
-							<li><a href="#"><span>Date</span> : Los Angeles</a></li>
-							<li><a href="#"><span>Total</span> : USD 2210</a></li>
-							<li><a href="#"><span>Payment method</span> : Check payments</a></li>
+							<li><a href="#"><span>Order number</span> : {{ order.order_number|truncatechars:10 }}</a></li>
+							<li><a href="#"><span>Date</span> : {{ order.created_at }}</a></li>
+							<li><a href="#"><span>Total</span> : &#8358; {{ order.total_price|intcomma }}</a></li>
+							<li><a href="#"><span>Payment method</span> : Card</a></li>
 						</ul>
 					</div>
 				</div>
@@ -72,10 +73,11 @@
 					<div class="details_item">
 						<h4>Shipping Address</h4>
 						<ul class="list">
-							<li><a href="#"><span>Street</span> : 56/8</a></li>
-							<li><a href="#"><span>City</span> : Los Angeles</a></li>
-							<li><a href="#"><span>Country</span> : United States</a></li>
-							<li><a href="#"><span>Postcode </span> : 36952</a></li>
+							<li><a href="#"><span>Address</span> : {{ order.shipping_address.address|truncatechars:16 }}</a></li>
+							<li><a href="#"><span>City</span> : {{ order.shipping_address.city }}</li>
+							<li><a href="#"><span>State</span> : {{ order.shipping_address.state }}</li>
+							<li><a href="#"><span>Country</span> : {{ order.shipping_address.country }}</a></li>
+							<li><a href="#"><span>Postcode </span> : {{ order.shipping_address.zipcode }}</a></li>
 						</ul>
 					</div>
 				</div>
@@ -92,72 +94,28 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>
-									<p>Pixelstore fresh Blackberry</p>
-								</td>
-								<td>
-									<h5>x 02</h5>
-								</td>
-								<td>
-									<p>$720.00</p>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<p>Pixelstore fresh Blackberry</p>
-								</td>
-								<td>
-									<h5>x 02</h5>
-								</td>
-								<td>
-									<p>$720.00</p>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<p>Pixelstore fresh Blackberry</p>
-								</td>
-								<td>
-									<h5>x 02</h5>
-								</td>
-								<td>
-									<p>$720.00</p>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h4>Subtotal</h4>
-								</td>
-								<td>
-									<h5></h5>
-								</td>
-								<td>
-									<p>$2160.00</p>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h4>Shipping</h4>
-								</td>
-								<td>
-									<h5></h5>
-								</td>
-								<td>
-									<p>Flat rate: $50.00</p>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h4>Total</h4>
-								</td>
-								<td>
-									<h5></h5>
-								</td>
-								<td>
-									<p>$2210.00</p>
-								</td>
-							</tr>
+                            {% for order_item in order_items %}
+                            <tr>
+                                <td>{{ order_item.product.name }}</td>
+                                <td>x {{ order_item.quantity }}</td>
+                                <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td>SUBTOTAL</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>SHIPPING</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>TOTAL</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                            </tr>
 						</tbody>
 					</table>
 				</div>

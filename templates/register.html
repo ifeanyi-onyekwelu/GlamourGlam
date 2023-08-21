@@ -1,92 +1,89 @@
 {% extends '_base.html' %}
 {% load static %}
-{% load humanize %}
 
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock customstyle %}
+
+{% block title %}Register{% endblock %}
 
 {% block content %}
-<div id="container">
-    <div class="row">
-        <div class="col-lg-12 col-md-6 col-sm-12">
-            <div id="signup-box">
-                <form action="{% url 'app:handleUserRegistration' %}" method="post">
-                    {% csrf_token %}
-                    <h1 id="signup-title">Create an Account</h1>
-                    <input type="text" id="fullname-input" name="firstName" placeholder="First Name" class="firstname-input">
-                    <input type="text" id="fullname-input" name="lastName" placeholder="Last Name" class="lastname-input">
-                    <input type="email" id="email-input" name="email" placeholder="Email Address" class="email-input">
-                    <input type="password" id="password-input" name="password" placeholder="Password" class="password-input">
-                    <input type="password" id="password-input" name="cmfpassword" placeholder="Confirm Password" class="cmfpassword-input">
-                    <button id="signup-button" type="submit">Sign Up</button>
-                    <p class="mt-3"><a href="{% url 'app:login_page' %}">Already have an account? login here</a></p>
-                </form>
+<!--================Login Box Area =================-->
+<section class="login_box_area section_gap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login_box_img">
+                    <img class="img-fluid" src="{% static 'img/blog/blog-7.jpg' %}" alt="">
+                    <div class="hover">
+                        <h4>New to {{ APP_NAME }}</h4>
+                        <p>There are advances being made in science and technology everyday, and a good example of this is the</p>
+                        <a class="btn custom-background" href="{% url 'app:login_page' %}">Create an Account</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="login_form_inner">
+                    <h3>Create Account</h3>
+                    <form class="row login_form"  method="post" id="registration-form">
+                        {% csrf_token %}
+                        <div id="registration-errors" class="col-md-12 form-group text-danger"></div>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'First Name'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Last Name'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email Address'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="cmfpassword" name="cmfpassword" placeholder="Confirm Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Confirm Password'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="btn custom-outline-background w-75">Register</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+<!--================End Login Box Area =================-->
 {% endblock %}
 
 {% block javascript %}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".login_form");
-        const formInputs = form.querySelectorAll("input");
-        const firstNameinput = document.querySelector(".firstname-input");
-        const lastNameinput = document.querySelector(".lastname-input");
-        const emailinput = document.querySelector(".email-input");
-        const passwordinput = document.querySelector(".password-input");
-        const cmfpasswordinput = document.querySelector(".cmfpassword-input");
-
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Prevent the form from submitting normally
-
-            const validationErrors = {};
-
-            // Remove existing error messages and red borders
-            formInputs.forEach(input => {
-                input.classList.remove("inputError");
-                const errorMessage = input.parentElement.querySelector(".error-message");
-                if (errorMessage) {
-                    errorMessage.remove();
+    $(document).ready(function() {
+        $('#registration-form').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+    
+            var formData = $(this).serialize(); // Serialize form data
+            var url = "{% url 'app:handleUserRegistration' %}"; // URL for registration handler
+    
+            // AJAX request
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                dataType: 'json', // Expect JSON response
+                success: function(response) {
+                    if (response.success) {
+                        location.href = "{% url 'app:home_page' %}"
+                    } else {
+                        // Display error message(s)
+                        $('#registration-errors').text(response.message);
+                    }
+                },
+                error: function() {
+                    // Handle AJAX request error
+                    $('#registration-errors').text('An error occurred. Please try again.');
                 }
             });
-
-            // Perform validation for each field
-            if (!validator.isLength(firstNameinput.value, { min: 3 })) {
-                validationErrors.firstName = "First name is too short";
-                firstNameinput.classList.add("inputError");
-                displayErrorMessage(firstNameinput, "First name is too short");
-            }
-            if (!validator.isLength(lastNameinput.value, { min: 3 })) {
-                validationErrors.lastName = "Last name is too short";
-                lastNameinput.classList.add("inputError");
-                displayErrorMessage(lastNameinput, "Last name is too short");
-            }
-            if (!validator.isLength(emailinput.value, { min: 1 })) {
-                validationErrors.email = "Email is required";
-                emailinput.classList.add("inputError");
-                displayErrorMessage(emailinput, "Email is required");
-            }
-            if (!validator.isLength(passwordinput.value, { min: 6 })) {
-                validationErrors.password = "Passcode is too short ( Should be 6 characters long )";
-                passwordinput.classList.add("inputError");
-                displayErrorMessage(passwordinput, "Passcode is too short ( Should be 6 characters long )");
-            }
-
-            // Display validation errors
-            if (Object.keys(validationErrors).length > 0) {
-                return;
-            }
-
-            // If all validations pass, submit the form
-            form.submit();
         });
-
-        function displayErrorMessage(input, message) {
-            const errorMessage = document.createElement("span");
-            errorMessage.className = "error-message";
-            errorMessage.textContent = message;
-            input.parentElement.appendChild(errorMessage);
-        }
     });
-</script>
+    </script>
 {% endblock javascript %}
