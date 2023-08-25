@@ -35,7 +35,7 @@ urlpatterns = [
     # ########################################
     path('color/', all_product_color, name="colors"),
     path('color/add/', add_color, name="add_color"),  
-    path('color/delete/<uuid:color_id>', delete_color, name="delete_color"),
+    path('color/delete/<int:color_id>', delete_color, name="delete_color"),
     path('color/delete/all/', delete_all_colors, name="delete_all_colors"),  
 
     # ########################################

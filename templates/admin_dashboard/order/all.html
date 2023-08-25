@@ -35,7 +35,7 @@
                         <tbody>
                             {% for order in orders %}
                             <tr>
-                                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                                <td><a href="{% url 'my_admin:order_detail' order.id %}">{{ order.user.first_name }} {{ order.user.last_name }}</a></td>
                                 {% if order.items.count > 1 %}
                                 <td>{{ order.items.first.product.name }} with {{ order.items.count|add:"-1" }} more items</td>
                                 {% else %}

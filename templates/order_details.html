@@ -4,6 +4,9 @@
 
 {% block title %}Order Detail{% endblock %}
 
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock customstyle %}  
 
 {% block cart_num %}
 
@@ -39,44 +42,73 @@
 </div>
 <!-- Breadcrumb End -->
 
-<!-- Content wrapper -->
-<div class="content-wrapper">
-    <div class="container flex-grow-1 container-p-y mt-3">
-        <h3>Order Details</h3>
-
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <h5>Ordered Items</h5>
-
-                <ul>
-                    {% for item in order.items.all %}
-                    <li class="list-item">{{ item.product.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="col-md-6">
-                <h2>Order Status</h2>
-                {% if order.delivery_status == "P" %}
-                <p>Status: <span class="bg-warning" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Pending</span></p>
-                {% elif order.delivery_status == "S" %}
-                <p>Status: <span class="bg-primary" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Shipping</span></p>
-                {% elif order.delivery_status == "D" %}
-                <p>Status: <span class="bg-success" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Delivered</span></p>
-                {% else %}
-                <p>Status: <span class="bg-danger" style="border-radius: 10px; padding: 2px 5px; font-size: 12px; color: white;">Failed</span></p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h2>Shipping Details</h2>
-                <p>Shipping Address: {{ order.shipping_address }}</p>
-                <!-- <p>Estimated Delivery Date: {{ order.estimated_delivery_date }}</p> -->
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Content wrapper -->
+	<!--================Order Details Area =================-->
+	<section class="product spad order_details section_gap">
+		<div class="container">
+			<div class="row order_d_inner">
+				<div class="col-lg-6">
+					<div class="details_item">
+						<p style="font-size: 1.1rem;">Order Info</p>
+						<ul class="list">
+							<li><a href="#"><span>Order number</span> : {{ order.order_number }}</a></li>
+							<li><a href="#"><span>Date</span> : {{ order.created_at }}</a></li>
+							<li><a href="#"><span>Total</span> : &#8358; {{ order.total_price|intcomma }}</a></li>
+							<li><a href="#"><span>Payment method</span> : Card</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="details_item">
+						<p style="font-size: 1.1rem;">Shipping Address</p>
+						<ul class="list">
+							<li><a href="#"><span>Address</span> : {{ order.shipping_address.address }}</a></li>
+							<li><a href="#"><span>City</span> : {{ order.shipping_address.city }}</li>
+							<li><a href="#"><span>State</span> : {{ order.shipping_address.state }}</li>
+							<li><a href="#"><span>Country</span> : {{ order.shipping_address.country }}</a></li>
+							<li><a href="#"><span>Postcode </span> : {{ order.shipping_address.zipcode }}</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="order_details_table">
+				<h2>Order Details</h2>
+				<div class="table-responsive">
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Product</th>
+								<th scope="col">Quantity</th>
+								<th scope="col">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+                            {% for order_item in order_items %}
+                            <tr>
+                                <td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
+                                <td>x {{ order_item.quantity }}</td>
+                                <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
+                            </tr>
+                            {% endfor %}
+							<tr>
+                                <td>SHIPPING</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>SUBTOTAL</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>TOTAL</td>
+                                <td><h5></h5></td>
+                                <td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                            </tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--================End Order Details Area =================-->
 {% endblock %}

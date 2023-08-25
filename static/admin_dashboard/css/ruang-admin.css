@@ -1096,7 +1096,7 @@ a:focus {
 
 .custom-background {
   background: #bda06a;
-  color: #fff;
+  color: #fff !important;
 }
 
 .sidebar-light .sidebar-brand {

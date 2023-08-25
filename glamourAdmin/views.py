@@ -19,6 +19,7 @@ import calendar
 
 load_dotenv()
 
+
 @admin_only_login
 def dashboard(request):
     orders = Order.objects.all()
@@ -35,47 +36,59 @@ def dashboard(request):
     orders_yesterday = orders.filter(created_at__date=yesterday)
 
     total_order_today = orders_today.filter(delivery_status="P").count()
-    total_order_yesterday = orders_yesterday.filter(delivery_status="P").count()
+    total_order_yesterday = orders_yesterday.filter(
+        delivery_status="P").count()
     percentage_change = 0
     if total_order_yesterday == 0:
         percentage_change = 100.0
     else:
-        percentage_change = ((total_order_today - total_order_yesterday) / total_order_yesterday) * 100
+        percentage_change = (
+            (total_order_today - total_order_yesterday) / total_order_yesterday) * 100
 
     # Using these to perform some logic
     first_day = timezone.datetime(current_year, current_month, 1)
-    last_day = timezone.datetime(current_year, current_month, calendar.monthrange(current_year, current_month)[1])
+    last_day = timezone.datetime(current_year, current_month, calendar.monthrange(
+        current_year, current_month)[1])
 
     # Get orders from this month
-    filtered_monthly_orders = orders.filter(created_at__range=(first_day, last_day))
+    filtered_monthly_orders = orders.filter(
+        created_at__range=(first_day, last_day))
     # Get users that joined this month
-    filtered_monthly_users_joined = users.filter(date_joined__range=(first_day, last_day)).count()
+    filtered_monthly_users_joined = users.filter(
+        date_joined__range=(first_day, last_day)).count()
 
     # Get users that joined last month
     last_month = current_month - 1 if current_month > 1 else 12
     last_year = current_year if current_month > 1 else current_year - 1
     last_month_first_day = timezone.datetime(last_year, last_month, 1)
-    last_month_last_day = timezone.datetime(last_year, last_month, calendar.monthrange(last_year, last_month)[1])
-    filtered_last_month_users_joined = users.filter(date_joined__range=(last_month_first_day, last_month_last_day)).count()
-    filtered_last_month_orders = orders.filter(created_at__range=(last_month_first_day, last_month_last_day))
-    filtered_this_month_orders = orders.filter(created_at__range=(first_day, timezone.now()))
+    last_month_last_day = timezone.datetime(
+        last_year, last_month, calendar.monthrange(last_year, last_month)[1])
+    filtered_last_month_users_joined = users.filter(
+        date_joined__range=(last_month_first_day, last_month_last_day)).count()
+    filtered_last_month_orders = orders.filter(
+        created_at__range=(last_month_first_day, last_month_last_day))
+    filtered_this_month_orders = orders.filter(
+        created_at__range=(first_day, timezone.now()))
 
     percentage_change_users = 0
     if filtered_last_month_users_joined == 0:
         percentage_change_users = 100.0
     else:
-        percentage_change_users = ((filtered_monthly_users_joined - filtered_last_month_users_joined) / filtered_last_month_users_joined) * 100
+        percentage_change_users = (
+            (filtered_monthly_users_joined - filtered_last_month_users_joined) / filtered_last_month_users_joined) * 100
 
     # Get orders from last year
     last_year_first_day = timezone.datetime(current_year - 1, 1, 1)
     last_year_last_day = timezone.datetime(current_year - 1, 12, 31)
-    filtered_last_year_orders = orders.filter(created_at__range=(last_year_first_day, last_year_last_day))
+    filtered_last_year_orders = orders.filter(
+        created_at__range=(last_year_first_day, last_year_last_day))
 
     percentage_change_users = 0
     if filtered_last_month_users_joined == 0:
         percentage_change_users = 100.0
     else:
-        percentage_change_users = ((filtered_monthly_users_joined - filtered_last_month_users_joined) / filtered_last_month_users_joined) * 100
+        percentage_change_users = (
+            (filtered_monthly_users_joined - filtered_last_month_users_joined) / filtered_last_month_users_joined) * 100
 
     total_orders = orders.count()
     percentage_change_orders_year = 0
@@ -83,18 +96,22 @@ def dashboard(request):
     if total_orders_last_year == 0:
         percentage_change_orders_year = 100.0
     else:
-        percentage_change_orders_year = ((total_orders - total_orders_last_year) / total_orders_last_year) * 100
+        percentage_change_orders_year = (
+            (total_orders - total_orders_last_year) / total_orders_last_year) * 100
 
     total_pending_orders = orders.filter(delivery_status="P").count()
     total_income = sum(order.total_price for order in filtered_monthly_orders)
-    total_income_last_month = sum(order.total_price for order in filtered_last_month_orders)
-    total_income_this_month = sum(order.total_price for order in filtered_this_month_orders)
+    total_income_last_month = sum(
+        order.total_price for order in filtered_last_month_orders)
+    total_income_this_month = sum(
+        order.total_price for order in filtered_this_month_orders)
 
     percentage_change_income = 0
     if total_income_last_month == 0:
         percentage_change_income = 100.0
     else:
-        percentage_change_income = ((total_income - total_income_last_month) / total_income_last_month) * 100
+        percentage_change_income = (
+            (total_income - total_income_last_month) / total_income_last_month) * 100
 
     # Handle display of 6 random orders
     random_orders = orders.order_by('?')[:6]
@@ -114,29 +131,35 @@ def dashboard(request):
         'total_income_this_month': total_income_this_month,
         'random_orders': random_orders,
         'notifications': get_all_notifications(),
+        'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/index.html', context)
 
 # ########################################
 # User
 # ########################################
+
+
 @admin_only_login
 @staff_member_required
 def all_user(request):
     users = CustomUser.objects.all()
-    return render(request, 'admin_dashboard/user/all.html', {'users': users})
+    return render(request, 'admin_dashboard/user/all.html', {'users': users, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def user_detail(request, user_id):
     user = CustomUser.objects.get(id=user_id)
-    return render(request, 'admin_dashboard/user/user_detail.html', {'user': user})
+    return render(request, 'admin_dashboard/user/user_detail.html', {'user': user, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def mark_user_as_active(request, user_id):
     update_user_status(user_id, True)
     return redirect('my_admin:users')
+
 
 @admin_only_login
 @staff_member_required
@@ -147,6 +170,8 @@ def mark_user_as_suspended(request, user_id):
 # ########################################
 # Product
 # ########################################
+
+
 @admin_only_login
 def all_products(request):
     products = Product.objects.all()
@@ -155,9 +180,11 @@ def all_products(request):
 
     context = {
         'products': products_with_images,
+        'APP_NAME': os.getenv('APP_NAME')
     }
 
     return render(request, 'admin_dashboard/product/all.html', context)
+
 
 @admin_only_login
 def product_detail(request, product_id):
@@ -170,10 +197,12 @@ def product_detail(request, product_id):
         'product': product,
         'productImage': productImage,
         'original_price': original_price,
-        'price_with_increase': price_with_increase
+        'price_with_increase': price_with_increase,
+        'APP_NAME': os.getenv('APP_NAME')
     }
 
     return render(request, 'admin_dashboard/product/product_detail.html', context)
+
 
 @admin_only_login
 def add_product(request):
@@ -184,7 +213,8 @@ def add_product(request):
         category = request.POST.get('category')
         category_matched = Category.objects.get(name=category)
         sub_category = request.POST.get('sub_category')
-        sub_category_matched = SubCategory.objects.get(name=sub_category, category=category_matched)
+        sub_category_matched = SubCategory.objects.get(
+            name=sub_category, category=category_matched)
         sizes = request.POST.getlist('size')
         colors = request.POST.getlist('color')
         images = request.FILES.getlist('image')
@@ -226,6 +256,7 @@ def add_product(request):
         'categories': categories,
         'sizes': sizes,
         'colors': colors,
+        'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/product/add.html', context)
 
@@ -251,22 +282,24 @@ def edit_product(request, product_id):
             product.description = description
             product.price = price
             product.category = category_matched
-            
-             # Handling sizes
+
+            # Handling sizes
             for size in product.sizes.all():
                 if size.name not in sizes:
                     product.sizes.remove(size)
-                    
+
             for size_name in sizes:
                 print(size_name)
-                size, created = ProductSize.objects.get_or_create(name=size_name, product=product)
-                print("Size exists: ",created)
+                size, created = ProductSize.objects.get_or_create(
+                    name=size_name, product=product)
+                print("Size exists: ", created)
                 if created:
                     product.sizes.add(size)
                 size.save()
 
             for image in images:
-                img, created = ProductImage.objects.get_or_create(product=product, image=image)
+                img, created = ProductImage.objects.get_or_create(
+                    product=product, image=image)
                 print("Image exists: ", created)
                 if not created:
                     product.images.add(img)
@@ -288,7 +321,7 @@ def edit_product(request, product_id):
             return redirect('my_admin:product_detail', product_id=product.id)
         except Product.DoesNotExist:
             print(Product.DoesNotExist(str(e)))
-    
+
     sub_categories = SubCategory.objects.all()
     categories = Category.objects.all()
     sizes = ProductSize.objects.all()
@@ -301,22 +334,27 @@ def edit_product(request, product_id):
         'sizes': sizes,
         'colors': colors,
         'product': product,
-        'productImages': productImages
+        'productImages': productImages,
+        'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/product/edit.html', context)
 
 # ########################################
 # Category
 # ########################################
+
+
 @admin_only_login
 def all_category(request):
     categories = Category.objects.all()
-    return render(request, 'admin_dashboard/category/all.html', {'categories': categories})
+    return render(request, 'admin_dashboard/category/all.html', {'categories': categories, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 def category_detail(request, category_id):
     category = Category.objects.get(id=category_id)
-    return render(request, 'admin_dashboard/category/category_detail.html', {'category': category})
+    return render(request, 'admin_dashboard/category/category_detail.html', {'category': category, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 def add_category(request):
@@ -328,12 +366,14 @@ def add_category(request):
             return redirect('my_admin:category_detail', category_id=category.id)
     else:
         category_form = CategoryForm()
-    return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form})
+    return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     category.delete()
     return redirect('my_admin:categories')
+
 
 @admin_only_login
 def delete_all_category(request):
@@ -349,7 +389,8 @@ def all_product_color(request):
     colors = ProductColor.objects.all()
     print(colors)
     color_form = ColorForm()
-    return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form})
+    return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 def add_color(request):
@@ -363,10 +404,12 @@ def add_color(request):
         color_form = ColorForm()
     return render(request, 'admin_dashboard/color/all.html', {'color_form': color_form})
 
+
 def delete_color(request, color_id):
     color = get_object_or_404(ProductColor, id=color_id)
     color.delete()
     return redirect('my_admin:colors')
+
 
 @admin_only_login
 def delete_all_colors(request):
@@ -376,17 +419,21 @@ def delete_all_colors(request):
 # ########################################
 # Sub Category
 # ########################################
+
+
 @admin_only_login
 @staff_member_required()
 def all_sub_category(request):
     sub_categories = SubCategory.objects.all()
-    return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories})
+    return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required()
 def sub_category_detail(request, sub_category_id):
     sub_category = SubCategory.objects.get(id=sub_category_id)
-    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category})
+    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required()
@@ -399,12 +446,14 @@ def add_sub_category(request):
             return redirect('my_admin:add_sub_category')
     else:
         sub_category_form = SubCategoryForm()
-    return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form})
+    return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 def delete_sub_category(request, sub_category_id):
     sub_category = get_object_or_404(SubCategory, id=sub_category_id)
     sub_category.delete()
     return redirect('my_admin:sub_categories')
+
 
 @admin_only_login
 def delete_all_sub_category(request):
@@ -420,42 +469,78 @@ def delete_all_sub_category(request):
 def all_order(request):
     orders = Order.objects.all()
     context = {
-        'orders': orders
+        'orders': orders,
+        'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/order/all.html', context)
+
 
 @admin_only_login
 @staff_member_required
 def order_detail(request, order_id):
-    order = Order.objects.get(id=order_id)
+    order = get_object_or_404(Order, id=order_id)
+    order_items = order.items.all()
+    shipping_fee = 3500.00
+    APP_NAME = os.getenv('APP_NAME')
+
+    for order_item in order_items:
+        order_item.first_image = order_item.product.productimage_set.first()
+        order_item.subtotal = order_item.quantity * order_item.product.price
+
+    discount_code = request.session.get('discount_code', None)
+    try:
+        discount = DiscountCode.objects.get(code=discount_code)
+        discount_percentage = discount.percentage
+    except DiscountCode.DoesNotExist:
+        discount = None
+
+    total_amount = float(
+        sum(order_item.subtotal for order_item in order_items))
+    total_amount_shipping = int(total_amount) + shipping_fee
+
+    if discount:
+        discount_amount = (discount.percentage / 100) * total_amount
+        total_amount -= discount_amount
+        total_amount_shipping = int(total_amount) + shipping_fee
+
     context = {
-        'order': order
+        'order_items': order_items,
+        'order': order,
+        'total_amount': total_amount,
+        'shipping_fee': shipping_fee,
+        'total_amount_shipping': total_amount_shipping,
+        'APP_NAME': APP_NAME,
     }
     return render(request, 'admin_dashboard/order/order_detail.html', context)
+
 
 @admin_only_login
 @staff_member_required
 def all_pending_orders(request):
     pending_orders = Order.objects.filter(delivery_status="P")
-    return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders})
+    return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def all_shipped_orders(request):
     shipped_orders = Order.objects.filter(delivery_status="S")
-    return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders})
+    return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def all_delivered_orders(request):
     delivered_orders = Order.objects.filter(delivery_status="D")
-    return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders})
+    return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def all_failed_delivery_orders(request):
     failed_delivered_orders = Order.objects.filter(delivery_status="F")
-    return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders})
+    return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
@@ -463,11 +548,13 @@ def mark_order_as_shipped(request, order_id):
     update_order_delivery_status(order_id, 'S')
     return redirect('my_admin:orders')
 
+
 @admin_only_login
 @staff_member_required
 def mark_order_as_delivered(request, order_id):
     update_order_delivery_status(order_id, 'D')
     return redirect('my_admin:orders')
+
 
 @admin_only_login
 @staff_member_required
@@ -478,6 +565,8 @@ def mark_order_as_failed_delivery(request, order_id):
 # ########################################
 # Discounts and Coupons
 # ########################################
+
+
 @admin_only_login
 def all_coupons(request):
     coupons = DiscountCode.objects.all()
@@ -485,14 +574,17 @@ def all_coupons(request):
 
     context = {
         'coupons': coupons,
-        'coupon_form': coupon_form
+        'coupon_form': coupon_form,
+        'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/coupons/all.html', context)
+
 
 @admin_only_login
 def coupon_detail(request, coupon_id):
     coupon = DiscountCode.objects.get(id=coupon_id)
-    return render(request, 'admin_dashboard/coupons/coupon_detail.html', {'coupon': coupon})
+    return render(request, 'admin_dashboard/coupons/coupon_detail.html', {'coupon': coupon, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 def create_coupon(request):
@@ -503,22 +595,26 @@ def create_coupon(request):
             number_of_codes = int(coupon_form.cleaned_data['number_of_codes'])
 
             for _ in range(number_of_codes):
-                code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                code = ''.join(random.choices(
+                    string.ascii_uppercase + string.digits, k=10))
                 valid_from = timezone.now()
                 valid_to = valid_from + timedelta(days=365)
 
-                discount_code = DiscountCode(code=code, percentage=percentage, valid_from=valid_from, valid_to=valid_to)
+                discount_code = DiscountCode(
+                    code=code, percentage=percentage, valid_from=valid_from, valid_to=valid_to)
                 discount_code.save()
 
             return redirect(reverse('my_admin:discount_codes'))
     else:
         coupon_form = CouponForm()
-    return render(request, 'admin_dashboard/coupons/add.html', {'coupon_form': coupon_form})
+    return render(request, 'admin_dashboard/coupons/add.html', {'coupon_form': coupon_form, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 def delete_coupon(request, coupon_id):
     coupon = get_object_or_404(DiscountCode, id=coupon_id)
     coupon.delete()
     return redirect('my_admin:discount_codes')
+
 
 @admin_only_login
 def delete_all_coupons(request):
@@ -533,18 +629,21 @@ def delete_all_coupons(request):
 @staff_member_required
 def all_shipping_address(request):
     shipping_address = ShippingAddress.objects.all()
-    return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address})
+    return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 @admin_only_login
 @staff_member_required
 def shipping_detail(request, shipping_id):
     shipping_address = ShippingAddress.objects.get(id=shipping_id)
-    return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address})
+    return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME')})
+
 
 def delete_shipping_address(request, shipping_id):
     shipping_address = get_object_or_404(ShippingAddress, id=shipping_id)
     shipping_address.delete()
     return redirect('my_admin:shipping_addresses')
+
 
 @admin_only_login
 def delete_all_shipping_addresses(request):
@@ -566,7 +665,8 @@ def admin_login(request):
 
             if user.check_password(password):
                 login(request, user)
-                create_notification(title="Login", notification="You logged in", notification_type="ACTIVITY")
+                create_notification(
+                    title="Login", notification="You logged in", notification_type="ACTIVITY")
                 return redirect(reverse('my_admin:dashboard'))
             else:
                 messages.error(request, "Account does not exists")
@@ -579,13 +679,14 @@ def admin_login(request):
         messages.error(request, "Account does not exist!")
         return redirect(reverse('my_admin:login'))
 
-    return render(request, 'admin_dashboard/login.html')
+    return render(request, 'admin_dashboard/login.html', {'APP_NAME': os.getenv('APP_NAME')})
+
 
 def admin_logout(request):
     logout(request)
-    create_notification(title="Logout", notification="You logged out", notification_type="ACTIVITY")
+    create_notification(
+        title="Logout", notification="You logged out", notification_type="ACTIVITY")
     return redirect(reverse('app:home_page'))
-
 
 # Error handling
 def error404(request, e):
@@ -594,7 +695,7 @@ def error404(request, e):
         'APP_NAME': APP_NAME,
     }
     return render(request, '404.html', context)
-    
+
 def error500(request):
     APP_NAME = os.getenv('APP_NAME')
     context = {

@@ -14,6 +14,10 @@
 
     <link rel="shortcut icon" href="{% static 'img/gg favicon.png' %}" type="image/x-icon">
 
+    {% block customstyletemp %}
+
+    {% endblock customstyletemp %}
+
     <!-- Css Styles -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css" />
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type="text/css" />
@@ -81,6 +85,11 @@
             font-size: 14px;
             margin-right: 5px;
         }
+        @media screen and (max-width: 414px) {
+            .user-dropdown-menu {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -109,14 +118,14 @@
                 <ul class="user-dropdown-menu">
                     {% if request.user.is_authenticated %}
                     <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i> Order History</a></li>
-                    <li class="user-dropdown-item"><i class="fa fa-comments"></i><a href="">Messages</a></li>
-                    <li class="user-dropdown-item"><i class="fa fa-sign-out"></i><a href="{% url 'app:handleUserLogout' %}">Logout</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i class="fa fa-user"></i> Account</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
                     {% else %}
-                    <li class="user-dropdown-item"><i class="fa fa-lock"></i><a href="{% url 'app:login_page' %}">Login</a></li>
-                    <li class="user-dropdown-item"><i class="fa fa-user-circle"></i><a href="{% url 'app:register_page' %}">Register</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:login_page' %}"><i class="fa fa-lock"></i> Login</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:register_page' %}"><i class="fa fa-user-circle"></i> Register</a></li>
                     <li class="user-dropdown-item"><a href="{% url 'app:about_page' %}"><i class="fa fa-info-circle"></i> About Us</a></li>
-                    <li class="user-dropdown-item"><a href="{% url 'app:contact_page' %}"><i class="fa fa-envelope"></i> Contact Us</a></li>  
-                    <li class="user-dropdown-item"><i class="fa fa-question-circle"></i><a href="{% url 'app:faqs_page' %}">FAQs</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:contact_page' %}"><i class="fa fa-envelope"></i> Contact Us</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:faqs_page' %}"><i class="fa fa-question-circle"></i> FAQs</a></li>
                     {% endif %}
                 </ul>
             </li>
@@ -170,6 +179,10 @@
                             {% url 'app:kids_page' as kids_page %}
                             <li class="{% if kids_page == request.path %} active {% endif %}">
                                 <a href="{{ kids_page }}">Kid's</a>
+                            </li>
+                            {% url 'app:unisex_page' as unisex_page %}
+                            <li class="{% if unisex_page == request.path %} active {% endif %}">
+                                <a href="{{ unisex_page }}">Unisex</a>
                             </li>
                             {% url 'app:accessories_page' as accessories_page %}
                             <li class="{% if accessories_page == request.path %} active {% endif %}">
@@ -247,9 +260,10 @@
                         <h6>Quick links</h6>
                         <ul>
                             <li><a href="{% url 'app:about_page' %}">About Us</a></li>
-                            <li><a href="{% url 'app:privacy_policy_page' %}">Privacy Policy</a></li>
-                            <li><a href="{% url 'app:terms_of_service_page' %}">Terms of Service</a></li>
                             <li><a href="{% url 'app:contact_page' %}">Contact Us</a></li>
+                            <li><a href="{% url 'app:returns_and_refunds_page' %}">Returns</a></li>
+                            <li><a href="{% url 'app:dropshipping_page' %}">Dropshipping</a></li>
+                            <li><a href="{% url 'app:terms_of_service_page' %}">Terms of Service</a></li>
                             <li><a href="{% url 'app:faqs_page' %}">FAQ</a></li>
                         </ul>
                     </div>
@@ -262,6 +276,7 @@
                             <li><a href="{% url 'app:men_page' %}">Men</a></li>
                             <li><a href="{% url 'app:kids_page' %}">Kids</a></li>
                             <li><a href="{% url 'app:shop_page' %}">Shop</a></li>
+                            <li><a href="{% url 'app:unisex_page' %}">Unisex</a></li>
                             <li><a href="{% url 'app:accessories_page' %}">Accessories</a></li>
                         </ul>
                     </div>

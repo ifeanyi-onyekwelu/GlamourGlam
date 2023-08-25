@@ -15,9 +15,6 @@ class Category(models.Model):
     name = models.CharField(max_length=255, default="")
     description = models.TextField(default="")
 
-    def __str__(self):
-        return self.name
-
 class SubCategory(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -26,9 +23,6 @@ class SubCategory(models.Model):
     )
     name = models.CharField(max_length=255, default="")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
-
-    def __str__(self):
-        return self.name
 
 class Product(models.Model):
     id = models.UUIDField(
@@ -48,39 +42,15 @@ class Product(models.Model):
     colors = models.ManyToManyField('ProductColor', related_name='products', default="Default Color")
     images = models.ManyToManyField('ProductImage', related_name='products')
 
-    def __str__(self):
-        return f'{self.name} for {self.category.name}, price: {self.price}'
-
 class ProductSize(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
     name = models.CharField(max_length=20)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 
-    def __str__(self):
-        return self.name
-
 class ProductColor(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
     color = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.color
-
 class ProductImage(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/')
 
@@ -91,20 +61,6 @@ class ProductImage(models.Model):
             url = "No image found"
         return url
 
-class Review(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    review = models.TextField(default="")
-    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.author.first_name} {self.author.last_name} says the product: '{self.product}' is {self.review}"
-
 class Cart(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -114,9 +70,6 @@ class Cart(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Cart for {self.user.first_name} {self.user.last_name}"
 
 class CartItem(models.Model):
     id = models.UUIDField(
@@ -130,9 +83,6 @@ class CartItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     color = models.CharField(max_length=20, null=True, blank=True, default="Default Color")
     size = models.CharField(max_length=20, null=True, blank=True, default="Default Size")
-
-    def __str__(self):
-        return f"{self.quantity} {self.product} in cart"
 
     def subtotal(self):
         return self.product.price * self.quantity
@@ -163,9 +113,6 @@ class Order(models.Model):
     delivery_status = models.CharField(max_length=1, choices=DELIVERY_STATUS_CHOICES, default='P')
     shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True)
 
-    def __str__(self):
-        return f"Order #{self.id} for {self.user.first_name} {self.user.last_name}"
-
     def save(self, *args, **kwargs):
         if not self.order_number:
             self.order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=30))
@@ -184,9 +131,6 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     color = models.CharField(max_length=20, null=True, blank=True, default="Default Color")
     size = models.CharField(max_length=20, null=True, blank=True, default="Default Size")
-
-    def __str__(self):
-        return f"{self.quantity}x {self.product.name} in Order #{self.order.id}"
 
     def subtotal(self):
         return self.item_price * self.quantity
@@ -207,9 +151,6 @@ class ShippingAddress(models.Model):
     zipcode = models.CharField(max_length=200)
     date_added = models.DateField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} order to be shipped to {self.country} {self.state} {self.address}"
-
 class Return(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -225,9 +166,6 @@ class Return(models.Model):
     ), default='P')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.order.user.first_name + ' ' + self.order.user.last_name + ' ' + self.reason
-
 class DiscountCode(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -239,9 +177,6 @@ class DiscountCode(models.Model):
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.code
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -275,8 +210,32 @@ class Notification(models.Model):
     notification_type = models.CharField(max_length=255, choices=NOTIFICATION_TYPE, default='Reports')
     date_created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.title + ' ' + self.notification
-
     def formatted_datetime(self):
         return self.date_created.strftime("%B %d, %Y")
+    
+class Comment(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    authorFullName = models.CharField(max_length=255, default="")
+    authorEmail = models.CharField(max_length=255, default="")
+    authorPhoneNumber = models.CharField(max_length=255, default="")
+    comment = models.TextField(default="")
+    date_created = models.DateTimeField(auto_now_add=True)
+
+class Review(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    review = models.TextField(default="")
+    authorFullName = models.CharField(max_length=255, default="")
+    authorEmail = models.CharField(max_length=255, default="")
+    authorPhoneNumber = models.CharField(max_length=255, default="")
+    ratings = models.CharField(max_length=10, default="")
+    date_created = models.DateTimeField(auto_now_add=True)

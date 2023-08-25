@@ -22,6 +22,25 @@
 
 {% block title %}Cart{% endblock title %}
 
+{% block customstyle %}
+<style>
+    @media screen and (max-width: 414px) {
+        .shop__cart__table thead th {
+            font-size: 14px;
+        }
+        .shop__cart__table tbody td {
+            font-size: 14px !important;
+        }
+        .shop__cart__table tbody td img {
+            width: 70px !important;
+        }
+        .shop__cart__table tbody .quantity-form input {
+            width: 40%;
+        }
+    }
+</style>
+{% endblock customstyle %}
+
 
 {% block content %}
     <!-- Breadcrumb Begin -->
@@ -109,7 +128,7 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="discount__content">
-                    <h6>Discount codes</h6>
+                    <h6>Discount code</h6>
                     <form action="{% url 'app:cart_page' %}" method="post">
                         {% csrf_token %}
                         <input type="text" placeholder="Enter your coupon code" name="code">

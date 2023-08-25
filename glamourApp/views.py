@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout, authenticate, get_user_model
-from .utils import get_products_with_images, send_message, create_notification
+from .utils import get_products_with_images, send_message, create_notification, send_order_email
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.generic import TemplateView, DetailView, ListView, CreateView, View, UpdateView
 from .models import Product, ShippingAddress, Order, OrderItem, Category, ProductImage, Cart, CartItem, Notification, SubCategory, DiscountCode
@@ -29,7 +29,7 @@ class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             # Fetch all products ordered by date_created (latest first)
-            products = Product.objects.order_by('-date_created')[:6]
+            products = Product.objects.order_by('-date_created')
             # Fetch hot trends, bestsellers, and features using random sampling
             hot_trends = sample(list(products), 3)
             best_sellers = sample(list(products), 3)
@@ -73,6 +73,7 @@ class AboutPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         APP_NAME = os.getenv('APP_NAME')
+        FOUNDER_NAME = os.getenv('FOUNDER_NAME')
 
         cart = None
         total_items = 0
@@ -81,40 +82,7 @@ class AboutPageView(TemplateView):
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
         
         context['APP_NAME'] = APP_NAME
-        context['total_items_in_cart'] = total_items
-        return context
-
-class PrivacyPolicyPageView(TemplateView):
-    template_name = 'privacy_policy.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        APP_NAME = os.getenv('APP_NAME')
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
-        
-        context['APP_NAME'] = APP_NAME
-        context['total_items_in_cart'] = total_items
-        return context
-
-class TermsOfServicePageView(TemplateView):
-    template_name = 'terms_of_service.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        APP_NAME = os.getenv('APP_NAME')
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
-        
-        context['APP_NAME'] = APP_NAME
+        context['FOUNDER_NAME'] = FOUNDER_NAME
         context['total_items_in_cart'] = total_items
         return context
 
@@ -125,7 +93,11 @@ class WomenPageView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        category = get_object_or_404(Category, name='Women')
+        category = None
+        try:
+            category = get_object_or_404(Category, name='Women')
+        except Exception as e:
+            print("No category found")
         return Product.objects.filter(category=category).order_by('id')  
 
     def get_context_data(self, **kwargs):
@@ -166,7 +138,11 @@ class MenPageView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        category = get_object_or_404(Category, name='Men')
+        category = None
+        try:
+            category = get_object_or_404(Category, name='Men')
+        except Exception as e:
+            print("No category found")
         return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
@@ -200,6 +176,52 @@ class MenPageView(ListView):
         context['APP_NAME'] = APP_NAME.title()
         return context
 
+class UnisexPageView(ListView):
+    model = Product
+    template_name = 'unisex.html'
+    context_object_name = 'products'
+    paginate_by = 9
+
+    def get_queryset(self):
+        category = None
+        try:
+            category = get_object_or_404(Category, name='Unisex')
+        except Exception as e:
+            print("No category found")
+        return Product.objects.filter(category=category).order_by('id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_products = self.get_queryset()
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+
+
+        # Paginate the products
+        paginator = Paginator(all_products, self.paginate_by)
+        page = self.request.GET.get('page')
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        context['all_products'] = get_products_with_images(products)
+
+        unisex_products = Product.objects.filter(category__name__in=['Unisex'])
+        sub_categories = SubCategory.objects.filter(product__in=unisex_products).distinct()
+        context['sub_categories'] = sub_categories
+        context['total_items_in_cart'] = total_items
+        context['APP_NAME'] = APP_NAME.title()
+        return context
+
 class KidsPageView(ListView):
     model = Product
     template_name = 'kids.html'
@@ -207,7 +229,11 @@ class KidsPageView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        category = get_object_or_404(Category, name='Kids')
+        category = None
+        try:
+            category = get_object_or_404(Category, name='Kids')
+        except Exception as e:
+            print("No category found")
         return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
@@ -249,7 +275,11 @@ class AccessoriesPageView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        category = get_object_or_404(Category, name='Accessories')
+        category = None
+        try:
+            category = get_object_or_404(Category, name='Accessories')
+        except Exception as e:
+            print("No category found")
         return Product.objects.filter(category=category).order_by('id')
 
     def get_context_data(self, **kwargs):
@@ -534,7 +564,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             cart_items = cart.items.all()
 
             total_price = sum(item.product.price * item.quantity for item in cart_items)
-
+        
             order = Order.objects.create(
                 user=request.user,
                 shipping_address=shipping_address,
@@ -546,34 +576,23 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     order=order,
                     product=cart_item.product,
                     quantity=cart_item.quantity,
-                    price=cart_item.product.price
+                    price=cart_item.product.price,
+                    size = cart_item.size,
+                    color=cart_item.color
                 )
             
                 order.items.add(order_items)
 
             cart.delete()
             cart.save()
-            
-            send_order_email(order)
-            return redirect('app:order_complete', order_id=order.id)
+            try:
+                send_order_email(order)
+            except Exception as e:
+                print("Error occurred %s", e)
+
+            return JsonResponse({'success': True, 'message': 'Order was made successfully', 'order_id': order.id})
         else:
-            return render(request, 'checkout.html')
-
-class FAQPageView(TemplateView):
-    def get(self, request, *args, **kwargs):
-        cart = None
-        total_items = 0
-        APP_NAME = os.getenv('APP_NAME')
-
-        if request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
-
-        context = {
-            'APP_NAME': APP_NAME,
-            'total_items_in_cart': total_items,
-        }
-        return render(request, 'faqs.html', context)
+            return JsonResponse({'success': False, 'message': 'Invalid method'})
 
 class AccountPageView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
@@ -635,25 +654,44 @@ class OrderHistoryPage(LoginRequiredMixin, TemplateView):
         return render(request, 'order_history.html', context)
 
 class OrderDetailsPage(LoginRequiredMixin, DetailView):
-    model = Order
-    template_name = 'order_details.html'
-    context_object_name = 'order'
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(Order, id=self.kwargs['order_id'])
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        cart = None
-        total_items = 0
+    def get(self, request, *args, **kwargs):
+        order = get_object_or_404(Order, id=kwargs['order_id'])
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        order_items = order.items.all()
+        shipping_fee = 3500.00
         APP_NAME = os.getenv('APP_NAME')
 
-        cart, created = Cart.objects.get_or_create(user=self.request.user)
-        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        for order_item in order_items:
+            order_item.first_image = order_item.product.productimage_set.first()
+            order_item.subtotal = order_item.quantity * order_item.product.price
+        
+        discount_code = request.session.get('discount_code', None)
+        try:
+            discount = DiscountCode.objects.get(code=discount_code)
+            discount_percentage = discount.percentage
+        except DiscountCode.DoesNotExist:
+            discount = None
 
-        context['total_items_in_cart'] = total_items
-        context['APP_NAME'] = APP_NAME
-        return context
+        total_amount = float(sum(order_item.subtotal for order_item in order_items))
+        total_amount_shipping = int(total_amount) + shipping_fee
+
+        if discount:
+            discount_amount = (discount.percentage / 100) * total_amount
+            total_amount -= discount_amount
+            total_amount_shipping = int(total_amount) + shipping_fee
+
+        context = {
+            'total_items_in_cart': total_items,
+            'order_items': order_items, 
+            'order': order,
+            'total_amount': total_amount,
+            'shipping_fee': shipping_fee,
+            'total_amount_shipping': total_amount_shipping,
+            'APP_NAME': APP_NAME,
+        }
+
+        return render(request, 'order_details.html', context)
 
 class OrderCompletePageView(LoginRequiredMixin, DetailView):
      def get(self, request, *args, **kwargs):
@@ -695,7 +733,92 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
 
         return render(request, 'order_complete.html', context)
 
-# Function based views
+# Legal Views
+class FAQPageView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        cart = None
+        total_items = 0
+        APP_NAME = os.getenv('APP_NAME')
+
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+
+        context = {
+            'APP_NAME': APP_NAME,
+            'total_items_in_cart': total_items,
+        }
+        return render(request, 'faqs.html', context)
+
+class PrivacyPolicyPageView(TemplateView):
+    template_name = 'privacy_policy.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+class TermsOfServicePageView(TemplateView):
+    template_name = 'terms_of_service.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+class ReturnAndRefund(TemplateView):
+    template_name = 'returns_and_refund.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+        
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+class DropShipping(TemplateView):
+    template_name = 'drop_shipping.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv('APP_NAME')
+        
+        cart = None
+        total_items = 0
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum']
+        
+        context['APP_NAME'] = APP_NAME
+        context['total_items_in_cart'] = total_items
+        return context
+
+# Function based handler views
 def handleUserRegistration(request):
     try:
         firstName = request.POST.get('firstName')
@@ -706,14 +829,15 @@ def handleUserRegistration(request):
         username = str(firstName) + str(lastName)
         hased_password = make_password(password)
 
-        if CustomUser.objects.filter(username=username).exists() and not CustomUser.objects.filter(email=email).exists():
-            new_user = CustomUser.objects.create(username=username + str(password), first_name=firstName, last_name=lastName, email=email, password=hased_password)
-        
         if CustomUser.objects.filter(email=email).exists():
             return JsonResponse({'success': False, 'message': 'Email already exists'})
 
         if password != cmfpassword:
             return JsonResponse({'success': False, 'message': 'Passwords do not match!'})
+
+        if CustomUser.objects.filter(username=username).exists() and not CustomUser.objects.filter(email=email).exists():
+            new_user = CustomUser.objects.create(username=username + str(password), first_name=firstName, last_name=lastName, email=email, password=hased_password)
+        
         
         new_user = CustomUser.objects.create(username=username, first_name=firstName, last_name=lastName, email=email, password=hased_password)
         create_notification(title="User joined", notification="A user just created an account", notification_type="REGISTRATION")
@@ -766,12 +890,16 @@ def handleAddToCart(request, product_id, color_selected, size_selected, quantity
     user = request.user
 
     product_price = product.price
-
+    print(request)
+    print(product_id)
+    print(color_selected)
+    print(size_selected)
+    print(quantity_selected)
     # If the user is authenticated, handle their cart
     cart, created = Cart.objects.get_or_create(user=user)
 
     try:
-        cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item = CartItem.objects.get(cart=cart, product=product, size=size_selected, color=color_selected)
         cart_item.quantity += int(quantity_selected)
         cart_item.save()
     except CartItem.DoesNotExist:
@@ -935,7 +1063,6 @@ def handleUpdateProfileDetail(request):
         return None
     except Exception as e:
         print("An error occurred: %s" % str(e))
-
 
 def custom_error_404(request, exception):
     APP_NAME = os.getenv('APP_NAME')
