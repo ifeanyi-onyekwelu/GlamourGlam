@@ -1,9 +1,14 @@
 from random import sample
 from django.core.mail import EmailMessage
-from .models import ProductImage, Notification
+from .models import ProductImage, Notification, DiscountCode
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import JsonResponse
+from dotenv import load_dotenv
+from django.template.loader import render_to_string
+import os
+
+load_dotenv()
 
 
 def get_products_with_images(products_list):
@@ -36,27 +41,50 @@ def create_notification(title, notification, notification_type='Reports'):
     )
     new_notification.save()
 
-def send_order_email(order):
-    subject = f'New Order: Order #{order.id}'
-    from_email = settings.DEFAULT_FROM_EMAIL
-    to_email = [order.user.email]
+def send_order_email(request, order):
+    subject = f"Your Order Confirmation - Order #{order.id}"
+    recipient_email = order.user.email  # Assuming you have the user's email
+    APP_NAME = os.getenv('APP_NAME')
+    APP_URL = os.getenv('APP_URL')
 
-    # Prepare the context for rendering the HTML template
+    order_items = order.items.all()
+    shipping_fee = 3500.00
+
+    for order_item in order_items:
+        order_item.first_image = order_item.product.productimage_set.first()
+        order_item.subtotal = order_item.quantity * order_item.product.price
+
+    discount_code = request.session.get("discount_code", None)
+    try:
+        discount = DiscountCode.objects.get(code=discount_code)
+        discount_percentage = discount.percentage
+    except DiscountCode.DoesNotExist:
+        discount = None
+
+    total_amount = float(sum(order_item.subtotal for order_item in order_items))
+    total_amount_shipping = int(total_amount) + shipping_fee
+
+    if discount:
+        discount_amount = (discount.percentage / 100) * total_amount
+        total_amount -= discount_amount
+        total_amount_shipping = int(total_amount) + shipping_fee
+
     context = {
-        'order': order,
-        'order_items': order.items.all()
+        "order_items": order_items,
+        "order": order,
+        "total_amount": total_amount,
+        "shipping_fee": shipping_fee,
+        "total_amount_shipping": total_amount_shipping,
+        "APP_NAME": APP_NAME,
+        "APP_URL": APP_URL
     }
 
-    # Render the email message content from an HTML template
-    html_message = render_to_string('email/order_confirmation.html', context)
+    message = render_to_string("email/order_confirmation.html", context)
 
-    # Create and send the email
-    email = EmailMessage(subject, html_message, from_email, to_email)
-    email.content_subtype = 'html'  # Set the content type to HTML
-    email.send()
-
-    # Send email to admin
-    admin_email = 'admin@example.com'  # Replace with your admin's email
-    email_to_admin = EmailMessage(subject, html_message, from_email, [admin_email])
-    email_to_admin.content_subtype = 'html'
-    email_to_admin.send()
+    send_mail(
+        subject,
+        "",
+        settings.DEFAULT_EMAIL,  # Sender's email
+        [recipient_email],  # Recipient's email
+        html_message=message,
+    )

@@ -678,9 +678,9 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             cart.delete()
             cart.save()
             try:
-                send_order_email(order)
+                send_order_email(request, order)
             except Exception as e:
-                print("Error occurred %s", e)
+                print("Error occurred: ", e)
 
             return JsonResponse(
                 {
