@@ -9,7 +9,6 @@ handler404 = custom_error_404
 handler500 = custom_error_500
 
 urlpatterns = [
-    path('default_admin/', admin.site.urls),
     path('admin/', include('glamourAdmin.urls', namespace="my_admin")),
     path('', include('glamourApp.urls', namespace='app'))
 ] 

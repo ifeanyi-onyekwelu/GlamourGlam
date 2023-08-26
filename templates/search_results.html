@@ -1,27 +1,26 @@
-{% extends '_base.html' %}
-{% load static %}
-{% load humanize %}
+{% extends '_base.html' %} 
+{% load static %} 
+{% load humanize %} 
 
-{% block cart_num %}
+{% block cart_num %} 
+{% if total_items_in_cart == None %} 
+0 
+{% else %}
 
+{{ total_items_in_cart }}
+
+{% endif %}
+{% endblock cart_num %} 
+
+{% block cart_num_offcanvas %} 
 {% if total_items_in_cart == None %}
-0
+0 
 {% else %}
 {{ total_items_in_cart }}
 {% endif %}
+{% endblock cart_num_offcanvas %} 
 
-{% endblock cart_num %}
-
-{% block cart_num_offcanvas %}
-{% if total_items_in_cart == None %}
-0
-{% else %}
-{{ total_items_in_cart }}
-{% endif %}
-{% endblock cart_num_offcanvas %}
-
-{% block title %}Men{% endblock title %}
-
+{% block title %}Men{% endblock title %} 
 
 {% block content %}
 <!-- Breadcrumb Begin -->
@@ -33,7 +32,7 @@
                     <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
                     <span>Search results</span>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -45,29 +44,29 @@
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <div class="row property__gallery">
-                    {% if products %}
+                    {% if products %} 
                     {% for product in products %}
                     <div class="col-lg-3 col-md-4 col-sm-6 mix men-shirt">
                         <div class="product__item">
                             <div class="product__item__pic set-bg" data-setbg="{{ product.image.image.url }}">
                                 <div class="label new">New</div>
                                 <ul class="product__hover">
-                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
-                                                class="arrow_expand"></span></a></li>
-                                                {% for color in product.product.colors.all %}
-                                                {% for size in product.product.sizes.all %}
-                                                {% if forloop.parentloop.first and forloop.first %}
-                                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"  data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="icon_bag_alt"></span></a></li>
-                                                {% else %}
-                                                {% endif %}
-                                                {% endfor %}
-                                                {% endfor %}
-                                    <li><a href="{% url 'app:product_detail_page' product.product.id %}"><span
-                                                class="icon_link_alt"></span></a></li>
+                                    <li><a href="#" id="add-to-wishlist-button"><span class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}" data-product-id="{{ product.id }}"></span></a></li>
+                                    {% for color in product.product.colors.all %} 
+                                    {% for size in product.product.sizes.all %} 
+                                    {% if forloop.parentloop.first and forloop.first %}
+                                    <li><a class="add-to-cart-link" href="#" id="add-to-cart-button" data-product-id="{{ product.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a></li>
+                                    {% else %} 
+                                    {% endif %} 
+                                    {% endfor %} 
+                                    {% endfor %}
+                                    <li><a href="{% url 'app:product_detail_page' product.product.id %}"><span class="fa fa-plus"></span></a></li>
                                 </ul>
                             </div>
                             <div class="product__item__text">
-                                <h6><a href="{% url 'app:product_detail_page' product.product.id  %}">{{ product.product.name }}</a></h6>
+                                <h6>
+                                    <a href="{% url 'app:product_detail_page' product.product.id  %}">{{product.product.name }}</a>
+                                </h6>
                                 <div class="rating">
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
@@ -75,11 +74,13 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                                <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                                <div class="product__price">
+                                    &#8358; {{ product.product.price | intcomma }}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
+                    {% endfor %} 
                     {% else %}
                     <h3>No results found.</h3>
                     {% endif %}
@@ -101,31 +102,29 @@
     </div>
 </div>
 <!-- Search End -->
-{% endblock content %}
-
-{% block javascript %}
+{% endblock content %} {% block javascript %}
 <script>
-    $(document).ready(function() {
-        $('.add-to-cart-link').click(function(e) {
-            e.preventDefault();
+    $(document).ready(function () {
+        $('.add-to-cart-link').click(function (e) {
+            e.preventDefault()
 
-            let link = $(this);
-            let product_id = link.data('product-id');
-            let quantity = 1;
+            let link = $(this)
+            let product_id = link.data('product-id')
+            let quantity = 1
 
             $.ajax({
                 type: 'POST',
                 url: '/add-to-cart/' + product_id + '/',
                 data: {
-                    'product_id': product_id,
-                    'quantity': quantity,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    product_id: product_id,
+                    quantity: quantity,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-                success: function(data) {
+                success: function (data) {
                     location.reload()
                 },
-                error: function(xhr, status, errorThrown) {
-                    console.log(errorThrown);
+                error: function (xhr, status, errorThrown) {
+                    console.log(errorThrown)
                 }
             })
         })

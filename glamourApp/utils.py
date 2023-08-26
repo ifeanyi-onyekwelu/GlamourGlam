@@ -3,6 +3,7 @@ from django.core.mail import EmailMessage
 from .models import ProductImage, Notification
 from django.core.mail import send_mail
 from django.conf import settings
+from django.http import JsonResponse
 
 
 def get_products_with_images(products_list):
@@ -34,7 +35,6 @@ def create_notification(title, notification, notification_type='Reports'):
         notification_type=notification_type,
     )
     new_notification.save()
-
 
 def send_order_email(order):
     subject = f'New Order: Order #{order.id}'

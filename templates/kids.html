@@ -79,16 +79,16 @@
                                             <div class="label new">New</div>
                                             {% endif %}
                                             <ul class="product__hover">
-                                                <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                                <li><a href="#" id="add-to-wishlist-button"><span class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}" data-product-id="{{ product_info.product.id }}"></span></a></li>
                                                 {% for color in product_info.product.colors.all %}
                                                 {% for size in product_info.product.sizes.all %}
                                                 {% if forloop.parentloop.first and forloop.first %}
-                                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"  data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="icon_bag_alt"></span></a></li>
+                                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"  data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a></li>
                                                 {% else %}
                                                 {% endif %}
                                                 {% endfor %}
                                                 {% endfor %}
-                                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="icon_link_alt"></span></a></li>
+                                                <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="fa fa-plus"></span></a></li>
                                             </ul>
                                         </div>
                                         <div class="product__item__text">

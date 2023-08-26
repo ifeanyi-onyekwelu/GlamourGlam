@@ -107,12 +107,11 @@
                                 </p>
                             </div>
                         </div>
-                        <form id="formAccountDeactivation">
+                        <form id="formAccountDeactivation" action="{% url 'app:handleDeleteAccount' %}" method="post">
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="accountActivation"
-                                    id="accountActivation" required />
-                                <label class="form-check-label" for="accountActivation">I confirm my account
-                                    deactivation</label>
+                                {% csrf_token %}
+                                <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" required />
+                                <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
                             </div>
                             <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
                         </form>

@@ -63,12 +63,15 @@
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapse{{ category.id }}">{{ category.name }}</a>
                                     </div>
-                                    <div id="collapse{{ category.id }}" class="collapse" data-parent="#accordionExample">
+                                    <div id="collapse{{ category.id }}" class="collapse"
+                                        data-parent="#accordionExample">
                                         <div class="card-body">
                                             <ul style="display: block; cursor: pointer;">
                                                 <li data-filter=".all-{{ category.name|lower }}"> All</li>
                                                 {% for sub_category in category.subcategories.all %}
-                                                <li data-filter=".{{ category.name|lower }}-{{ sub_category.name|lower }}"> {{ sub_category.name }}</li>
+                                                <li
+                                                    data-filter=".{{ category.name|lower }}-{{ sub_category.name|lower }}">
+                                                    {{ sub_category.name }}</li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
@@ -86,29 +89,36 @@
                     {% for category in categories %}
                     {% for subcategory in category.subcategories.all %}
                     {% if product_info.product.category == category and product_info.product.sub_category == subcategory %}
-                    <div class="col-lg-3 col-md-4 col-sm-6 mix {{ category.name|lower }}-{{ subcategory.name|lower }} all-{{ category.name|lower }}">
+                    <div
+                        class="col-lg-3 col-md-4 col-sm-6 mix {{ category.name|lower }}-{{ subcategory.name|lower }} all-{{ category.name|lower }}">
                         <div class="product__item">
                             <div class="product__item__pic set-bg" data-setbg="{{ product_info.image.image.url }}">
                                 {% if not product_info.date_created|date:"U" > now|date:"U"|add:"-86400" %}
                                 <div class="label new">New</div>
                                 {% endif %}
                                 <ul class="product__hover">
-                                    <li><a href="{{ product_info.image.image.url }}" class="image-popup"><span
-                                                class="arrow_expand"></span></a></li>
-                                                {% for color in product_info.product.colors.all %}
-                                                {% for size in product_info.product.sizes.all %}
-                                                {% if forloop.parentloop.first and forloop.first %}
-                                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"  data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="icon_bag_alt"></span></a></li>
-                                                {% else %}
-                                                {% endif %}
-                                                {% endfor %}
-                                                {% endfor %}
+                                    <li><a href="#" id="add-to-wishlist-button"><span
+                                                class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}"
+                                                data-product-id="{{ product_info.product.id }}"></span></a></li>
+                                    {% for color in product_info.product.colors.all %}
+                                    {% for size in product_info.product.sizes.all %}
+                                    {% if forloop.parentloop.first and forloop.first %}
+                                    <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"
+                                            data-product-id="{{ product_info.product.id }}"
+                                            data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span
+                                                class="fa fa-shopping-cart"></span></a>
+                                    </li>
+                                    {% else %}
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
                                     <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
-                                                class="icon_link_alt"></span></a></li>
+                                                class="fa fa-plus"></span></a></li>
                                 </ul>
                             </div>
                             <div class="product__item__text">
-                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                        {{ product_info.product.name }}</a></h6>
                                 <div class="rating">
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>

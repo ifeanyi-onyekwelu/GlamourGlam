@@ -13,7 +13,7 @@ urlpatterns = [
     path('unisex/', UnisexPageView.as_view(), name="unisex_page"),
     path('accessories/', AccessoriesPageView.as_view(), name="accessories_page"),
     path('contact/', ContactPageView.as_view(), name="contact_page"),
-    path('<uuid:pk>/product', ProductDetailPageView.as_view(), name="product_detail_page"),
+    path('product/<uuid:pk>/', ProductDetailPageView.as_view(), name="product_detail_page"),
     path('cart/', ShopCartPageView.as_view(), name="cart_page"),
     path('checkout/', CheckoutPageView.as_view(), name="checkout_page"),
     path('account/', AccountPageView.as_view(), name="account_page"),
@@ -40,7 +40,10 @@ urlpatterns = [
     path('update-profile/', handleUpdateProfileDetail, name="handleUpdateProfileDetail"),
     path('change-password/', handleUpdateSecurityDetail, name="handleUpdateSecurityDetail"),
     path('update-item/', handleUpdateCart, name="handleUpdateCart"),
+    path('product/add-review/<uuid:product_id>/', handleAddProductReview, name="handleAddProductReview"),
+    path('product/add-to-wishlist/', handleAddToWishList, name="handleAddToWishList"),
     path('logout/', handleUserLogout, name="handleUserLogout"),
+    path('delete-account/', handleDeleteAccount, name="handleDeleteAccount"),
 
     # Error handling
     # path('error-404/', error404, name="error404"),

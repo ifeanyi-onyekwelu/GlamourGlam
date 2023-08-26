@@ -33,7 +33,6 @@ class Product(models.Model):
     name = models.CharField(max_length=255, default="")
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     description = models.TextField(default="")
-    specification = models.TextField(default="")
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -212,19 +211,6 @@ class Notification(models.Model):
 
     def formatted_datetime(self):
         return self.date_created.strftime("%B %d, %Y")
-    
-class Comment(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
-    authorFullName = models.CharField(max_length=255, default="")
-    authorEmail = models.CharField(max_length=255, default="")
-    authorPhoneNumber = models.CharField(max_length=255, default="")
-    comment = models.TextField(default="")
-    date_created = models.DateTimeField(auto_now_add=True)
 
 class Review(models.Model):
     id = models.UUIDField(
@@ -237,5 +223,13 @@ class Review(models.Model):
     authorFullName = models.CharField(max_length=255, default="")
     authorEmail = models.CharField(max_length=255, default="")
     authorPhoneNumber = models.CharField(max_length=255, default="")
-    ratings = models.CharField(max_length=10, default="")
+    ratings = models.CharField(max_length=10, default="1")
+    date_created = models.DateTimeField(auto_now_add=True)
+
+class NewsletterSubscribers(models.Model):
+    email = models.CharField(max_length=255, default="")
+
+class WishListItem(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="wishlist_item", on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
