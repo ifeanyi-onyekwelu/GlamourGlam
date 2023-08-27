@@ -19,6 +19,7 @@ from .utils import (
     send_message,
     create_notification,
     send_order_email,
+    calculate_discounted_total
 )
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -34,6 +35,7 @@ from .models import *
 from django.core.mail import send_mail
 from django.utils.decorators import method_decorator
 from .decorators import prevent_authenticated_access
+import paystack
 
 load_dotenv()
 
@@ -43,7 +45,8 @@ class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             # Fetch all products ordered by date_created (latest first)
-            products = Product.objects.order_by("-date_created")
+            products = Product.objects.order_by("?")
+            new_products = Product.objects.order_by("?")[:12]
             # Fetch hot trends, bestsellers, and features using random sampling
             hot_trends = sample(list(products), 3)
             best_sellers = sample(list(products), 3)
@@ -51,6 +54,7 @@ class HomePageView(TemplateView):
             # Get products with their latest images for each category
 
             products_with_images = get_products_with_images(products)
+            new_product_with_image = get_products_with_images(new_products)
             hot_trend = get_products_with_images(hot_trends)
             best_seller = get_products_with_images(best_sellers)
             feature = get_products_with_images(features)
@@ -87,6 +91,7 @@ class HomePageView(TemplateView):
 
             context = {
                 "products": products_with_images,
+                "new_products": new_product_with_image,
                 "hot_trends": hot_trend,
                 "best_sellers": best_seller,
                 "features": feature,
@@ -162,11 +167,11 @@ class WomenPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
-        women_and_unisex_products = Product.objects.filter(
-            category__name__in=["Women", "Unisex"]
+        women_products = Product.objects.filter(
+            category__name__in=["Women"]
         )
         sub_categories = SubCategory.objects.filter(
-            product__in=women_and_unisex_products
+            product__in=women_products
         ).distinct()
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
@@ -214,11 +219,11 @@ class MenPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
-        men_and_unisex_products = Product.objects.filter(
-            category__name__in=["Men", "Unisex"]
+        men_products = Product.objects.filter(
+            category__name__in=["Men"]
         )
         sub_categories = SubCategory.objects.filter(
-            product__in=men_and_unisex_products
+            product__in=men_products
         ).distinct()
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
@@ -316,9 +321,9 @@ class KidsPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
-        kids_and_unisex_products = Product.objects.filter(category__name__in=["Kids"])
+        kids_products = Product.objects.filter(category__name__in=["Kids"])
         sub_categories = SubCategory.objects.filter(
-            product__in=kids_and_unisex_products
+            product__in=kids_products
         ).distinct()
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
@@ -366,11 +371,11 @@ class AccessoriesPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
-        accessories_and_unisex_products = Product.objects.filter(
+        accessories_products = Product.objects.filter(
             category__name__in=["Accessories"]
         )
         sub_categories = SubCategory.objects.filter(
-            product__in=accessories_and_unisex_products
+            product__in=accessories_products
         ).distinct()
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
@@ -380,8 +385,8 @@ class AccessoriesPageView(ListView):
 
 class ShopPageView(TemplateView):
     def get(self, request, *args, **kwargs):
-        all_products = Product.objects.all().order_by("id")
-        paginator = Paginator(all_products, 9)
+        all_products = Product.objects.all().order_by("?")
+        paginator = Paginator(all_products, 12)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         APP_NAME = os.getenv("APP_NAME")
@@ -642,55 +647,63 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         if request.method == "POST":
-            shipping_address = ShippingAddress.objects.create(
-                user=request.user,
-                address=request.POST.get("address"),
-                phone=request.POST.get("phone"),
-                country=request.POST.get("country"),
-                city=request.POST.get("city"),
-                state=request.POST.get("state"),
-                zipcode=request.POST.get("zipcode"),
-            )
-
-            cart = Cart.objects.get(user=request.user)
-            cart_items = cart.items.all()
-
-            total_price = sum(item.product.price * item.quantity for item in cart_items)
-
-            order = Order.objects.create(
-                user=request.user,
-                shipping_address=shipping_address,
-                total_price=total_price,
-            )
-
-            for cart_item in cart_items:
-                order_items = OrderItem.objects.create(
-                    order=order,
-                    product=cart_item.product,
-                    quantity=cart_item.quantity,
-                    price=cart_item.product.price,
-                    size=cart_item.size,
-                    color=cart_item.color,
+            try:
+                shipping_address = ShippingAddress.objects.create(
+                    user=request.user,
+                    address=request.POST.get("address"),
+                    phone=request.POST.get("phone"),
+                    country=request.POST.get("country"),
+                    city=request.POST.get("city"),
+                    state=request.POST.get("state"),
+                    zipcode=request.POST.get("zipcode"),
                 )
 
-                order.items.add(order_items)
+                cart = Cart.objects.get(user=request.user)
+                cart_items = cart.items.all()
 
-            cart.delete()
-            cart.save()
-            try:
+                total_price = sum(item.product.price * item.quantity for item in cart_items)
+                shipping_fee = 3500.00
+
+                discount = request.session.get("discount_code", None)
+                if discount:
+                    total_amount = calculate_discounted_total(total_price, discount.percentage)
+                    total_amount_shipping = int(total_amount) + shipping_fee
+                else:
+                    total_amount_shipping = int(total_price) + shipping_fee  
+
+
+                
+
+                order = Order.objects.create(
+                    user=request.user,
+                    shipping_address=shipping_address,
+                    total_price=total_amount_shipping,
+                )
+                order.save()
+
+                for cart_item in cart_items:
+                    order_items = OrderItem.objects.create(
+                        order=order,
+                        product=cart_item.product,
+                        quantity=cart_item.quantity,
+                        price=cart_item.product.price,
+                        size=cart_item.size,
+                        color=cart_item.color,
+                    )
+
+                    order.items.add(order_items)
+                    
+                cart.delete()
+                cart.save()
+
                 send_order_email(request, order)
+
+                return redirect(payment_url)
+
             except Exception as e:
                 print("Error occurred: ", e)
 
-            return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Order was made successfully",
-                    "order_id": order.id,
-                }
-            )
-        else:
-            return JsonResponse({"success": False, "message": "Invalid method"})
+        return JsonResponse({"success": False, "message": "Invalid method"})
 
 
 class AccountPageView(LoginRequiredMixin, UpdateView):
@@ -848,6 +861,44 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
         }
 
         return render(request, "order_complete.html", context)
+
+
+class WishListPage(ListView):
+    template_name = "wishlist.html"
+    paginate_by = 9
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv("APP_NAME")
+
+        cart = None
+        total_items = 0
+
+        if self.request.user.is_authenticated:
+            wishlist_item = WishListItem.objects.get(user=self.request.user)
+
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
+                "quantity__sum"
+            ]
+        else:
+            wishlist_item = []
+        
+        # Paginate the products
+        paginator = Paginator(wishlist_item, self.paginate_by)
+        page = self.request.GET.get("page")
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        context["all_products"] = get_products_with_images(products)
+        context["total_items_in_cart"] = total_items
+        context["APP_NAME"] = APP_NAME.title()
+        return context
 
 
 # Legal Views

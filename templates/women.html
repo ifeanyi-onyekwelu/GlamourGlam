@@ -56,8 +56,7 @@
                                         <ul style="display: block; cursor: pointer;">
                                             <li data-filter="*">All</li>
                                             {% for sub_category in sub_categories %}
-                                            <li data-filter=".women-{{ sub_category.name|lower }}">{{ sub_category.name
-                                                }}</li>
+                                            <li data-filter=".women-{{ sub_category.name|lower }}">{{ sub_category.name }}</li>
                                             {% endfor %}
                                         </ul>
                                     </div>
@@ -85,22 +84,16 @@
                                     {% for color in product_info.product.colors.all %}
                                     {% for size in product_info.product.sizes.all %}
                                     {% if forloop.parentloop.first and forloop.first %}
-                                    <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"
-                                            data-product-id="{{ product_info.product.id }}"
-                                            data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span
-                                                class="fa fa-shopping-cart"></span></a>
-                                    </li>
+                                    <li><a class="add-to-cart-link" href="#" id="add-to-cart-button" data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a></li>
                                     {% else %}
                                     {% endif %}
                                     {% endfor %}
                                     {% endfor %}
-                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
-                                                class="fa fa-plus"></span></a></li>
+                                    <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="fa fa-plus"></span></a></li>
                                 </ul>
                             </div>
                             <div class="product__item__text">
-                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{
-                                        product_info.product.name }}</a></h6>
+                                <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
                                 <div class="rating">
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>

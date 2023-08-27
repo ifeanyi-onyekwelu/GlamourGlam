@@ -35,7 +35,7 @@
                         <tbody>
                             {% for sub_category in sub_categories %}
                             <tr>
-                                <td><a href="{% url 'my_admin:sub_category_detail' sub_category.id %}">{{ sub_category.name }}</a></td>
+                                <td><a href="{% url 'my_admin:sub_category_detail' sub_category.id %}">{{ sub_category.name }} for {{ sub_category.category.name }}</a></td>
                                 <td class="d-flex justify-content-end" style="gap:5px;">
                                     <a href="" class="btn btn-sm custom-background">Detail</a>
                                     <a href="{% url 'my_admin:delete_sub_category' sub_category.id %}" class="btn btn-danger btn-sm">Delete</a>

@@ -18,6 +18,7 @@ urlpatterns = [
     path('checkout/', CheckoutPageView.as_view(), name="checkout_page"),
     path('account/', AccountPageView.as_view(), name="account_page"),
     path('security/', SecurityAccountPageView.as_view(), name="security_account_page"),
+    path('saved-products/', WishListPage.as_view(), name="wish_list_page"),
     path('order-history/', OrderHistoryPage.as_view(), name="order_history"),
     path('order-details/<uuid:order_id>/', OrderDetailsPage.as_view(), name="order_details"),
     path('order-complete/<uuid:order_id>/complete/', OrderCompletePageView.as_view(), name="order_complete"),

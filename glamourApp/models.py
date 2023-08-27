@@ -15,6 +15,9 @@ class Category(models.Model):
     name = models.CharField(max_length=255, default="")
     description = models.TextField(default="")
 
+    def __str__(self):
+        return self.name
+
 class SubCategory(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -23,6 +26,9 @@ class SubCategory(models.Model):
     )
     name = models.CharField(max_length=255, default="")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     id = models.UUIDField(

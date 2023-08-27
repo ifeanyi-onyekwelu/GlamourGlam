@@ -9,8 +9,9 @@ handler404 = custom_error_404
 handler500 = custom_error_500
 
 urlpatterns = [
+    path('default-admin/', admin.site.urls),
     path('admin/', include('glamourAdmin.urls', namespace="my_admin")),
-    path('', include('glamourApp.urls', namespace='app'))
+    path('', include('glamourApp.urls', namespace='app')),
 ] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

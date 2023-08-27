@@ -88,3 +88,8 @@ def send_order_email(request, order):
         [recipient_email],  # Recipient's email
         html_message=message,
     )
+
+def calculate_discounted_total(total, discount_percentage):
+    discount_amount = (discount_percentage / 100) * total
+    discounted_total = total - discount_amount
+    return discounted_total

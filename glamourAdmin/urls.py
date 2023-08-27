@@ -9,9 +9,9 @@ urlpatterns = [
     # Order urls
     # ########################################
     path('users/', all_user, name="users"),
-    path('user/<uuid:user_id>', user_detail, name="user_detail"),
-    path('user/<uuid:user_id>/active', mark_user_as_active, name="mark_user_as_active"),
-    path('user/<uuid:user_id>/suspended', mark_user_as_suspended, name="mark_user_as_suspended"),
+    path('user/<int:user_id>', user_detail, name="user_detail"),
+    path('user/<int:user_id>/active', mark_user_as_active, name="mark_user_as_active"),
+    path('user/<int:user_id>/suspended', mark_user_as_suspended, name="mark_user_as_suspended"),
 
     # ########################################
     # Products urls

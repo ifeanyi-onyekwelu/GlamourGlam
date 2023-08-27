@@ -32,6 +32,7 @@
                         </thead>
                         <tbody>
                             {% for user in users %}
+                            {% if not user.email == request.user.email %}
                             <tr>
                                 <td><a href="{% url 'my_admin:user_detail' user.id %}">{{ user.first_name }}</a></td>
                                 <td>{{ user.last_name }}</td>
@@ -41,7 +42,7 @@
                                 {% else %}
                                 <td><span class="badge badge-danger">Suspended</span></td>
                                 {% endif %}
-                                
+                            
                                 {% if user.is_active == True %}
                                 <td><a href="{% url 'my_admin:mark_user_as_suspended' user.id %}" class="btn btn-sm btn-danger">Suspend</a></td>
                                 {% else %}
@@ -49,6 +50,7 @@
                                 {% endif %}
                                 <!-- <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td> -->
                             </tr>
+                            {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>

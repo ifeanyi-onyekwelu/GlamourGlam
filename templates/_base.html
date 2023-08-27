@@ -117,6 +117,7 @@
                 <span class="fa fa-user user-dropdown-btn"></span>
                 <ul class="user-dropdown-menu">
                     {% if request.user.is_authenticated %}
+                    <li class="user-dropdown-item"><a href="{% url 'app:wish_list_page' %}"><i class="fa fa-heart"></i> Wishlist</a></li>
                     <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i> Order History</a></li>
                     <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i class="fa fa-user"></i> Account</a></li>
                     <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
@@ -215,6 +216,7 @@
                                 <span class="fa fa-user user-dropdown-btn"></span>
                                 <ul class="user-dropdown-menu">
                                     {% if request.user.is_authenticated %}
+                                    <li class="user-dropdown-item"><a href="{% url 'app:wish_list_page' %}"><i class="fa fa-heart"></i> Wishlist</a></li>
                                     <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i> Order History</a></li>
                                     <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i class="fa fa-user"></i> Account</a></li>
                                     <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
