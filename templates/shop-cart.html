@@ -128,12 +128,15 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="discount__content">
-                    <h6>Discount code</h6>
-                    <form action="{% url 'app:cart_page' %}" method="post">
-                        {% csrf_token %}
-                        <input type="text" placeholder="Enter your coupon code" name="code">
-                        <button type="submit" class="site-btn">Apply</button>
-                    </form>
+                    <div class="form-content">
+                        <h6>Discount code</h6>
+                        <form method="post" id="couponForm" action="{% url 'app:cart_page' %}">
+                            {% csrf_token %}
+                            <input type="text" placeholder="Enter coupon code if you have one" name="code" id="couponCodeInput">
+                            <button type="submit" class="site-btn">Apply</button>
+                        </form>
+                    </div>
+                    <div class="couponCodeError" style="color: red; font-weight: bold;"></div>
                 </div>
             </div>
             <div class="col-lg-4 offset-lg-2">
@@ -151,19 +154,6 @@
     </div>
 </section>
 <!-- Shop Cart Section End -->
-
-
-<!-- Search Begin -->
-<div class="search-model">
-    <div class="h-100 d-flex align-items-center justify-content-center">
-        <div class="search-close-switch">+</div>
-        <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
-            {% csrf_token %}
-            <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
-        </form>
-    </div>
-</div>
-<!-- Search End -->
 
 {% endblock content %}
 
@@ -213,7 +203,7 @@
         function handleRemoveCartItem(cartItemId) {
             $.ajax({
                 type: 'POST',
-                url: `/delete-item/${cartItemId}/`,
+                url: `/remove-item/${cartItemId}/`,
                 data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                 },
@@ -221,6 +211,7 @@
                         $(`#cart-item-${cartItemId}`).remove();
                         const newTotalAmount = response.total_amount;
                         $('.cart__total__procced li span').html('&#8358;' + newTotalAmount);
+                        location.reload();
 
                     },
                 error: function (xhr, textStatus, errorThrown) {
@@ -237,5 +228,6 @@
             handleRemoveCartItem(cartItemId);
         });
     });
+
 </script>
 {% endblock javascript %}

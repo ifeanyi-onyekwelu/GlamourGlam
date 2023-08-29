@@ -102,7 +102,7 @@
             <li><span class="icon_search search-switch"></span></li>
             {% if request.user.is_authenticated %}
             <li>
-                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                <a href="{% url 'app:cart_page' %}"><span class="fa fa-shopping-cart"></span>
                     <div class="tip">{% block cart_num_offcanvas %}{% endblock cart_num_offcanvas %}</div>
                 </a>
             </li>
@@ -208,7 +208,7 @@
                         <ul class="header__right__widget">
                             <li><span class="icon_search search-switch"></span></li>
                             <li>
-                                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                                <a href="{% url 'app:cart_page' %}"><span class="fa fa-shopping-basket"></span>
                                     <div class="tip">{% block cart_num %}{% endblock cart_num %}</div>
                                 </a>
                             </li>
@@ -242,7 +242,19 @@
         
     <!-- Header Section End -->
 
-    {% block content %} {% endblock content %}
+    {% block content %} 
+    {% endblock content %}
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+                {% csrf_token %}
+                <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
 
     <footer class="footer">
         <div class="container">

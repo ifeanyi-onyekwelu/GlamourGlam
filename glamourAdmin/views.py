@@ -144,14 +144,19 @@ def dashboard(request):
 @staff_member_required
 def all_user(request):
     users = CustomUser.objects.all()
-    return render(request, 'admin_dashboard/user/all.html', {'users': users, 'APP_NAME': os.getenv('APP_NAME')})
+    context = {
+        'users': users, 
+        'APP_NAME': os.getenv('APP_NAME'), 
+        'notifications': get_all_notifications(),
+    }
+    return render(request, 'admin_dashboard/user/all.html', context)
 
 
 @admin_only_login
 @staff_member_required
 def user_detail(request, user_id):
     user = CustomUser.objects.get(id=user_id)
-    return render(request, 'admin_dashboard/user/user_detail.html', {'user': user, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/user/user_detail.html', {'user': user, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -180,7 +185,8 @@ def all_products(request):
 
     context = {
         'products': products_with_images,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
 
     return render(request, 'admin_dashboard/product/all.html', context)
@@ -198,7 +204,8 @@ def product_detail(request, product_id):
         'productImage': productImage,
         'original_price': original_price,
         'price_with_increase': price_with_increase,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
 
     return render(request, 'admin_dashboard/product/product_detail.html', context)
@@ -255,7 +262,8 @@ def add_product(request):
         'categories': categories,
         'sizes': sizes,
         'colors': colors,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/product/add.html', context)
 
@@ -334,7 +342,8 @@ def edit_product(request, product_id):
         'colors': colors,
         'product': product,
         'productImages': productImages,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/product/edit.html', context)
 
@@ -346,13 +355,13 @@ def edit_product(request, product_id):
 @admin_only_login
 def all_category(request):
     categories = Category.objects.all()
-    return render(request, 'admin_dashboard/category/all.html', {'categories': categories, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/category/all.html', {'categories': categories, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 def category_detail(request, category_id):
     category = Category.objects.get(id=category_id)
-    return render(request, 'admin_dashboard/category/category_detail.html', {'category': category, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/category/category_detail.html', {'category': category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -365,7 +374,7 @@ def add_category(request):
             return redirect('my_admin:category_detail', category_id=category.id)
     else:
         category_form = CategoryForm()
-    return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 def delete_category(request, category_id):
@@ -388,7 +397,7 @@ def all_product_color(request):
     colors = ProductColor.objects.all()
     print(colors)
     color_form = ColorForm()
-    return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -401,7 +410,7 @@ def add_color(request):
             return redirect('my_admin:colors')
     else:
         color_form = ColorForm()
-    return render(request, 'admin_dashboard/color/all.html', {'color_form': color_form})
+    return render(request, 'admin_dashboard/color/all.html', {'color_form': color_form, 'notifications': get_all_notifications(),})
 
 
 def delete_color(request, color_id):
@@ -424,14 +433,14 @@ def delete_all_colors(request):
 @staff_member_required()
 def all_sub_category(request):
     sub_categories = SubCategory.objects.all()
-    return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 @staff_member_required()
 def sub_category_detail(request, sub_category_id):
     sub_category = SubCategory.objects.get(id=sub_category_id)
-    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -445,7 +454,7 @@ def add_sub_category(request):
             return redirect('my_admin:add_sub_category')
     else:
         sub_category_form = SubCategoryForm()
-    return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 def delete_sub_category(request, sub_category_id):
@@ -469,7 +478,8 @@ def all_order(request):
     orders = Order.objects.all()
     context = {
         'orders': orders,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/order/all.html', context)
 
@@ -509,6 +519,7 @@ def order_detail(request, order_id):
         'shipping_fee': shipping_fee,
         'total_amount_shipping': total_amount_shipping,
         'APP_NAME': APP_NAME,
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/order/order_detail.html', context)
 
@@ -517,28 +528,28 @@ def order_detail(request, order_id):
 @staff_member_required
 def all_pending_orders(request):
     pending_orders = Order.objects.filter(delivery_status="P")
-    return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 @staff_member_required
 def all_shipped_orders(request):
     shipped_orders = Order.objects.filter(delivery_status="S")
-    return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 @staff_member_required
 def all_delivered_orders(request):
     delivered_orders = Order.objects.filter(delivery_status="D")
-    return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 @staff_member_required
 def all_failed_delivery_orders(request):
     failed_delivered_orders = Order.objects.filter(delivery_status="F")
-    return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -574,7 +585,8 @@ def all_coupons(request):
     context = {
         'coupons': coupons,
         'coupon_form': coupon_form,
-        'APP_NAME': os.getenv('APP_NAME')
+        'APP_NAME': os.getenv('APP_NAME'),
+        'notifications': get_all_notifications(),
     }
     return render(request, 'admin_dashboard/coupons/all.html', context)
 
@@ -582,7 +594,7 @@ def all_coupons(request):
 @admin_only_login
 def coupon_detail(request, coupon_id):
     coupon = DiscountCode.objects.get(id=coupon_id)
-    return render(request, 'admin_dashboard/coupons/coupon_detail.html', {'coupon': coupon, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/coupons/coupon_detail.html', {'coupon': coupon, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
@@ -606,7 +618,7 @@ def create_coupon(request):
             return redirect(reverse('my_admin:discount_codes'))
     else:
         coupon_form = CouponForm()
-    return render(request, 'admin_dashboard/coupons/add.html', {'coupon_form': coupon_form, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/coupons/add.html', {'coupon_form': coupon_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 def delete_coupon(request, coupon_id):
@@ -628,14 +640,14 @@ def delete_all_coupons(request):
 @staff_member_required
 def all_shipping_address(request):
     shipping_address = ShippingAddress.objects.all()
-    return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
 @staff_member_required
 def shipping_detail(request, shipping_id):
     shipping_address = ShippingAddress.objects.get(id=shipping_id)
-    return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 def delete_shipping_address(request, shipping_id):
@@ -664,21 +676,20 @@ def admin_login(request):
 
             if user.check_password(password):
                 login(request, user)
-                create_notification(
-                    title="Login", notification="You logged in", notification_type="ACTIVITY")
+                create_notification(title="Login", notification="You logged in", notification_type="ACTIVITY")
                 return redirect(reverse('my_admin:dashboard'))
             else:
                 messages.error(request, "Account does not exists")
                 return redirect(reverse('my_admin:login'))
 
-    except Exception as e:
-        messages.error(request, str(e))
-        return redirect(reverse('my_admin:login'))
     except CustomUser.DoesNotExist:
         messages.error(request, "Account does not exist!")
         return redirect(reverse('my_admin:login'))
+    except Exception as e:
+        messages.error(request, str(e))
+        return redirect(reverse('my_admin:login'))
 
-    return render(request, 'admin_dashboard/login.html', {'APP_NAME': os.getenv('APP_NAME')})
+    return render(request, 'admin_dashboard/login.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 def admin_logout(request):

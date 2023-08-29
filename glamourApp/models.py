@@ -182,6 +182,7 @@ class DiscountCode(models.Model):
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     active = models.BooleanField(default=True)
+    is_used = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -192,6 +193,9 @@ class DiscountCode(models.Model):
         if self.valid_from <= current_time <= self.valid_to:
             self.active = True
         else:
+            self.active = False
+        
+        if self.is_used:
             self.active = False
 
         super(DiscountCode, self).save(*args, **kwargs)

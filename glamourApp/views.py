@@ -509,38 +509,6 @@ class ShopCartPageView(TemplateView):
             shipping_fee = 0.00
             total_amount = 0.00
             total_amount_shipping = 0.00
-        # else:
-        #     # For guest users, retrieve the cart from the session
-        #     cart = request.session.get('cart', {})
-        #     cart_items = []
-        #     total_items = 0
-        #     total_amount = 0
-
-        #     for item_id, item_info in cart.items():
-        #         product_id = item_id
-        #         quantity = item_info['quantity']
-        #         product = get_object_or_404(Product, id=product_id)
-
-        #         # For guest users, get the first image URL related to the product
-        #         try:
-        #             product_image = ProductImage.objects.filter(product_id=product_id).first()
-        #             product.first_image = product_image.image.url if product_image else None
-        #         except ProductImage.DoesNotExist:
-        #             # Handle the case when there is no image associated with the product
-        #             product.first_image = None
-
-        #         subtotal = product.price * quantity
-        #         total_items += quantity
-        #         total_amount += subtotal
-        #         total_amount_shipping = int(total_amount) + shipping_fee
-
-        #         cart_item = {
-        #             'product': product,
-        #             'quantity': quantity,
-        #             'subtotal': subtotal,
-        #         }
-        #         cart_items.append(cart_item)
-
         context = {
             "total_items_in_cart": total_items,
             "cart_items": cart_items,
@@ -583,7 +551,6 @@ class ShopCartPageView(TemplateView):
             discount = DiscountCode.objects.get(code=discount_code)
         except DiscountCode.DoesNotExist:
             discount = None
-            return JsonResponse({"message": "Invalid code provided"})
 
         if discount:
             request.session["discount_code"] = discount_code
@@ -663,16 +630,18 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
 
                 total_price = sum(item.product.price * item.quantity for item in cart_items)
                 shipping_fee = 3500.00
+                discount_code = request.session.get("discount_code", None)
+                try:
+                    discount = DiscountCode.objects.get(code=discount_code)
+                except DiscountCode.DoesNotExist:
+                    discount = None
 
-                discount = request.session.get("discount_code", None)
                 if discount:
-                    total_amount = calculate_discounted_total(total_price, discount.percentage)
-                    total_amount_shipping = int(total_amount) + shipping_fee
+                    discount_amount = (discount.percentage / 100) * float(total_price)
+                    total_price = float(total_price) - discount_amount
+                    total_amount_shipping = int(total_price) + shipping_fee
                 else:
                     total_amount_shipping = int(total_price) + shipping_fee  
-
-
-                
 
                 order = Order.objects.create(
                     user=request.user,
@@ -696,9 +665,10 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                 cart.delete()
                 cart.save()
 
-                send_order_email(request, order)
+                discount.is_used = True
+                discount.save()
 
-                return redirect(payment_url)
+                send_order_email(request, order)
 
             except Exception as e:
                 print("Error occurred: ", e)
@@ -732,6 +702,17 @@ class LoginPageView(TemplateView):
 class RegisterPageView(TemplateView):
     def get(self, request, *args, **kwargs):
         return render(request, "register.html", {"APP_NAME": os.getenv("APP_NAME")})
+
+
+class ForgotPasswordPage(TemplateView):
+    template_name = "forgot_password.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        APP_NAME = os.getenv("APP_NAME")
+
+        context["APP_NAME"] = APP_NAME
+        return context
 
 
 class OrderHistoryPage(LoginRequiredMixin, TemplateView):
@@ -867,6 +848,15 @@ class WishListPage(ListView):
     template_name = "wishlist.html"
     paginate_by = 9
 
+    def get_queryset(self):
+        wishlist_item = []
+
+        if self.request.user.is_authenticated:
+            wishlist_item = WishListItem.objects.filter(user=self.request.user)
+        
+        products_in_wishlist = [item.product for item in wishlist_item]
+        return products_in_wishlist
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         APP_NAME = os.getenv("APP_NAME")
@@ -875,7 +865,7 @@ class WishListPage(ListView):
         total_items = 0
 
         if self.request.user.is_authenticated:
-            wishlist_item = WishListItem.objects.get(user=self.request.user)
+            wishlist_item = self.get_queryset()
 
             cart, created = Cart.objects.get_or_create(user=self.request.user)
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[

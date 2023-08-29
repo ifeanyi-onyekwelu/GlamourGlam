@@ -8,6 +8,73 @@
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
 {% endblock customCssFiles %}  
 
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+	{% if notification.notification_type == "REPORTS" %}
+	<div class="mr-3">
+		<div class="icon-circle bg-primary">
+			<i class="fas fa-file-alt text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% elif notification.notification_type == "FINANCE" %}
+	<div class="mr-3">
+		<div class="icon-circle bg-success">
+			<i class="fas fa-donate text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% elif notification.notification_type == "ALERT" %}
+	<div class="mr-3">
+		<div class="icon-circle bg-warning">
+			<i class="fas fa-exclamation-triangle text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% elif notification.notification_type == "REGISTRATION" %}
+	<div class="mr-3">
+		<div class="icon-circle custom-background">
+			<i class="fas fa-user text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% elif notification.notification_type == "ORDER" %}
+	<div class="mr-3">
+		<div class="icon-circle bg-info">
+			<i class="fas fa-shopping-cart text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% elif notification.notification_type == "ACTIVITY" %}
+	<div class="mr-3">
+		<div class="icon-circle bg-info">
+			<i class="fas fa-bell text-white"></i>
+		</div>
+	</div>
+	<div>
+		<div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+		<span class="font-weight-bold">{{ notification.title }}</span>
+	</div>
+	{% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
 
 {% block content %}
 <!-- Container Fluid-->
