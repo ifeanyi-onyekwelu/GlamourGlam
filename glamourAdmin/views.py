@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.contrib import messages
 import os
@@ -141,7 +140,6 @@ def dashboard(request):
 
 
 @admin_only_login
-@staff_member_required
 def all_user(request):
     users = CustomUser.objects.all()
     context = {
@@ -153,21 +151,18 @@ def all_user(request):
 
 
 @admin_only_login
-@staff_member_required
 def user_detail(request, user_id):
     user = CustomUser.objects.get(id=user_id)
     return render(request, 'admin_dashboard/user/user_detail.html', {'user': user, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def mark_user_as_active(request, user_id):
     update_user_status(user_id, True)
     return redirect('my_admin:users')
 
 
 @admin_only_login
-@staff_member_required
 def mark_user_as_suspended(request, user_id):
     update_user_status(user_id, False)
     return redirect('my_admin:users')
@@ -377,6 +372,22 @@ def add_category(request):
     return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
+@admin_only_login
+def edit_category(request, category_id):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+
+        category = Category.objects.get(id=category_id)
+
+        category.name = name
+        category.description = description
+        category.save()
+
+        return redirect('my_admin:category_detail', category_id=category.id)
+
+    return render(request, 'admin_dashboard/category/category_detail.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+
 def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     category.delete()
@@ -430,21 +441,18 @@ def delete_all_colors(request):
 
 
 @admin_only_login
-@staff_member_required()
 def all_sub_category(request):
     sub_categories = SubCategory.objects.all()
     return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required()
 def sub_category_detail(request, sub_category_id):
     sub_category = SubCategory.objects.get(id=sub_category_id)
-    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+    return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(), 'categories': Category.objects.all()})
 
 
 @admin_only_login
-@staff_member_required()
 def add_sub_category(request):
     if request.method == 'POST':
         sub_category_form = SubCategoryForm(request.POST)
@@ -455,6 +463,25 @@ def add_sub_category(request):
     else:
         sub_category_form = SubCategoryForm()
     return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+
+
+@admin_only_login
+def edit_sub_category(request, sub_category_id):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+
+        category_matched = Category.objects.get(id=category)
+
+        sub_category = SubCategory.objects.get(id=sub_category_id)
+
+        sub_category.name = name
+        sub_category.category = category_matched
+        sub_category.save()
+
+        return redirect(reverse('my_admin:sub_category_detail', sub_category_id=sub_category.id))
+
+    return render(request, 'admin_dashboard/sub_category/sub_category_detail.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications()})
 
 
 def delete_sub_category(request, sub_category_id):
@@ -473,7 +500,6 @@ def delete_all_sub_category(request):
 # Order
 # ########################################
 @admin_only_login
-@staff_member_required
 def all_order(request):
     orders = Order.objects.all()
     context = {
@@ -485,7 +511,6 @@ def all_order(request):
 
 
 @admin_only_login
-@staff_member_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = order.items.all()
@@ -525,49 +550,42 @@ def order_detail(request, order_id):
 
 
 @admin_only_login
-@staff_member_required
 def all_pending_orders(request):
     pending_orders = Order.objects.filter(delivery_status="P")
     return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def all_shipped_orders(request):
     shipped_orders = Order.objects.filter(delivery_status="S")
     return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def all_delivered_orders(request):
     delivered_orders = Order.objects.filter(delivery_status="D")
     return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def all_failed_delivery_orders(request):
     failed_delivered_orders = Order.objects.filter(delivery_status="F")
     return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def mark_order_as_shipped(request, order_id):
     update_order_delivery_status(order_id, 'S')
     return redirect('my_admin:orders')
 
 
 @admin_only_login
-@staff_member_required
 def mark_order_as_delivered(request, order_id):
     update_order_delivery_status(order_id, 'D')
     return redirect('my_admin:orders')
 
 
 @admin_only_login
-@staff_member_required
 def mark_order_as_failed_delivery(request, order_id):
     update_order_delivery_status(order_id, 'F')
     return redirect('order_detail', order_id=order_id)
@@ -637,14 +655,12 @@ def delete_all_coupons(request):
 # Shipping
 # ########################################
 @admin_only_login
-@staff_member_required
 def all_shipping_address(request):
     shipping_address = ShippingAddress.objects.all()
     return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
 @admin_only_login
-@staff_member_required
 def shipping_detail(request, shipping_id):
     shipping_address = ShippingAddress.objects.get(id=shipping_id)
     return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})

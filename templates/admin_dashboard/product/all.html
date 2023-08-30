@@ -88,7 +88,6 @@
 
     <div class="row">
         <div class="col-lg-12 mb-4">
-            <!-- Simple Tables -->
             <div class="card">
                 <div class="table-responsive">
                     <table class="table align-items-center table-flush">
@@ -99,7 +98,6 @@
                                 <th>Description</th>
                                 <th>Price</th>
                                 <th>Category</th>
-                                <th>Date Created</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -109,9 +107,8 @@
                                 <td><a href="{% url 'my_admin:product_detail' product_info.product.id %}">{{ product_info.product.name }}</a></td>
                                 <td>{{ product_info.product.sub_category }}</td>
                                 <td>{{ product_info.product.description|truncatechars:10 }}</td>
-                                <td>&#8358;{{ product_info.product.price }}</td>
+                                <td>&#8358;{{ product_info.product.price|intcomma }}</td>
                                 <td>{{ product_info.product.category }}</td>
-                                <td>{{ product_info.product.date_created|date:"F d, Y" }}</td>
                                 <td><a href="{% url 'my_admin:product_detail' product_info.product.id %}" class="btn btn-sm btn-primary">Detail</a></td>
                             </tr>
                             {% endfor %}

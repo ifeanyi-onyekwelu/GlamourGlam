@@ -27,6 +27,7 @@ urlpatterns = [
     path('category/', all_category, name="categories"),
     path('category/<uuid:category_id>', category_detail, name="category_detail"),
     path('category/add/', add_category, name="add_category"),
+    path('category/<uuid:category_id>/edit', edit_category, name="edit_category"),
     path('category/delete/<uuid:category_id>', delete_category, name="delete_category"),
     path('category/delete/all/', delete_all_category, name="delete_all_category"),
 
@@ -44,6 +45,7 @@ urlpatterns = [
     path('sub-category/', all_sub_category, name="sub_categories"),
     path('sub-category/<uuid:sub_category_id>', sub_category_detail, name="sub_category_detail"),
     path('sub-category/add/', add_sub_category, name="add_sub_category"),
+    path('sub-category/<uuid:sub_category_id>/edit', edit_sub_category, name="edit_sub_category"),
     path('sub-category/delete/<uuid:sub_category_id>', delete_sub_category, name="delete_sub_category"),
     path('sub-category/delete/all/', delete_all_sub_category, name="delete_all_sub_category"),
 
