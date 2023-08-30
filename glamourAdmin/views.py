@@ -479,7 +479,7 @@ def edit_sub_category(request, sub_category_id):
         sub_category.category = category_matched
         sub_category.save()
 
-        return redirect(reverse('my_admin:sub_category_detail', sub_category_id=sub_category.id))
+        return redirect('my_admin:sub_category_detail', sub_category_id=sub_category.id)
 
     return render(request, 'admin_dashboard/sub_category/sub_category_detail.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications()})
 
