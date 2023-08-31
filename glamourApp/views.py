@@ -1139,7 +1139,7 @@ def handleContactForm(request):
 
 
 def handleSearchForm(request):
-    search_query = request.GET.get("search_query")
+    search_query = request.GET.get("search_query").lower()
     products = Product.objects.all()
 
     cart = None
@@ -1147,9 +1147,7 @@ def handleSearchForm(request):
 
     if search_query:
         print(search_query)
-        products = products.filter(name__icontains=search_query) | products.filter(
-            category__name__icontains=search_query
-        )
+        products = products.filter(name__icontains=search_query) | products.filter(category__name__icontains=search_query) | products.filter(sub_category__name__icontains=search_query)
 
     if request.user.is_authenticated:
         cart, created = Cart.objects.get_or_create(user=request.user)
@@ -1162,6 +1160,7 @@ def handleSearchForm(request):
         "search_query": search_query,
         "products": all_products,
         "total_items_in_cart": total_items,
+        "APP_NAME": os.getenv("APP_NAME")
     }
     return render(request, "search_results.html", context)
 

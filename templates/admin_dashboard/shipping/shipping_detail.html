@@ -1,0 +1,132 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | Shipping Address detail {{ shipping_address.user.first_name }} {{ shipping_address.user.last_name }}{% endblock title %}
+
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="./">Home</a></li>
+            <li class="breadcrumb-item">Shipping Address</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ shipping_address.address }}</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <form class="card mb-4" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ shipping_address.address }}, {{ shipping_address.state }} state</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <h5>User</h5>
+                        <p>{{ shipping_address.user.first_name }} {{ shipping_address.user.last_name }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>Phone</h5>
+                        <p>- {{ shipping_address.phone }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>Country</h5>
+                        <p>- {{ shipping_address.country }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>Apartment</h5>
+                        <p>- {{ shipping_address.appartment }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>Address</h5>
+                        <p>- {{ shipping_address.address }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>City</h5>
+                        <p>- {{ shipping_address.city }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>State</h5>
+                        <p>- {{ shipping_address.state }}</p>
+                    </div>
+                    <div class="form-group">
+                        <h5>Zipcode</h5>
+                        <p>- {{ shipping_address.zipcode }}</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!---Container Fluid-->
+{% endblock content %}
