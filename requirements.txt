@@ -4,6 +4,7 @@ charset-normalizer==3.2.0
 Django==4.2.4
 idna==3.4
 paystack==1.5.0
+psycopg2==2.9.7
 python-dotenv==1.0.0
 requests==2.31.0
 simplejson==3.19.1
