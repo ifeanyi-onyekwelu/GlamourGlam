@@ -640,6 +640,8 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     discount_amount = (discount.percentage / 100) * float(total_price)
                     total_price = float(total_price) - discount_amount
                     total_amount_shipping = int(total_price) + shipping_fee
+                    discount.is_used = True
+                    discount.save()
                 else:
                     total_amount_shipping = int(total_price) + shipping_fee  
 
@@ -664,9 +666,6 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     
                 cart.delete()
                 cart.save()
-
-                discount.is_used = True
-                discount.save()
 
                 send_order_email(request, order)
 
