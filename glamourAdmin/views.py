@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from .decorators import admin_only_login
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.hashers import make_password
 from glamourApp.models import *
 from .utils import update_order_delivery_status, update_user_status, get_products_with_images, send_message, get_all_notifications, create_notification
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -679,6 +680,13 @@ def delete_all_shipping_addresses(request):
 
 
 # ########################################
+# Admin Profile Page
+# ########################################
+def admin_profile_page(request):
+    return render(request, 'admin_dashboard/profile.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+
+
+# ########################################
 # Admin Authentication
 # ########################################
 def admin_login(request):
@@ -687,12 +695,31 @@ def admin_login(request):
             email = request.POST.get('email')
             password = request.POST.get('password')
 
-            user = CustomUser.objects.get(email=email)
-            print(user)
+            if email == os.getenv('ADMIN_EMAIL'):
+                print("email")
+                print(os.getenv('ADMIN_EMAIL'))
+                user = None
+                try:
+                    user = CustomUser.objects.get(email=email)
+                except CustomUser.DoesNotExist:
+                    user = CustomUser.objects.create(first_name="Ifeanyi", last_name="Onyekwelu", email=email, is_staff=True, is_superuser=True, is_active=True, password=make_password(password))
+                    user.save()
+                    
+                login(request, user)
+                notification = f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account"
+                create_notification(title="Login", notification=notification, notification_type="ACTIVITY")
+                send_message("Login Successful!", f"Login Successful!\n\nWelcome back, {user.first_name}! You've logged in to your account", user.email, os.getenv("DEFAULT_EMAIL"))
+                return redirect(reverse('my_admin:dashboard'))
+            else:
+                print(os.getenv('ADMIN_EMAIL'))
+                print("This")
 
+            user = CustomUser.objects.get(email=email)
             if user.check_password(password):
                 login(request, user)
-                create_notification(title="Login", notification="You logged in", notification_type="ACTIVITY")
+                notification = f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account"
+                create_notification(title="Login", notification=notification, notification_type="ACTIVITY")
+                send_message("Login Successful!", f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account", user.email, os.getenv("DEFAULT_EMAIL"))
                 return redirect(reverse('my_admin:dashboard'))
             else:
                 messages.error(request, "Account does not exists")

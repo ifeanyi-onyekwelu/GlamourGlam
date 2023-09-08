@@ -80,6 +80,9 @@ urlpatterns = [
     path('shipping-address/delete/<uuid:shipping_id>', delete_shipping_address, name="delete_shipping_address"),
     path('shipping-address/delete/all', delete_all_shipping_addresses, name="delete_all_shipping_address"),
 
+
+    path('profile/', admin_profile_page, name="profile"),
+
     # ########################################
     # Authentication
     # ########################################

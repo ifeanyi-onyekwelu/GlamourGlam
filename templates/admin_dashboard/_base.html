@@ -14,13 +14,12 @@
     </title>
 
     <link href="{% static 'img/gg favicon.png' %}" rel="shortcut icon" type="image/x-icon">
-
-    <link href="{% static 'admin_dashboard/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"
-        type="text/css">
+    
     <link href="{% static 'admin_dashboard/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'admin_dashboard/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"type="text/css">
     <link href="{% static 'admin_dashboard/css/ruang-admin.css' %}" rel="stylesheet">
     {% block customCssFiles %}
-      
+
     {% endblock customCssFiles %}
 </head>
 
@@ -131,7 +130,7 @@
                 Customization
             </div>
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="{% url 'my_admin:profile' %}">
                     <i class="fa fa-cog"></i>
                     <span>Settings</span>
                 </a>
@@ -198,11 +197,11 @@
                             </a>
                             <div aria-labelledby="userDropdown"
                                 class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{% url 'my_admin:profile' %}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{% url 'my_admin:profile' %}">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
                                 </a>

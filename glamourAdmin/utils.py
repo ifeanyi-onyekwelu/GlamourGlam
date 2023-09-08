@@ -15,7 +15,6 @@ def get_products_with_images(products_list):
         products_with_images.append({'product': product, 'image': image})
     return products_with_images
 
-
 def send_message(subject, message, reciepient, sender):
     send_mail(
         subject,
@@ -24,7 +23,6 @@ def send_message(subject, message, reciepient, sender):
         [reciepient],
         fail_silently=False
     )
-
 
 def update_user_status(user_id, status):
     user = CustomUser.objects.get(id=user_id)

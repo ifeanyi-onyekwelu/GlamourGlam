@@ -131,7 +131,7 @@ class WomenPageView(ListView):
     model = Product
     template_name = "women.html"
     context_object_name = "products"
-    paginate_by = 9
+    paginate_by = 10
 
     def get_queryset(self):
         category = None
