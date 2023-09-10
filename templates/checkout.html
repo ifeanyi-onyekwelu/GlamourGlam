@@ -229,6 +229,9 @@
     $(document).ready(function() {
         $('#checkout-btn').click(function(event) {
             event.preventDefault(); // Prevent default form submission
+            
+            // Disable the button
+            $('#checkout-btn').prop('disabled', true);
     
             var formData = $('#checkout__form').serialize(); // Serialize form data
             var url = "{% url 'app:checkout_page' %}"; // URL for login handler
@@ -248,6 +251,10 @@
                 error: function() {
                     // Handle AJAX request error
                     $('#checkout-errors').text('An error occurred. Please try again.');
+                },
+                complete: function () {
+                    // Re-enable the button after the request is complete
+                    $('#checkout-btn').prop('disabled', false);
                 }
             });
         });

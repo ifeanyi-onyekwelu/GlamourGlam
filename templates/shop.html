@@ -53,30 +53,42 @@
                         </div>
                         <div class="categories__accordion">
                             <div class="accordion" id="accordionExample">
-                                <div class="card">
-                                    <div class="card-heading">
-                                        <a data-filter="*">All</a>
-                                    </div>
-                                </div>
                                 {% for category in categories %}
+                                {% if forloop.first  %}
+                                    <div class="card">
+                                        <div class="card-heading active">
+                                            <a data-toggle="collapse" data-target="#collapse{{ category.id }}">{{ category.name }}</a>
+                                        </div>
+                                        <div id="collapse{{ category.id }}" class="collapse show" data-parent="#accordionExample">
+                                            <div class="card-body">
+                                                <ul style="display: block; cursor: pointer;">
+                                                    <li data-filter=".all-{{ category.name|lower }}"> All</li>
+                                                    {% for sub_category in category.subcategories.all %}
+                                                    <li data-filter=".{{ category.name|lower }}-{{ sub_category.name|lower }}">
+                                                        {{ sub_category.name }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
                                 <div class="card">
                                     <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapse{{ category.id }}">{{ category.name }}</a>
                                     </div>
-                                    <div id="collapse{{ category.id }}" class="collapse"
-                                        data-parent="#accordionExample">
+                                    <div id="collapse{{ category.id }}" class="collapse" data-parent="#accordionExample">
                                         <div class="card-body">
                                             <ul style="display: block; cursor: pointer;">
                                                 <li data-filter=".all-{{ category.name|lower }}"> All</li>
                                                 {% for sub_category in category.subcategories.all %}
-                                                <li
-                                                    data-filter=".{{ category.name|lower }}-{{ sub_category.name|lower }}">
+                                                <li data-filter=".{{ category.name|lower }}-{{ sub_category.name|lower }}">
                                                     {{ sub_category.name }}</li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </div>
@@ -134,6 +146,22 @@
                     {% endfor %}
                     {% endfor %}
                     {% endfor %}
+                    
+                    <div class="col-lg-12 text-center">
+                        <div class="pagination__option">
+                            {% if page_obj.has_previous %}
+                            <a href="?page=1"><i class="fa fa-chevron-left"></i></a>
+                            <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                            {% endif %}
+                    
+                            <span class="current-page">{{ page_obj.number }}</span>
+                    
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}"><i class="fa fa-chevron-right"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

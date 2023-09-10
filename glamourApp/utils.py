@@ -48,7 +48,7 @@ def send_order_email(request, order):
     APP_URL = os.getenv('APP_URL')
 
     order_items = order.items.all()
-    shipping_fee = 3500.00
+    shipping_fee = float(settings.SHIPPING_FEE)
 
     for order_item in order_items:
         order_item.first_image = order_item.product.productimage_set.first()
@@ -80,6 +80,54 @@ def send_order_email(request, order):
     }
 
     message = render_to_string("email/order_confirmation.html", context)
+
+    send_mail(
+        subject,
+        "",
+        settings.DEFAULT_EMAIL,  # Sender's email
+        [recipient_email],  # Recipient's email
+        html_message=message,
+    )
+
+def send_admin_order_email(request, order):
+    subject = f"Order Confirmation - Order #{order.order_number}"
+    recipient_email = settings.DEFAULT_EMAIL
+    APP_NAME = os.getenv('APP_NAME')
+    APP_URL = os.getenv('APP_URL')
+
+    order_items = order.items.all()
+    shipping_fee = float(settings.SHIPPING_FEE)
+
+    for order_item in order_items:
+        order_item.first_image = order_item.product.productimage_set.first()
+        order_item.subtotal = order_item.quantity * order_item.product.price
+
+    discount_code = request.session.get("discount_code", None)
+    try:
+        discount = DiscountCode.objects.get(code=discount_code)
+        discount_percentage = discount.percentage
+    except DiscountCode.DoesNotExist:
+        discount = None
+
+    total_amount = float(sum(order_item.subtotal for order_item in order_items))
+    total_amount_shipping = int(total_amount) + shipping_fee
+
+    if discount:
+        discount_amount = (discount.percentage / 100) * total_amount
+        total_amount -= discount_amount
+        total_amount_shipping = int(total_amount) + shipping_fee
+
+    context = {
+        "order_items": order_items,
+        "order": order,
+        "total_amount": total_amount,
+        "shipping_fee": shipping_fee,
+        "total_amount_shipping": total_amount_shipping,
+        "APP_NAME": APP_NAME,
+        "APP_URL": APP_URL
+    }
+
+    message = render_to_string("email/admin_order_confirmation.html", context)
 
     send_mail(
         subject,

@@ -19,6 +19,7 @@ from .utils import (
     send_message,
     create_notification,
     send_order_email,
+    send_admin_order_email,
     calculate_discounted_total
 )
 from django.contrib.auth.models import Group
@@ -131,7 +132,7 @@ class WomenPageView(ListView):
     model = Product
     template_name = "women.html"
     context_object_name = "products"
-    paginate_by = 10
+    paginate_by = 12
 
     def get_queryset(self):
         category = None
@@ -174,6 +175,7 @@ class WomenPageView(ListView):
             product__in=women_products
         ).distinct()
         context["sub_categories"] = sub_categories
+        context["products"] = products
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
         return context
@@ -183,7 +185,7 @@ class MenPageView(ListView):
     model = Product
     template_name = "men.html"
     context_object_name = "products"
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         category = None
@@ -225,6 +227,7 @@ class MenPageView(ListView):
         sub_categories = SubCategory.objects.filter(
             product__in=men_products
         ).distinct()
+        context["page_obj"] = products
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
@@ -235,7 +238,7 @@ class UnisexPageView(ListView):
     model = Product
     template_name = "unisex.html"
     context_object_name = "products"
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         category = None
@@ -275,6 +278,7 @@ class UnisexPageView(ListView):
         sub_categories = SubCategory.objects.filter(
             product__in=unisex_products
         ).distinct()
+        context["page_obj"] = products
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
@@ -285,7 +289,7 @@ class KidsPageView(ListView):
     model = Product
     template_name = "kids.html"
     context_object_name = "products"
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         category = None
@@ -335,7 +339,7 @@ class AccessoriesPageView(ListView):
     model = Product
     template_name = "accessories.html"
     context_object_name = "products"
-    paginate_by = 9
+    paginate_by = 12
 
     def get_queryset(self):
         category = None
@@ -377,6 +381,7 @@ class AccessoriesPageView(ListView):
         sub_categories = SubCategory.objects.filter(
             product__in=accessories_products
         ).distinct()
+        context["page_obj"] = products
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
@@ -486,7 +491,7 @@ class ShopCartPageView(TemplateView):
         total_items = 0
         cart_items = None
         cart = None
-        shipping_fee = 3500.00
+        shipping_fee = float(settings.SHIPPING_FEE)
         total_amount_shipping = 0
         APP_NAME = os.getenv("APP_NAME")
 
@@ -527,7 +532,7 @@ class ShopCartPageView(TemplateView):
         total_items = 0
         cart_items = None
         cart = None
-        shipping_fee = 3500.00
+        shipping_fee = float(settings.SHIPPING_FEE)
         total_amount_shipping = 0
         APP_NAME = os.getenv("APP_NAME")
 
@@ -578,7 +583,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             "quantity__sum"
         ]
         cart_items = cart.items.all()
-        shipping_fee = 3500.00
+        shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
 
         for cart_item in cart_items:
@@ -629,7 +634,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                 cart_items = cart.items.all()
 
                 total_price = sum(item.product.price * item.quantity for item in cart_items)
-                shipping_fee = 3500.00
+                shipping_fee = float(settings.SHIPPING_FEE)
                 discount_code = request.session.get("discount_code", None)
                 try:
                     discount = DiscountCode.objects.get(code=discount_code)
@@ -663,16 +668,17 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     )
 
                     order.items.add(order_items)
-                    
                 cart.delete()
                 cart.save()
 
                 send_order_email(request, order)
+                send_admin_order_email(request, order)
+                return JsonResponse({"success": True, 'order_id': order.id})
 
             except Exception as e:
-                print("Error occurred: ", e)
+                return JsonResponse({"success": False, "message": str(e)})
 
-        return JsonResponse({"success": False, "message": "Invalid method"})
+        return JsonResponse({"success": False})
 
 
 class AccountPageView(LoginRequiredMixin, UpdateView):
@@ -765,7 +771,7 @@ class OrderDetailsPage(LoginRequiredMixin, DetailView):
             "quantity__sum"
         ]
         order_items = order.items.all()
-        shipping_fee = 3500.00
+        shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
 
         for order_item in order_items:
@@ -808,7 +814,7 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
             "quantity__sum"
         ]
         order_items = order.items.all()
-        shipping_fee = 3500.00
+        shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
 
         for order_item in order_items:
@@ -1137,7 +1143,7 @@ def handleContactForm(request):
     return redirect(reverse("app:contact_page"))
 
 
-def handleSearchForm(request):
+def handleSearchForm(request):  
     search_query = request.GET.get("search_query").lower()
     products = Product.objects.all()
 
@@ -1145,7 +1151,6 @@ def handleSearchForm(request):
     total_items = 0
 
     if search_query:
-        print(search_query)
         products = products.filter(name__icontains=search_query) | products.filter(category__name__icontains=search_query) | products.filter(sub_category__name__icontains=search_query)
 
     if request.user.is_authenticated:
@@ -1181,29 +1186,8 @@ def handleUpdateCart(request):
                     cart_item.save()
                     return JsonResponse({"success": True, "new_quantity": new_quantity})
                 else:
-                    return JsonResponse(
-                        {"success": False, "message": "Quantity must be at least 1"}
-                    )
-            else:
-                # For guest users, update the cart in the session
-                cart = request.session.get("cart", {})
-                cart_item = cart.get(str(product_id))
-                if cart_item:
-                    new_quantity = int(quantity)
-                    if new_quantity >= 1:
-                        cart_item["quantity"] = new_quantity
-                        request.session["cart"] = cart
-                        return JsonResponse(
-                            {"success": True, "new_quantity": new_quantity}
-                        )
-                    else:
-                        return JsonResponse(
-                            {"success": False, "message": "Quantity must be at least 1"}
-                        )
-                else:
-                    return JsonResponse(
-                        {"success": False, "message": "Cart item does not exist"}
-                    )
+                    cart_item.delete()
+
         except CartItem.DoesNotExist:
             return JsonResponse(
                 {"success": False, "message": "Cart item does not exist"}
