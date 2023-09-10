@@ -4,9 +4,8 @@
 {% block title %}FAQs{% endblock title %}
 
 {% block customstyle %}
-
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css" />
 <link rel="stylesheet" href="{% static 'assets/vendor/css/core.css' %}" class="template-customizer-core-css" />
-
 {% endblock customstyle %}
 
 {% block cart_num %}
@@ -75,16 +74,12 @@
                     </div>
 
                     <div class="accordion-item card">
-                        <h2 class="accordion-header text-body d-flex justify-content-between"
-                            id="accordionIconTwo">
-                            <button type="button" class="accordion-button collapsed"
-                                data-bs-toggle="collapse" data-bs-target="#accordionIcon-2"
-                                aria-controls="accordionIcon-2">
+                        <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconTwo">
+                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionIcon-2" aria-controls="accordionIcon-2">
                                 Accordion Item 2
                             </button>
                         </h2>
-                        <div id="accordionIcon-2" class="accordion-collapse collapse"
-                            data-bs-parent="#accordionIcon">
+                        <div id="accordionIcon-2" class="accordion-collapse collapse" data-bs-parent="#accordionIcon">
                             <div class="accordion-body">
                                 Dessert ice cream donut oat cake jelly-o pie sugar plum cheesecake. Bear
                                 claw dragée oat cake
@@ -104,7 +99,7 @@
                                 Accordion Item 3
                             </button>
                         </h2>
-                        <div id="accordionIcon-3" class="accordion-collapse collapse show"
+                        <div id="accordionIcon-3" class="accordion-collapse collapse"
                             data-bs-parent="#accordionIcon">
                             <div class="accordion-body">
                                 Oat cake toffee chocolate bar jujubes. Marshmallow brownie lemon drops
@@ -124,3 +119,7 @@
 </div>
 <!-- Content wrapper -->
 {% endblock content %}
+
+{% block javascript %}
+<script src="{% static 'admin_dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% endblock javascript %}

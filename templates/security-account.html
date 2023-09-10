@@ -1,6 +1,6 @@
 {% extends '_base.html' %}
 {% load static %}
-{% block title %}Account{% endblock title %}
+{% block title %}Security{% endblock title %}
 
 {% block customstyle %}
 <link rel="stylesheet" href="{% static 'assets/vendor/fonts/boxicons.css' %}" />
@@ -66,27 +66,30 @@
                             <hr class="my-0" />
                             <div class="card-body">
                                 <div class="col-lg-12">
-                                    <form id="formAccountSettings" method="POST" action="{% url 'app:handleUpdateSecurityDetail' %}">
+                                    <form id="formAccountSettings">
                                         {% csrf_token %}
                                         <div class="row">
                                             <div class="mb-3 col-md-12">
                                                 <label for="oldPassword" class="form-label">Old Password <span class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" id="oldPassword"
                                                     name="oldPassword" placeholder="Old Password" />
+                                                <span id="oldPasswordError" style="color: red; font-weight: bold;"></span>
                                             </div>
                                             <div class="mb-3 col-md-12">
                                                 <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" name="newPassword"
                                                     id="newPassword" placeholder="New Password" />
+                                                <span id="newPasswordError" style="color: red; font-weight: bold;"></span>
                                             </div>
                                             <div class="mb-3 col-md-12">
                                                 <label for="ConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" id="ConfirmPassword"
                                                     name="ConfirmPassword" placeholder="Confirm Password" />
+                                                <span id="confirmPasswordError" style="color: red; font-weight: bold;"></span>
                                             </div>
                                         </div>
                                         <div class="mt-2">
-                                            <button type="submit" class="btn custom-background">Change Password</button>
+                                            <button type="submit" class="btn custom-background save-changes">Change Password</button>
                                             <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                                         </div>
                                     </form>
@@ -126,5 +129,42 @@
 {% endblock content %}
 
 {% block javascript %}
-<script src="../assets/js/pages-account-settings-account.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#formAccountSettings").on("submit", function(event) {
+            event.preventDefault();
+
+            $("#oldPasswordError").text("");
+            $("#newPasswordError").text("");
+            $("#confirmPasswordError").text("");
+
+            $.ajax({
+                url: "{% url 'app:handleUpdateSecurityDetail' %}",
+                method: "POST",
+                data: {
+                    oldPassword: $('#oldPassword').val(),
+                    newPassword: $('#newPassword').val(),
+                    ConfirmPassword: $('#ConfirmPassword').val(),
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(data) {
+                    if (!data.success) {
+                        if (data.message == "Old password is incorrect!") {
+                            $("#oldPasswordError").text(data.message)
+                        }
+                        if (data.message == "Passwords do not match!") {
+                            $("#newPasswordError").text(data.message);
+                            $("#confirmPasswordError").text(data.message);
+                        }
+                        if (data.message == "New password cannot be your current password!") {
+                            $("#oldPasswordError").text(data.message);
+                        }
+                    } else {
+                        $(".save-changes").text("Password Updated");
+                    }
+                }
+            })
+        })
+    })
+</script>
 {% endblock javascript %}

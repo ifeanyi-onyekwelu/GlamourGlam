@@ -61,7 +61,7 @@
                     <!-- Account -->
                     <hr class="my-0" />
                     <div class="card-body">
-                        <form id="formAccountSettings" method="POST" action="{% url 'app:handleUpdateProfileDetail' %}">
+                        <form id="formAccountSettings">
                             {% csrf_token %}
                             <div class="row">
                                 <div class="mb-3 col-md-6">
@@ -76,17 +76,18 @@
                                 </div>
                                 <div class="mb-3 col-md-6">
                                     <label for="email" class="form-label">E-mail</label>
-                                    <input class="form-control" type="text" id="email" name="email"
-                                        value="{{ request.user.email }}" placeholder="john.doe@example.com" />
+                                    <input class="form-control" type="text" id="email" name="email" value="{{ request.user.email }}" placeholder="john.doe@example.com" />
+                                    <span id="email_error" style="color: red; font-weight: bold;"></span>
                                 </div>
                                 <div class="mb-3 col-md-6">
                                     <label for="username" class="form-label">Username</label>
                                     <input class="form-control" type="text" id="username" name="username"
                                         placeholder="Username" value="{{ request.user.username }}" />
+                                    <span id="username_error" style="color: red; font-weight: bold;"></span>
                                 </div>
                             </div>
                             <div class="mt-2">
-                                <button type="submit" class="btn custom-background">Save changes</button>
+                                <button type="submit" class="btn custom-background save-changes">Save changes</button>
                                 <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                             </div>
                         </form>
@@ -102,5 +103,35 @@
 {% endblock content %}
 
 {% block javascript %}
-<script src="../assets/js/pages-account-settings-account.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#formAccountSettings').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{% url 'app:handleUpdateProfileDetail' %}",
+                method: 'POST',
+                data: {
+                    firstName: $("#firstName").val(),
+                    lastName: $("#lastName").val(),
+                    email: $("#email").val(),
+                    username: $("#username").val(),
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                },
+                success: function (data) {
+                    if (!data.success) {
+                        if (data.message == "Username already exists") {
+                            $("#username_error").text(data.message)
+                        }
+                        if (data.message == "Email already exists") {
+                            $("#email_error").text(data.message);
+                        }
+                    } else {
+                        $(".save-changes").text("Updated");
+                    }
+                }
+            })
+        })
+    })
+</script>
 {% endblock javascript %}

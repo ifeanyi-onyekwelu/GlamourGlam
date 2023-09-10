@@ -683,7 +683,17 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
 
 class AccountPageView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
-        return render(request, "account.html")
+        
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
+            "quantity__sum"
+        ]
+
+        context = {
+            "total_items_in_cart": total_items,
+            "APP_NAME": os.getenv("APP_NAME"),
+        }
+        return render(request, "account.html", context)
 
     def post(self, request, *args, **kwargs):
         return render(request, "account.html")
@@ -691,10 +701,18 @@ class AccountPageView(LoginRequiredMixin, UpdateView):
 
 class SecurityAccountPageView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
-        return render(request, "security-account.html")
 
-    def post(self, request, *args, **kwargs):
-        return render(request, "security-account.html")
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
+            "quantity__sum"
+        ]
+
+        context = {
+            "total_items_in_cart": total_items,
+            "APP_NAME": os.getenv("APP_NAME"),
+        }
+
+        return render(request, "security-account.html", context)
 
 
 @method_decorator(prevent_authenticated_access("app:home_page"), name="dispatch")
@@ -1224,13 +1242,25 @@ def handleUpdateSecurityDetail(request):
         if request.method == "POST":
             old_password = request.POST.get("oldPassword")
             new_password = request.POST.get("newPassword")
+            confirm_password = request.POST.get("ConfirmPassword")
             hashed_password = make_password(new_password)
+
 
             user = CustomUser.objects.get(id=request.user.id)
 
             if not user.check_password(old_password):
                 return JsonResponse(
                     {"success": False, "message": "Old password is incorrect!"}
+                )
+            
+            if not new_password == confirm_password:
+                return JsonResponse(
+                    {"success": False, "message": "Passwords do not match!"}
+                )
+
+            if new_password == old_password:
+                return JsonResponse(
+                    {"success": False, "message": "New password cannot be your current password!"}
                 )
 
             user.password = hashed_password
@@ -1239,11 +1269,11 @@ def handleUpdateSecurityDetail(request):
                 {"success": True, "message": "Password updated successfully"}
             )
 
-        return JsonResponse({"success": False, "message": "Invalid request"})
+        return JsonResponse({"success": False})
     except CustomUser.DoesNotExist:
         return None
     except Exception as e:
-        print("An error occurred: %s" % str(e))
+        return JsonResponse({"success": False})
 
 
 @login_required
@@ -1255,6 +1285,12 @@ def handleUpdateProfileDetail(request):
             email = request.POST.get("email")
             username = request.POST.get("username")
 
+            if CustomUser.objects.filter(email=email).exists():
+                return JsonResponse({'success': False, "message": "Email already exists"})
+            
+            if CustomUser.objects.filter(username=username).exists() and not username == request.user.username:
+                return JsonResponse({'success': False, "message": "Username already exists"})
+
             user = CustomUser.objects.get(id=request.user.id)
             user.first_name = first_name
             user.last_name = last_name
@@ -1264,6 +1300,7 @@ def handleUpdateProfileDetail(request):
             return JsonResponse(
                 {"success": True, "message": "Profile updated successfully"}
             )
+
         return JsonResponse({"success": False, "message": "Invalid request"})
     except CustomUser.DoesNotExist:
         return None
