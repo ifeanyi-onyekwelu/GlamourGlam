@@ -325,18 +325,12 @@
             event.preventDefault();
 
             const productId = "{{ product.id }}";
-            console.log(productId);
             const selectedColorElement = document.querySelector('input[name="color__radio"]:checked');
-            console.log(selectedColorElement);
             const selectedSizeElement = document.querySelector('input[name="size__radio"]:checked');
-            console.log(selectedSizeElement);
             const selectedQuantity = document.querySelector('.pro-qty input').value;
-            console.log(selectedQuantity);
 
             const selectedColor = selectedColorElement.id;
-            console.log(selectedColor)
             const selectedSize = selectedSizeElement.id;
-            console.log(selectedSize)
 
             const addToCartUrl = `/add-to-cart/${productId}/${selectedColor}/${selectedSize}/${selectedQuantity}/`;
 
@@ -407,10 +401,8 @@
                     success: function (data) {
                         if (data.added) {
                             icon.removeClass('fa-heart-o').addClass('fa-heart')
-                            console.log("Added--------")
                         } else {
                             icon.removeClass('fa-heart').addClass('fa-heart-o')
-                            console.log("Removed--------")
                         }
                     }
                 })

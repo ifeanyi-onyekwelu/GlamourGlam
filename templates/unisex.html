@@ -72,7 +72,7 @@
             </div>
             <div class="col-lg-9 col-md-9">
                 <div class="row property__gallery">
-                    {% for product_info in all_products %}
+                    {% for product_info, in_wishlist in products_in_wishlist %}
                     {% for sub_category in sub_categories %}
                     {% if product_info.product.sub_category == sub_category %}
                     {% with sub_category_slug=sub_category.name|slugify %}
@@ -84,7 +84,7 @@
                                 {% endif %}
                                 <ul class="product__hover">
                                     <li><a href="#" id="add-to-wishlist-button"><span
-                                                class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}"
+                                                class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}"
                                                 data-product-id="{{ product_info.product.id }}"></span></a></li>
                                     {% for color in product_info.product.colors.all %}
                                     {% for size in product_info.product.sizes.all %}

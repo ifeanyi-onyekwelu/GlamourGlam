@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9791248a-e2e0-43a1-b753-22a693d00ab1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/glamourApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/glamourApp/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accessories.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accessories.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/kids.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/kids.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/men.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/men.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/search_results.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/search_results.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/shop-cart.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/shop-cart.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/shop.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/shop.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/unisex.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/unisex.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/women.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/women.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2VIPZkvvy5tw00HKQQmXR3BJdez" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/HP/Documents/Aptech/Python"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9791248a-e2e0-43a1-b753-22a693d00ab1" name="Changes" comment="" />
+      <created>1694520682021</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1694520682021</updated>
+    </task>
+    <servers />
+  </component>
+</project>

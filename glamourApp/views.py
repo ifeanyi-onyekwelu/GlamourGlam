@@ -71,25 +71,28 @@ class HomePageView(TemplateView):
                 total_items = CartItem.objects.filter(cart=cart).aggregate(
                     Sum("quantity")
                 )["quantity__sum"]
+
+                user_wishlist_items = WishListItem.objects.filter(user=request.user)
+                wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+                product_wishlist_status = {}
+
+                for entry  in new_product_with_image:
+                    product = entry['product']
+                    is_in_wishlist = product.id in wishlist_product_ids
+                    product_wishlist_status[product.id] = is_in_wishlist
+
             else:
                 cart = request.session.get("cart", {})
                 total_items = sum(item["quantity"] for item in cart.values())
-            
-            if request.user.is_authenticated:
-                user_wishlist_items = WishListItem.objects.filter(user=request.user)
-                wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-                print(wishlist_product_ids)
 
-                product_wishlist_status = {
-                    product.id: product.id in wishlist_product_ids
-                    for product in products
-                }
-
-                print(product_wishlist_status)
-
-            else:
                 product_wishlist_status = {}
+            
+            wishlist_statuses = [status for status in product_wishlist_status.values()]
 
+            products_in_wishlist = zip(new_product_with_image, wishlist_statuses)
+            
+            
             context = {
                 "products": products_with_images,
                 "new_products": new_product_with_image,
@@ -98,7 +101,7 @@ class HomePageView(TemplateView):
                 "features": feature,
                 "total_items_in_cart": total_items,
                 "APP_NAME": APP_NAME.title(),
-                "product_in_wishlist": product_wishlist_status,
+                "products_in_wishlist": products_in_wishlist,
             }
             return render(request, "index.html", context)
         except Exception as e:
@@ -152,8 +155,22 @@ class WomenPageView(ListView):
         if self.request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=self.request.user)
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
+                "quantity__sum" 
             ]
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
 
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
@@ -167,6 +184,7 @@ class WomenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
+        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
 
         women_products = Product.objects.filter(
             category__name__in=["Women"]
@@ -175,6 +193,7 @@ class WomenPageView(ListView):
             product__in=women_products
         ).distinct()
         context["sub_categories"] = sub_categories
+        context["products_in_wishlist"] = products_in_wishlist
         context["products"] = products
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
@@ -208,6 +227,22 @@ class MenPageView(ListView):
                 "quantity__sum"
             ]
 
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
+
+
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
         page = self.request.GET.get("page")
@@ -220,6 +255,7 @@ class MenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
+        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
 
         men_products = Product.objects.filter(
             category__name__in=["Men"]
@@ -230,6 +266,7 @@ class MenPageView(ListView):
         context["page_obj"] = products
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
+        context["products_in_wishlist"] = products_in_wishlist
         context["APP_NAME"] = APP_NAME.title()
         return context
 
@@ -260,6 +297,21 @@ class UnisexPageView(ListView):
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
                 "quantity__sum"
             ]
+            
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
 
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
@@ -273,6 +325,7 @@ class UnisexPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
+        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
 
         unisex_products = Product.objects.filter(category__name__in=["Unisex"])
         sub_categories = SubCategory.objects.filter(
@@ -280,6 +333,7 @@ class UnisexPageView(ListView):
         ).distinct()
         context["page_obj"] = products
         context["sub_categories"] = sub_categories
+        context["products_in_wishlist"] = products_in_wishlist
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
         return context
@@ -312,6 +366,22 @@ class KidsPageView(ListView):
                 "quantity__sum"
             ]
 
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
+
+
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
         page = self.request.GET.get("page")
@@ -324,6 +394,7 @@ class KidsPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
+        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
 
         kids_products = Product.objects.filter(category__name__in=["Kids"])
         sub_categories = SubCategory.objects.filter(
@@ -331,6 +402,7 @@ class KidsPageView(ListView):
         ).distinct()
         context["sub_categories"] = sub_categories
         context["total_items_in_cart"] = total_items
+        context["products_in_wishlist"] = products_in_wishlist
         context["APP_NAME"] = APP_NAME.title()
         return context
 
@@ -362,6 +434,21 @@ class AccessoriesPageView(ListView):
                 "quantity__sum"
             ]
 
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
+
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
         page = self.request.GET.get("page")
@@ -375,6 +462,8 @@ class AccessoriesPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
+        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+
         accessories_products = Product.objects.filter(
             category__name__in=["Accessories"]
         )
@@ -383,6 +472,7 @@ class AccessoriesPageView(ListView):
         ).distinct()
         context["page_obj"] = products
         context["sub_categories"] = sub_categories
+        context["products_in_wishlist"] = products_in_wishlist
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
         return context
@@ -405,14 +495,32 @@ class ShopPageView(TemplateView):
                 "quantity__sum"
             ]
 
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {}
+
+
+        wishlist_statuses = [status for status in product_wishlist_status.values()]
+
         products_with_images = get_products_with_images(page_obj)
         categories = Category.objects.prefetch_related("subcategories").all()
+
+        products_in_wishlist = zip(products_with_images, wishlist_statuses)
 
         context = {
             "products": products_with_images,
             "page_obj": page_obj,
             "total_items_in_cart": total_items,
             "categories": categories,
+            "products_in_wishlist": products_in_wishlist,
             "APP_NAME": APP_NAME,
         }
         return render(request, "shop.html", context)
@@ -463,9 +571,7 @@ class ProductDetailPageView(DetailView):
             ]
 
         if self.request.user.is_authenticated:
-            product_in_wishlist = WishListItem.objects.filter(
-                user=self.request.user, product=self.object
-            ).exists()
+            product_in_wishlist = WishListItem.objects.filter(user=self.request.user, product=self.object).exists()
         else:
             product_in_wishlist = False
 
@@ -869,7 +975,7 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
 
 class WishListPage(ListView):
     template_name = "wishlist.html"
-    paginate_by = 9
+    # paginate_by = 9
 
     def get_queryset(self):
         wishlist_item = []
@@ -898,17 +1004,17 @@ class WishListPage(ListView):
             wishlist_item = []
         
         # Paginate the products
-        paginator = Paginator(wishlist_item, self.paginate_by)
-        page = self.request.GET.get("page")
+        # paginator = Paginator(wishlist_item, self.paginate_by)
+        # page = self.request.GET.get("page")
 
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
+        # try:
+        #     products = paginator.page(page)
+        # except PageNotAnInteger:
+        #     products = paginator.page(1)
+        # except EmptyPage:
+        #     products = paginator.page(paginator.num_pages)
 
-        context["all_products"] = get_products_with_images(products)
+        context["all_products"] = get_products_with_images(self.get_queryset())
         context["total_items_in_cart"] = total_items
         context["APP_NAME"] = APP_NAME.title()
         return context
@@ -932,26 +1038,6 @@ class FAQPageView(TemplateView):
             "total_items_in_cart": total_items,
         }
         return render(request, "faqs.html", context)
-
-
-class PrivacyPolicyPageView(TemplateView):
-    template_name = "privacy_policy.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
-            ]
-
-        context["APP_NAME"] = APP_NAME
-        context["total_items_in_cart"] = total_items
-        return context
 
 
 class TermsOfServicePageView(TemplateView):
@@ -1089,7 +1175,7 @@ def handleUserLogin(request):
                     {"success": False, "message": "Invalid username or password"}
                 )
         else:
-            return JsonResponse({"success": False, "message": "Account not found"})
+            return JsonResponse({"success": False, "message": "Invalid username or password"})
     except Http404:
         return JsonResponse({"success": False, "message": "Account not found!"})
     except Exception as e:
@@ -1177,12 +1263,31 @@ def handleSearchForm(request):
             "quantity__sum"
         ]
 
+        user_wishlist_items = WishListItem.objects.filter(user=request.user)
+        wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+        print(wishlist_product_ids)
+
+        product_wishlist_status = {}
+
+        for product in products:
+            is_in_wishlist = product.id in wishlist_product_ids
+            product_wishlist_status[product.id] = is_in_wishlist
+
+    else:
+        product_wishlist_status = {}
+    
+    wishlist_statuses = [status for status in product_wishlist_status.values()]
+
     all_products = get_products_with_images(products)
+
+    products_in_wishlist = zip(all_products, wishlist_statuses)
+
     context = {
         "search_query": search_query,
         "products": all_products,
         "total_items_in_cart": total_items,
-        "APP_NAME": os.getenv("APP_NAME")
+        "APP_NAME": os.getenv("APP_NAME"),
+        "product_in_wishlist": products_in_wishlist,
     }
     return render(request, "search_results.html", context)
 
@@ -1227,9 +1332,17 @@ def handleSubscribeToNewsLetter(request):
         body = render_to_string("email/newsletter.html", context)
         send_message(subject, "", body, settings.DEFAULT_EMAIL, email)
 
-        user = CustomUser.objects.filter(email=email).first()
+        try:
+            user = CustomUser.objects.filter(email=email).first()
+        except CustomUser.DoesNotExist:
+            return None
+
+        group, created = Group.objects.get_or_create(name='registered for newsletter')
+
         if user:
-            user.groups.add(Group.objects.get(name='registered for newsletter'))
+            user.groups.add(group)
+        else:
+            print("User not found!")
         
         return JsonResponse({"success": True, "message": "Subscribe to newsletter"})
 
@@ -1285,7 +1398,7 @@ def handleUpdateProfileDetail(request):
             email = request.POST.get("email")
             username = request.POST.get("username")
 
-            if CustomUser.objects.filter(email=email).exists():
+            if CustomUser.objects.filter(email=email).exists() and not email == request.user.email:
                 return JsonResponse({'success': False, "message": "Email already exists"})
             
             if CustomUser.objects.filter(username=username).exists() and not username == request.user.username:

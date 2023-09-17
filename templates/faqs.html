@@ -4,12 +4,32 @@
 {% block title %}FAQs{% endblock title %}
 
 {% block customstyle %}
-<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css" />
-<link rel="stylesheet" href="{% static 'assets/vendor/css/core.css' %}" class="template-customizer-core-css" />
+<link rel="stylesheet" href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}">
+
+<style>
+    .card {
+        border: none;
+        padding: 10px;
+    }
+
+    .accordion-button {
+        background: #bda06a;
+        margin-bottom: 4px;
+        color: #fff;
+        border: none;
+    }
+    
+    .accordion-button:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        background: #bda06a;
+        color: #fff;
+    }
+
+</style>
 {% endblock customstyle %}
 
 {% block cart_num %}
-
 {% if total_items_in_cart == None %}
 0
 {% else %}
@@ -43,83 +63,70 @@
 <!-- Breadcrumb End -->
 
 <!-- Content wrapper -->
-<div class="content-wrapper">
-
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <!-- Accordion -->
+<section class="section">
+    <div class="container">
         <div class="row">
-            <div class="col-lg-8 m-auto">
-                <h4>Frequently asked questions.</h4>
-                <div id="accordionIcon" class="accordion mt-3 accordion-without-arrow">
-                    <div class="accordion-item card">
-                        <h2 class="accordion-header text-body d-flex justify-content-between"
-                            id="accordionIconOne">
-                            <button type="button" class="accordion-button collapsed"
-                                data-bs-toggle="collapse" data-bs-target="#accordionIcon-1"
-                                aria-controls="accordionIcon-1">
-                                Accordion Item 1
-                            </button>
-                        </h2>
-
-                        <div id="accordionIcon-1" class="accordion-collapse collapse"
-                            data-bs-parent="#accordionIcon">
-                            <div class="accordion-body">
-                                Lemon drops chocolate cake gummies carrot cake chupa chups muffin
-                                topping. Sesame snaps icing
-                                marzipan gummi bears macaroon dragée danish caramels powder. Bear claw
-                                dragée pastry topping
-                                soufflé. Wafer gummi bears marshmallow pastry pie.
+            <div class="col-lg-8 mt-4 m-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Accordion without outline borders -->
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                        aria-controls="flush-collapseOne">
+                                        Accordion Item #1
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                    aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to
+                                        demonstrate the <code>.accordion-flush</code> class. This is the first item's
+                                        accordion body.</div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item card">
-                        <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconTwo">
-                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionIcon-2" aria-controls="accordionIcon-2">
-                                Accordion Item 2
-                            </button>
-                        </h2>
-                        <div id="accordionIcon-2" class="accordion-collapse collapse" data-bs-parent="#accordionIcon">
-                            <div class="accordion-body">
-                                Dessert ice cream donut oat cake jelly-o pie sugar plum cheesecake. Bear
-                                claw dragée oat cake
-                                dragée ice cream halvah tootsie roll. Danish cake oat cake pie macaroon
-                                tart donut gummies.
-                                Jelly beans candy canes carrot cake. Fruitcake chocolate chupa chups.
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseTwo" aria-expanded="false"
+                                        aria-controls="flush-collapseTwo">
+                                        Accordion Item #2
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseTwo" class="accordion-collapse collapse"
+                                    aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to
+                                        demonstrate the <code>.accordion-flush</code> class. This is the second item's
+                                        accordion body. Let's imagine this being filled with some actual content.</div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="accordion-item card active">
-                        <h2 class="accordion-header text-body d-flex justify-content-between"
-                            id="accordionIconThree">
-                            <button type="button" class="accordion-button" data-bs-toggle="collapse"
-                                data-bs-target="#accordionIcon-3" aria-expanded="true"
-                                aria-controls="accordionIcon-3">
-                                Accordion Item 3
-                            </button>
-                        </h2>
-                        <div id="accordionIcon-3" class="accordion-collapse collapse"
-                            data-bs-parent="#accordionIcon">
-                            <div class="accordion-body">
-                                Oat cake toffee chocolate bar jujubes. Marshmallow brownie lemon drops
-                                cheesecake. Bonbon
-                                gingerbread marshmallow sweet jelly beans muffin. Sweet roll bear claw
-                                candy canes oat cake
-                                dragée caramels. Ice cream wafer danish cookie caramels muffin.
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapseThree" aria-expanded="false"
+                                        aria-controls="flush-collapseThree">
+                                        Accordion Item #3
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseThree" class="accordion-collapse collapse"
+                                    aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to
+                                        demonstrate the <code>.accordion-flush</code> class. This is the third item's
+                                        accordion body. Nothing more exciting happening here in terms of content, but just
+                                        filling up the space to make it look, at least at first glance, a bit more
+                                        representative of how this would look in a real-world application.</div>
+                                </div>
                             </div>
-                        </div>
+                        </div><!-- End Accordion without outline borders -->
                     </div>
                 </div>
             </div>
         </div>
-        <!--/ Accordion -->
-
     </div>
-</div>
-<!-- Content wrapper -->
+</section>
 {% endblock content %}
 
 {% block javascript %}
-<script src="{% static 'admin_dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 {% endblock javascript %}

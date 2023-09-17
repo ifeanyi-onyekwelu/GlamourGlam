@@ -45,13 +45,13 @@
             <div class="col-lg-12 col-md-12">
                 <div class="row property__gallery">
                     {% if products %} 
-                    {% for product in products %}
+                    {% for product, in_wishlist in product_in_wishlist %}
                     <div class="col-lg-3 col-md-4 col-sm-6 mix men-shirt">
                         <div class="product__item">
                             <div class="product__item__pic set-bg" data-setbg="{{ product.image.image.url }}">
                                 <div class="label new">New</div>
                                 <ul class="product__hover">
-                                    <li><a href="#" id="add-to-wishlist-button"><span class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}" data-product-id="{{ product.id }}"></span></a></li>
+                                    <li><a href="#" id="add-to-wishlist-button"><span class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o{% endif %}" data-product-id="{{ product.product.id }}"></span></a></li>
                                     {% for color in product.product.colors.all %} 
                                     {% for size in product.product.sizes.all %} 
                                     {% if forloop.parentloop.first and forloop.first %}
@@ -80,7 +80,8 @@
                             </div>
                         </div>
                     </div>
-                    {% endfor %} 
+                    {% endfor %}
+
                     {% else %}
                     <h3>No results found.</h3>
                     {% endif %}

@@ -25,7 +25,6 @@ urlpatterns = [
     path('login/', LoginPageView.as_view(), name="login_page"),
     path('register/', RegisterPageView.as_view(), name="register_page"),
     path('faqs/', FAQPageView.as_view(), name="faqs_page"),
-    path('privacy-policy/',PrivacyPolicyPageView.as_view(), name="privacy_policy_page"),
     path('terms-of-service/', TermsOfServicePageView.as_view(), name="terms_of_service_page"),
     path('returns-policy/', ReturnAndRefund.as_view(), name="returns_and_refunds_page"),
     path('dropshipping/', DropShipping.as_view(), name="dropshipping_page"),
