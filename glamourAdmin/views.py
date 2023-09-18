@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 import os
 from dotenv import load_dotenv
-from .decorators import admin_only_login
+from .decorators import admin_only_login, prevent_authenticated_access
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.hashers import make_password
@@ -134,6 +134,15 @@ def dashboard(request):
         'APP_NAME': os.getenv('APP_NAME')
     }
     return render(request, 'admin_dashboard/index.html', context)
+
+
+@admin_only_login
+def news_letter_subscribers(request):
+    
+    context = {
+        'APP_NAME': os.getenv('APP_NAME')
+    }
+    return render(request, 'admin_dashboard/news_letter_subscribers.html', context)
 
 # ########################################
 # User
@@ -689,30 +698,12 @@ def admin_profile_page(request):
 # ########################################
 # Admin Authentication
 # ########################################
+@prevent_authenticated_access("my_admin:dashboard")
 def admin_login(request):
     try:
         if request.method == 'POST':
             email = request.POST.get('email')
             password = request.POST.get('password')
-
-            if email == os.getenv('ADMIN_EMAIL'):
-                print("email")
-                print(os.getenv('ADMIN_EMAIL'))
-                user = None
-                try:
-                    user = CustomUser.objects.get(email=email)
-                except CustomUser.DoesNotExist:
-                    user = CustomUser.objects.create(first_name="Ifeanyi", last_name="Onyekwelu", email=email, is_staff=True, is_superuser=True, is_active=True, password=make_password(password))
-                    user.save()
-                    
-                login(request, user)
-                notification = f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account"
-                create_notification(title="Login", notification=notification, notification_type="ACTIVITY")
-                send_message("Login Successful!", f"Login Successful!\n\nWelcome back, {user.first_name}! You've logged in to your account", user.email, os.getenv("DEFAULT_EMAIL"))
-                return redirect(reverse('my_admin:dashboard'))
-            else:
-                print(os.getenv('ADMIN_EMAIL'))
-                print("This")
 
             user = CustomUser.objects.get(email=email)
             if user.check_password(password):
@@ -720,26 +711,53 @@ def admin_login(request):
                 notification = f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account"
                 create_notification(title="Login", notification=notification, notification_type="ACTIVITY")
                 send_message("Login Successful!", f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account", user.email, os.getenv("DEFAULT_EMAIL"))
-                return redirect(reverse('my_admin:dashboard'))
+                return JsonResponse({'success': True, 'message': "Login Successful"})
             else:
                 messages.error(request, "Account does not exists")
-                return redirect(reverse('my_admin:login'))
+                return JsonResponse({'success': False, 'message': "Login Unsuccessful"})
 
     except CustomUser.DoesNotExist:
-        messages.error(request, "Account does not exist!")
-        return redirect(reverse('my_admin:login'))
+        return JsonResponse({'success': False, 'message': "Account not found"})
     except Exception as e:
-        messages.error(request, str(e))
-        return redirect(reverse('my_admin:login'))
+        return JsonResponse({'success': False, 'message': str(e)})
 
     return render(request, 'admin_dashboard/login.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+
+
+@prevent_authenticated_access("my_admin:dashboard")
+def admin_signup(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        username = request.POST.get('username')
+
+        if CustomUser.objects.filter(email=email).exists():
+            return JsonResponse({'success': False, 'message': 'That email address is already in use'})
+
+        if CustomUser.objects.filter(username=username).exists():
+            return JsonResponse({'success': False, 'message': 'That username is already in use'})
+        
+        user = CustomUser.objects.create(first_name=first_name, last_name=last_name, email=email, username=username, is_staff=True, is_superuser=True, is_active=True, password=make_password(password))
+        user.save()
+            
+        login(request, user)
+        
+        notification = f"Registration Successful!\nWelcome, {user.first_name}! You are already logged in to your account"
+        create_notification(title="Registration", notification=notification, notification_type="ACTIVITY")
+
+        return JsonResponse({'success': True, 'message': 'Account registration successfully'})
+    
+    return render(request, 'admin_dashboard/signup.html', {'APP_NAME': os.getenv('APP_NAME')})
 
 
 def admin_logout(request):
     logout(request)
     create_notification(
         title="Logout", notification="You logged out", notification_type="ACTIVITY")
-    return redirect(reverse('app:home_page'))
+    return redirect(reverse('my_admin:login'))
 
 # Error handling
 def error404(request, e):

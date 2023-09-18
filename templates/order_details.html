@@ -84,7 +84,9 @@
 						<tbody>
                             {% for order_item in order_items %}
                             <tr>
-                                <td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
+                                <td>
+									<img src="{{ order_item.first_image.image.url }}" alt="{{ order_item.product.name }}"style="width: 100px; object-fit: contain;">
+									{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
                                 <td>x {{ order_item.quantity }}</td>
                                 <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
                             </tr>

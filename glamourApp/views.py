@@ -1203,6 +1203,7 @@ def handleAddToCart(request, product_id, color_selected, size_selected, quantity
         )
         cart_item.quantity += int(quantity_selected)
         cart_item.save()
+        
     except CartItem.DoesNotExist:
         cart_item = CartItem.objects.create(
             cart=cart,
@@ -1293,7 +1294,7 @@ def handleSearchForm(request):
 
 
 @login_required
-def handleUpdateCart(request):
+def handleUpdateCart(request, color, size):
     if request.method == "POST":
         product_id = request.POST.get("product_id")
         quantity = request.POST.get("quantity")
@@ -1302,7 +1303,7 @@ def handleUpdateCart(request):
             # If the user is authenticated, update the cart in the database
             if request.user.is_authenticated:
                 cart, created = Cart.objects.get_or_create(user=request.user)
-                cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+                cart_item = CartItem.objects.get(cart=cart, product_id=product_id, color=color, size=size)
                 new_quantity = int(quantity)
                 if new_quantity >= 1:
                     cart_item.quantity = new_quantity

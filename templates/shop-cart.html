@@ -66,9 +66,9 @@
                             {% for cart_item in cart_items %}
                             <tr id="cart-item-{{ cart_item.id }}">
                                 <td class="cart__product__item">
-                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}" style="width: 100px; height: 100px; object-fit: contain;">
+                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}" style="width: 110px; height: 110px; object-fit: contain;">
                                     <div class="cart__product__item__title">
-                                        <h6>{{ cart_item.product.name }}</h6>
+                                        <h6>{{ cart_item.product.name }} ({{ cart_item.color }})</h6>
                                         <div class="rating">
                                             <i class="fa fa-star"></i>
                                             <i class="fa fa-star"></i>
@@ -80,10 +80,10 @@
                                 </td>
                                 <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
                                 <td class="cart__quantity">
-                                    <div class="pro-qty">
-                                        <form class="quantity-form" data-product-id="{{ cart_item.product.id }}" id="form-{{ cart_item.id }}">
+                                    <div class="">
+                                        <form class="quantity-form pro-qty" data-product-id="{{ cart_item.product.id }}" data-cart-item-color="{{ cart_item.color }}" data-cart-item-size="{{ cart_item.size }}" id="form-{{ cart_item.id }}">
                                             {% csrf_token %}
-                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1">
+                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1" class="qty-amt">
                                         </form>
                                     </div>
                                 </td>
@@ -164,12 +164,13 @@
             e.preventDefault();
 
             let product_id = $(this).data('product-id');
+            let color = $(this).data('cart-item-color');
+            let size = $(this).data('cart-item-size');
             let quantity = $(this).find('input[name="quantity"]').val()
 
             $.ajax({
                 type: "POST",
-                // url: '/update-quantity/',
-                url: '{% url "app:handleUpdateCart" %}',
+                url: `/update-item/${color}/${size}/`,
                 data: {
                     'product_id': product_id,
                     'quantity': quantity,
@@ -180,9 +181,8 @@
                     location.reload();
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    console.log(errorThrown);
                 }
-            });
+            }); 
         });
     });
 
@@ -217,5 +217,25 @@
         });
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        var proQty = $('.pro-qty');
+        proQty.prepend('<span class="dec qtybtn">-</span>');
+        proQty.append('<span class="inc qtybtn">+</span>');
+        proQty.on('click', '.qtybtn', function () {
+            var $button = $(this);
+            var oldValue = $button.parent().find('.qty-amt').val();
+            if ($button.hasClass('inc')) {
+                var newVal = parseFloat(oldValue) + 1;
+            } else {
+                // Don't allow decrementing below zero
+                if (oldValue > 0) {
+                    var newVal = parseFloat(oldValue) - 1;
+                } else {
+                    newVal = 0;
+                }
+            }
+            $button.parent().find('input').val(newVal);
+        });
+    })
 </script>
 {% endblock javascript %}

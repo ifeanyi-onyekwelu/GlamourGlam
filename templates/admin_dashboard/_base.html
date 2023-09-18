@@ -26,8 +26,9 @@
 <body id="page-top">
     <div id="wrapper">
         {% url 'my_admin:login' as login_page %}
+        {% url 'my_admin:signup' as signup_page %}
         <!-- Sidebar -->
-        {% if login_page == request.path %}
+        {% if login_page == request.path or signup_page == request.path %}
         {% else %}
         <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
             <a class="sidebar-brand d-flex align-items-center justify-content-center"
@@ -109,6 +110,19 @@
                 </div>
             </li>
             <li class="nav-item">
+                <a aria-controls="collapseBootstrap" aria-expanded="true" class="nav-link collapsed"
+                    data-target="#collapseNewsLetter" data-toggle="collapse" href="#">
+                    <i class="fa far fa-newspaper"></i>
+                    <span>Newsletter</span>
+                </a>
+                <div aria-labelledby="headingBootstrap" class="collapse" data-parent="#accordionSidebar" id="collapseNewsLetter">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{% url 'my_admin:subscribed_to_news_letter' %}">Subscribers</a>
+                        <a class="collapse-item" href="{% url 'my_admin:add_product' %}">Compose letter</a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{% url 'my_admin:discount_codes' %}">
                     <i class="fa fa-tags"></i>
                     <span>Discounts &amp; Coupons</span>
@@ -141,7 +155,7 @@
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
                 <!-- TopBar -->
-                {% if login_page == request.path %}
+                {% if login_page == request.path or signup_page == request.path %}
                 {% else %}
                 <nav class="navbar navbar-expand navbar-light bg-navbar topbar mb-4 static-top">
                     <button class="btn btn-link rounded-circle mr-3" id="sidebarToggleTop">

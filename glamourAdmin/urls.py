@@ -5,6 +5,7 @@ app_name = 'my_admin'
 
 urlpatterns = [
     path('', dashboard, name="dashboard"),
+    path('subscribed-to-news-letter/', news_letter_subscribers, name="subscribed_to_news_letter"),
     # ########################################
     # Order urls
     # ########################################
@@ -87,6 +88,7 @@ urlpatterns = [
     # Authentication
     # ########################################
     path('login/', admin_login, name="login"),
+    path('signup/', admin_signup, name="signup"),
     path('logout/', admin_logout, name="logout"),
 
     # Error handling

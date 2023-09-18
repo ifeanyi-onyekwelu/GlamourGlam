@@ -16,11 +16,9 @@
                 <div class="text-center">
                   <h1 class="h4 text-gray-900 mb-4">Login</h1>
                 </div>
-                <form class="user" method="post">
-                  {% for message in messages %}
-                  <p style="color: red; text-align: center;">{{ message }}</p>
-                  {% endfor %}
+                <form class="userForm" method="post">
                   {% csrf_token %}
+                  <div class="errorMsg" style="text-align: center; margin-bottom: 10px; color: red; font-weight: bold;"></div>
                   <div class="form-group">
                     <input type="email" class="form-control" id="exampleInputEmail" name="email" aria-describedby="emailHelp"
                       placeholder="Enter Email Address">
@@ -32,9 +30,7 @@
                     <input type="submit" value="Login" class="btn btn-primary btn-block">
                   </div>
                   <hr>
-                  <a href="" class="btn btn-google btn-block">
-                    <i class="fab fa-google fa-fw"></i> Login with Google
-                  </a>
+                  <a href="{% url 'my_admin:signup' %}">Don't have an account?</a>
                 </form>
                 <hr>
                 <div class="text-center">
@@ -49,3 +45,38 @@
 </div>
 <!-- Login Content -->
 {% endblock content %}
+
+{% block javascript %}
+<script>
+  $(document).ready(function () {
+
+    $('.errorMsg').text('');
+
+    $('.userForm').on('submit', function (event) {
+      event.preventDefault();
+
+
+      $.ajax({
+        method: 'POST',
+        url: "{% url 'my_admin:login' %}",
+        data: {
+          'email': $('#exampleInputEmail').val(),
+          'password': $('#exampleInputPassword').val(),
+          'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        success: function (data) {
+          if (data.success) {
+            location.href = "{% url 'my_admin:dashboard' %}"
+          } else if (!(data.success)) {
+            $(".errorMsg").text(data.message);
+          }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          $(".errorMsg").text(errorThrown);
+        }
+      })
+    })
+
+  })
+</script>
+{% endblock javascript %}

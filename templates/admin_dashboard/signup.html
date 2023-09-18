@@ -1,0 +1,105 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+
+{% block title %}Admin Signup{% endblock title %}
+
+{% block content %}
+<!-- Login Content -->
+<div class="container-login">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-12 col-md-9">
+            <div class="card shadow-sm my-5">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="login-form">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Register</h1>
+                                </div>
+                                <form class="userForm" method="post">
+                                    {% csrf_token %}
+                                    <div class="errorMsg" style="color: red; font-weight: bold;"></div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="exampleInputFirstName" name="first_name"
+                                            aria-describedby="emailHelp" placeholder="Enter First Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="exampleInputLastName" name="last_name"
+                                            aria-describedby="emailHelp" placeholder="Enter Last Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" id="exampleInputEmail" name="email"
+                                            aria-describedby="emailHelp" placeholder="Enter Email Address">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="exampleInputUsername" name="username"
+                                            aria-describedby="emailHelp" placeholder="Enter Username">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control" id="exampleInputPassword"
+                                            name="password" placeholder="Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control" id="exampleInputPassword2"
+                                            name="password2" placeholder="Re-enter Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="submit" value="Login" class="btn btn-primary btn-block">
+                                    </div>
+                                    <hr>
+                                    <a href="{% url 'my_admin:login' %}">Already have an account?</a>
+                                </form>
+                                <hr>
+                                <div class="text-center">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Login Content -->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+
+        $('.errorMsg').text('');
+
+        $('.userForm').on('submit', function(event) {
+            event.preventDefault();
+
+            if ($('#exampleInputPassword').val() !== $('#exampleInputPassword2').val()) {
+                return $('.errorMsg').text('Passwords do not match');
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: "{% url 'my_admin:signup' %}",
+                data: {
+                    'first_name': $('#exampleInputFirstName').val(),
+                    'last_name': $('#exampleInputLastName').val(),
+                    'email': $('#exampleInputEmail').val(),
+                    'username': $('#exampleInputUsername').val(),
+                    'password': $('#exampleInputPassword').val(),
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        location.href = "{% url 'my_admin:dashboard' %}"
+                    } else if (!(data.success)) {
+                        $(".errorMsg").text(data.message);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $(".errorMsg").text(errorThrown);
+                }
+            })
+        })
+
+    })
+</script>
+{% endblock javascript %}
