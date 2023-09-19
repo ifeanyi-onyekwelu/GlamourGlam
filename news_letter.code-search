@@ -1,0 +1,23 @@
+# Query: news_letter
+# ContextLines: 1
+
+5 results - 3 files
+
+glamourAdmin\urls.py:
+  78      # ########################################
+  79:     path('subscribed-to-news-letter/', news_letter_subscribers, name="subscribed_to_news_letter"),
+  80  
+
+glamourAdmin\views.py:
+  658  @admin_only_login
+  659: def news_letter_subscriberss(request):
+  660  
+
+  663      }
+  664:     return render(request, 'admin_dashboard/news_letter_subscriber.html', context)
+  665  
+
+templates\admin_dashboard\_base.html:
+  119                      <div class="bg-white py-2 collapse-inner rounded">
+  120:                         <a class="collapse-item" href="{% url 'my_admin:subscribed_to_news_letter' %}">Subscribers</a>
+  121                          <a class="collapse-item" href="{% url 'my_admin:add_product' %}">Compose letter</a>

@@ -5,14 +5,13 @@ app_name = 'my_admin'
 
 urlpatterns = [
     path('', dashboard, name="dashboard"),
-    path('subscribed-to-news-letter/', news_letter_subscribers, name="subscribed_to_news_letter"),
     # ########################################
     # Order urls
     # ########################################
     path('users/', all_user, name="users"),
-    path('user/<int:user_id>', user_detail, name="user_detail"),
-    path('user/<int:user_id>/active', mark_user_as_active, name="mark_user_as_active"),
-    path('user/<int:user_id>/suspended', mark_user_as_suspended, name="mark_user_as_suspended"),
+    path('user/<uuid:user_id>', user_detail, name="user_detail"),
+    path('user/<uuid:user_id>/active', mark_user_as_active, name="mark_user_as_active"),
+    path('user/<uuid:user_id>/suspended', mark_user_as_suspended, name="mark_user_as_suspended"),
 
     # ########################################
     # Products urls
@@ -73,8 +72,16 @@ urlpatterns = [
     path('discount/delete/all', delete_all_coupons, name="delete_all_coupons"),
     path('discount/delete/<uuid:coupon_id>', delete_coupon, name="delete_coupon"),
 
+
     # ########################################
-    # Shipping
+    # Newsletter urls
+    # ########################################
+    path('subscribed-to-news-letter/', news_letter_subscribers, name="subscribed_to_news_letter"),
+    path('compose-news-letter/', compose_and_send_message, name="compose_and_send_message"),
+    path('remove-from-newsletter/<int:user_id>/', remove_newsletter_subscriber, name='remove_newsletter_subscriber'),
+
+    # ########################################
+    # Shipping urls
     # ########################################
     path('shipping-address/', all_shipping_address, name="shipping_addresses"),
     path('shipping-address/<uuid:shipping_id>', shipping_detail, name="shipping_detail"),
@@ -82,10 +89,15 @@ urlpatterns = [
     path('shipping-address/delete/all', delete_all_shipping_addresses, name="delete_all_shipping_address"),
 
 
+    # ########################################
+    # Profile urls
+    # ########################################
     path('profile/', admin_profile_page, name="profile"),
+    path('edit-profile/', edit_profile, name="edit_profile"),
+    path('change-password/', change_password, name="change_password"),
 
     # ########################################
-    # Authentication
+    # Authentication urls
     # ########################################
     path('login/', admin_login, name="login"),
     path('signup/', admin_signup, name="signup"),

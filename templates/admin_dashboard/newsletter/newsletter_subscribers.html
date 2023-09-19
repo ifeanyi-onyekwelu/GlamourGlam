@@ -95,10 +95,11 @@
                                 <th>Last name</th>
                                 <th>Email Address</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for user in users %}
+                            {% for user in subscribed_users %}
                             <tr>
                                 <td><a href="{% url 'my_admin:user_detail' user.id %}">{{ user.first_name }}</a></td>
                                 <td>{{ user.last_name }}</td>
@@ -108,6 +109,8 @@
                                 {% else %}
                                 <td><span class="badge badge-danger">Suspended</span></td>
                                 {% endif %}
+                                <td><a href="#" class="btn btn-outline-danger btn-sm" id="removeUserFromGroupBtn"
+                                        data-user-id="{{ user.id }}">Remove</a></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -121,3 +124,29 @@
 </div>
 <!---Container Fluid-->
 {% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $('#removeUserFromGroupBtn').on('click', function (event) {
+            event.preventDefault();
+
+            user_id = $(this).data('user-id');
+
+            $.ajax({
+                method: 'POST',
+                url: `/admin/remove-from-newsletter/${user_id}/`,
+                data: {
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        location.reload();
+                    }
+                }
+            })
+        })
+
+    })
+</script>
+{% endblock javascript %}

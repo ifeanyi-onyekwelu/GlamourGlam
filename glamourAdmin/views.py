@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from .decorators import admin_only_login, prevent_authenticated_access
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import Group
 from django.contrib.auth.hashers import make_password
 from glamourApp.models import *
 from .utils import update_order_delivery_status, update_user_status, get_products_with_images, send_message, get_all_notifications, create_notification
@@ -136,19 +137,9 @@ def dashboard(request):
     return render(request, 'admin_dashboard/index.html', context)
 
 
-@admin_only_login
-def news_letter_subscribers(request):
-    
-    context = {
-        'APP_NAME': os.getenv('APP_NAME')
-    }
-    return render(request, 'admin_dashboard/news_letter_subscribers.html', context)
-
 # ########################################
 # User
 # ########################################
-
-
 @admin_only_login
 def all_user(request):
     users = CustomUser.objects.all()
@@ -177,11 +168,10 @@ def mark_user_as_suspended(request, user_id):
     update_user_status(user_id, False)
     return redirect('my_admin:users')
 
+
 # ########################################
 # Product
 # ########################################
-
-
 @admin_only_login
 def all_products(request):
     products = Product.objects.all()
@@ -352,11 +342,10 @@ def edit_product(request, product_id):
     }
     return render(request, 'admin_dashboard/product/edit.html', context)
 
+
 # ########################################
 # Category
 # ########################################
-
-
 @admin_only_login
 def all_category(request):
     categories = Category.objects.all()
@@ -445,11 +434,10 @@ def delete_all_colors(request):
     ProductColor.objects.all().delete()
     return redirect('my_admin:colors')
 
+
 # ########################################
 # Sub Category
 # ########################################
-
-
 @admin_only_login
 def all_sub_category(request):
     sub_categories = SubCategory.objects.all()
@@ -600,11 +588,10 @@ def mark_order_as_failed_delivery(request, order_id):
     update_order_delivery_status(order_id, 'F')
     return redirect('order_detail', order_id=order_id)
 
+
 # ########################################
 # Discounts and Coupons
 # ########################################
-
-
 @admin_only_login
 def all_coupons(request):
     coupons = DiscountCode.objects.all()
@@ -662,6 +649,66 @@ def delete_all_coupons(request):
 
 
 # ########################################
+# News Letter
+# ########################################
+@admin_only_login
+def news_letter_subscribers(request):
+
+    group = Group.objects.get(name="registered for newsletter")
+
+    users_in_group = CustomUser.objects.filter(groups=group)
+    context = {
+        'subscribed_users': users_in_group,
+        'APP_NAME': os.getenv('APP_NAME')
+    }
+    return render(request, 'admin_dashboard/newsletter/newsletter_subscribers.html', context)
+
+@admin_only_login
+def remove_newsletter_subscriber(request, user_id):
+    group = Group.objects.get(name='registered for newsletter')
+
+    try:
+        user = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        user = None
+
+    if user:
+        user.groups.remove(group)
+        return JsonResponse({'success': True, 'message': 'User removed successfully'})
+
+@admin_only_login
+def compose_and_send_message(request):
+    group = Group.objects.get(name="registered for newsletter")
+
+    if request.method == 'POST':
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        images = request.FILES.getlist('images')
+        from_email = os.getenv('DEFAULT_EMAIL')
+
+        users_in_group = CustomUser.objects.filter(groups=group)
+
+        recipents_list = [user.email for user in users_in_group]
+
+        if len(subject) <= 0:
+            return JsonResponse({'success': False, 'message': 'Subject is required', 'element': 'subject'})
+        
+        if len(message) <= 0:
+            return JsonResponse({'success': False, 'message': 'Message is required', 'element': 'message'})
+
+        try:
+            for user in recipents_list:
+                send_message(subject, message, user, from_email)
+            return JsonResponse({'success': True, 'message': 'Message sent successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+        
+    context = {
+        'APP_NAME': os.getenv('APP_NAME')
+    }
+    return render(request, 'admin_dashboard/newsletter/compose_message.html', context)
+
+# ########################################
 # Shipping
 # ########################################
 @admin_only_login
@@ -691,8 +738,48 @@ def delete_all_shipping_addresses(request):
 # ########################################
 # Admin Profile Page
 # ########################################
+@admin_only_login
 def admin_profile_page(request):
     return render(request, 'admin_dashboard/profile.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
+
+@admin_only_login
+def edit_profile(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        user = CustomUser.objects.get(username=request.user.username, email=request.user.email)
+        
+        if CustomUser.objects.filter(email=email).exists() and not request.user.email:
+            return JsonResponse({'success': False, 'message': 'Email already exists'})
+
+        if CustomUser.objects.filter(username=username).exists() and not request.user.username:
+            return JsonResponse({'success': False, 'message': 'Username taken already'})
+        
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.username = username
+        user.save()
+        return JsonResponse({'success': True, 'message': 'Profile updated successfully'})
+
+@admin_only_login
+def change_password(request):
+    if request.method == 'POST':
+        oldPassword = request.POST.get('oldPassword')
+        newPassword = request.POST.get('newPassword')
+
+        user = CustomUser.objects.get(username=request.user.username, email=request.user.email)
+
+        if not user.check_password(oldPassword):
+            return JsonResponse({'success': False, 'message': 'Old password is incorrect'})
+
+        user.password = make_password(newPassword)
+        user.save()
+
+        return JsonResponse({'success': True, 'message': 'Password changed successfully'})
 
 
 # ########################################

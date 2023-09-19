@@ -14,9 +14,10 @@
     </title>
 
     <link href="{% static 'img/gg favicon.png' %}" rel="shortcut icon" type="image/x-icon">
-    
+
     <link href="{% static 'admin_dashboard/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
-    <link href="{% static 'admin_dashboard/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"type="text/css">
+    <link href="{% static 'admin_dashboard/vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet"
+        type="text/css">
     <link href="{% static 'admin_dashboard/css/ruang-admin.css' %}" rel="stylesheet">
     {% block customCssFiles %}
 
@@ -115,10 +116,11 @@
                     <i class="fa far fa-newspaper"></i>
                     <span>Newsletter</span>
                 </a>
-                <div aria-labelledby="headingBootstrap" class="collapse" data-parent="#accordionSidebar" id="collapseNewsLetter">
+                <div aria-labelledby="headingBootstrap" class="collapse" data-parent="#accordionSidebar"
+                    id="collapseNewsLetter">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{% url 'my_admin:subscribed_to_news_letter' %}">Subscribers</a>
-                        <a class="collapse-item" href="{% url 'my_admin:add_product' %}">Compose letter</a>
+                        <a class="collapse-item" href="{% url 'my_admin:compose_and_send_message' %}">Compose letter</a>
                     </div>
                 </div>
             </li>
@@ -197,7 +199,8 @@
                                 </h6>
                                 {% block notification %}
                                 {% endblock notification %}
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Notifications</a>
+                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All
+                                    Notifications</a>
                             </div>
                         </li>
                         <div class="topbar-divider d-none d-sm-block"></div>
@@ -207,7 +210,8 @@
                                 <img class="img-profile rounded-circle"
                                     src="{% static 'admin_dashboard/img/IMG_2579.png' %}"
                                     style="max-width: 60px; object-fit: contain;">
-                                <span class="ml-2 d-none d-lg-inline text-white small">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                                <span class="ml-2 d-none d-lg-inline text-white small">{{ request.user.first_name }}
+                                    {{ request.user.last_name }}</span>
                             </a>
                             <div aria-labelledby="userDropdown"
                                 class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
