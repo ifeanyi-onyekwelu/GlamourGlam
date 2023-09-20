@@ -1,5 +1,6 @@
 import random
 import re
+import string
 import os
 from dotenv import load_dotenv
 from random import sample
@@ -1108,7 +1109,7 @@ def handleUserRegistration(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         cmfpassword = request.POST.get("cmfpassword")
-        username = str(firstName) + str(lastName)
+        username = "User" + ''.join(random.choices(string.digits, k=7))
         hased_password = make_password(password)
 
         if CustomUser.objects.filter(email=email).exists():
@@ -1124,7 +1125,7 @@ def handleUserRegistration(request):
             and not CustomUser.objects.filter(email=email).exists()
         ):
             new_user = CustomUser.objects.create(
-                username=username + str(password),
+                username ="User" + ''.join(random.choices(string.digits, k=7)),
                 first_name=firstName,
                 last_name=lastName,
                 email=email,
