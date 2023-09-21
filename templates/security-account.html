@@ -70,26 +70,33 @@
                                         {% csrf_token %}
                                         <div class="row">
                                             <div class="mb-3 col-md-12">
-                                                <label for="oldPassword" class="form-label">Old Password <span class="text-danger">*</span></label>
+                                                <label for="oldPassword" class="form-label">Old Password <span
+                                                        class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" id="oldPassword"
                                                     name="oldPassword" placeholder="Old Password" />
-                                                <span id="oldPasswordError" style="color: red; font-weight: bold;"></span>
+                                                <span id="oldPasswordError"
+                                                    style="color: red; font-weight: bold;"></span>
                                             </div>
                                             <div class="mb-3 col-md-12">
-                                                <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
+                                                <label for="newPassword" class="form-label">New Password <span
+                                                        class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" name="newPassword"
                                                     id="newPassword" placeholder="New Password" />
-                                                <span id="newPasswordError" style="color: red; font-weight: bold;"></span>
+                                                <span id="newPasswordError"
+                                                    style="color: red; font-weight: bold;"></span>
                                             </div>
                                             <div class="mb-3 col-md-12">
-                                                <label for="ConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                                <label for="ConfirmPassword" class="form-label">Confirm Password <span
+                                                        class="text-danger">*</span></label>
                                                 <input class="form-control" type="password" id="ConfirmPassword"
                                                     name="ConfirmPassword" placeholder="Confirm Password" />
-                                                <span id="confirmPasswordError" style="color: red; font-weight: bold;"></span>
+                                                <span id="confirmPasswordError"
+                                                    style="color: red; font-weight: bold;"></span>
                                             </div>
                                         </div>
                                         <div class="mt-2">
-                                            <button type="submit" class="btn custom-background save-changes">Change Password</button>
+                                            <button type="submit" class="btn custom-background save-changes">Change
+                                                Password</button>
                                             <button type="reset" class="btn btn-outline-secondary">Cancel</button>
                                         </div>
                                     </form>
@@ -113,8 +120,10 @@
                         <form id="formAccountDeactivation" action="{% url 'app:handleDeleteAccount' %}" method="post">
                             <div class="form-check mb-3">
                                 {% csrf_token %}
-                                <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" required />
-                                <label class="form-check-label" for="accountActivation">I confirm my account deactivation</label>
+                                <input class="form-check-input" type="checkbox" name="accountActivation"
+                                    id="accountActivation" required />
+                                <label class="form-check-label" for="accountActivation">I confirm my account
+                                    deactivation</label>
                             </div>
                             <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
                         </form>
@@ -130,8 +139,8 @@
 
 {% block javascript %}
 <script>
-    $(document).ready(function() {
-        $("#formAccountSettings").on("submit", function(event) {
+    $(document).ready(function () {
+        $("#formAccountSettings").on("submit", function (event) {
             event.preventDefault();
 
             $("#oldPasswordError").text("");
@@ -142,12 +151,12 @@
                 url: "{% url 'app:handleUpdateSecurityDetail' %}",
                 method: "POST",
                 data: {
-                    oldPassword: $('#oldPassword').val(),
-                    newPassword: $('#newPassword').val(),
-                    ConfirmPassword: $('#ConfirmPassword').val(),
+                    'oldPassword': $('#oldPassword').val(),
+                    'newPassword': $('#newPassword').val(),
+                    'ConfirmPassword': $('#ConfirmPassword').val(),
                     csrfmiddlewaretoken: "{{ csrf_token }}"
                 },
-                success: function(data) {
+                success: function (data) {
                     if (!data.success) {
                         if (data.message == "Old password is incorrect!") {
                             $("#oldPasswordError").text(data.message)

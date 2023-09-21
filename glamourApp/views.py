@@ -1155,7 +1155,7 @@ def handleUserRegistration(request):
         new_user.save()
         login(request, new_user)
 
-        return JsonResponse({"success": False, "message": "Registration successful"})
+        return JsonResponse({"success": True, "message": "Registration successful"})
 
     except Exception as e:
         return JsonResponse({"message": str(e)})
@@ -1472,6 +1472,7 @@ def handleAddToWishList(request):
         return JsonResponse({"added": added})
     return JsonResponse({"error": "Invalid request method"})
 
+
 @login_required
 def handleDeleteAccount(request):
     if request.method == "POST":
@@ -1481,6 +1482,7 @@ def handleDeleteAccount(request):
 
         return redirect(reverse('app:login_page'))
     return JsonResponse({"error": "Invalid request method"})
+
 
 def custom_error_404(request, exception):
     APP_NAME = os.getenv("APP_NAME")
