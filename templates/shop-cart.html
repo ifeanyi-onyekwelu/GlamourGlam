@@ -5,16 +5,16 @@
 {% block cart_num %}
 
 {% if total_items_in_cart == None %}
-    0
+0
 {% else %}
 {{ total_items_in_cart }}
 {% endif %}
-    
+
 {% endblock cart_num %}
 
 {% block cart_num_offcanvas %}
 {% if total_items_in_cart == None %}
-    0
+0
 {% else %}
 {{ total_items_in_cart }}
 {% endif %}
@@ -30,20 +30,20 @@
 
 
 {% block content %}
-    <!-- Breadcrumb Begin -->
-    <div class="breadcrumb-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="breadcrumb__links">
-                        <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
-                        <span>Cart</span>
-                    </div>
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Cart</span>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Breadcrumb End -->
+</div>
+<!-- Breadcrumb End -->
 
 <!-- Shop Cart Section Begin -->
 <section class="shop-cart spad">
@@ -62,11 +62,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                             {% for cart_item in cart_items %}
                             <tr id="cart-item-{{ cart_item.id }}">
                                 <td class="cart__product__item">
-                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}" style="width: 110px; height: 110px; object-fit: contain;">
+                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}"
+                                        style="width: 110px; height: 110px; object-fit: contain;">
                                     <div class="cart__product__item__title">
                                         <h6>{{ cart_item.product.name }} ({{ cart_item.color }})</h6>
                                         <div class="rating">
@@ -81,15 +82,19 @@
                                 <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
                                 <td class="cart__quantity">
                                     <div class="">
-                                        <form class="quantity-form pro-qty" data-product-id="{{ cart_item.product.id }}" data-cart-item-color="{{ cart_item.color }}" data-cart-item-size="{{ cart_item.size }}" id="form-{{ cart_item.id }}">
+                                        <form class="quantity-form pro-qty" data-product-id="{{ cart_item.product.id }}"
+                                            data-cart-item-color="{{ cart_item.color }}"
+                                            data-cart-item-size="{{ cart_item.size }}" id="form-{{ cart_item.id }}">
                                             {% csrf_token %}
-                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity" min="1" class="qty-amt">
+                                            <input type="number" value="{{ cart_item.quantity }}" name="quantity"
+                                                min="1" class="qty-amt">
                                         </form>
                                     </div>
                                 </td>
                                 <td class="cart__total total-column">&#8358; {{ cart_item.subtotal|intcomma }}</td>
                                 <td class="cart__action">
-                                    <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item" data-cart-item-id="{{ cart_item.id }}">
+                                    <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item"
+                                        data-cart-item-id="{{ cart_item.id }}">
                                         <span class="fa fa-remove"></span>
                                     </a>
                                 </td>
@@ -119,10 +124,12 @@
                         <h6>Discount code</h6>
                         <form method="post" id="couponForm" action="{% url 'app:cart_page' %}">
                             {% csrf_token %}
-                            <input type="text" placeholder="Enter coupon code if you have one" name="code" id="couponCodeInput">
+                            <input type="text" placeholder="Enter coupon code if you have one" name="code"
+                                id="couponCodeInput">
                             <button type="submit" class="site-btn">Apply</button>
                         </form>
-                        <p><b>NOTE:</b> Once discount is added, you can no longer increase or remove items in the cart, except you clear your cart.</p>
+                        <p><b>NOTE:</b> Once discount is added, you can no longer increase or remove items in the cart,
+                            except you clear your cart.</p>
                     </div>
                     <div class="couponCodeError" style="color: red; font-weight: bold;"></div>
                 </div>
@@ -135,7 +142,11 @@
                         <li>Subtotal <span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></li>
                         <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
                     </ul>
-                    <a href="{% url 'app:checkout_page' %}" class="primary-btn">Proceed to checkout</a>
+
+                    {% if total_items_in_cart >= 1 %}
+                    <a href="{% url 'app:checkout_page' %}" class="primary-btn custom-background">Proceed to
+                        checkout</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -145,22 +156,22 @@
 
 {% endblock content %}
 
-{% block javascript %} 
+{% block javascript %}
 <script>
-    $(document).ready(function(){
-        $("#update-button").click(function(e){
+    $(document).ready(function () {
+        $("#update-button").click(function (e) {
             e.preventDefault();
 
             let formId = $(this).data('form-id');
 
             if (formId == 'all') {
-                $('.quantity-form').each(function() {
+                $('.quantity-form').each(function () {
                     $(this).submit();
                 })
             }
         });
 
-        $('.quantity-form').submit(function(e) {
+        $('.quantity-form').submit(function (e) {
             e.preventDefault();
 
             let product_id = $(this).data('product-id');
@@ -176,13 +187,13 @@
                     'quantity': quantity,
                     'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
-                success: function(data) {
+                success: function (data) {
                     $("#cart-item-" + product_id + ' input[name="quantity"]').val(data.quantity);
                     location.reload();
                 },
-                error: function(xhr, textStatus, errorThrown) {
+                error: function (xhr, textStatus, errorThrown) {
                 }
-            }); 
+            });
         });
     });
 
@@ -195,13 +206,13 @@
                 data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                 },
-                    success: function (response) {
-                        $(`#cart-item-${cartItemId}`).remove();
-                        const newTotalAmount = response.total_amount;
-                        $('.cart__total__procced li span').html('&#8358;' + newTotalAmount);
-                        location.reload();
+                success: function (response) {
+                    $(`#cart-item-${cartItemId}`).remove();
+                    const newTotalAmount = response.total_amount;
+                    $('.cart__total__procced li span').html('&#8358;' + newTotalAmount);
+                    location.reload();
 
-                    },
+                },
                 error: function (xhr, textStatus, errorThrown) {
                     // Handle the error if the request fails.
                     console.error('Error:', errorThrown);
@@ -217,7 +228,7 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var proQty = $('.pro-qty');
         proQty.prepend('<span class="dec qtybtn">-</span>');
         proQty.append('<span class="inc qtybtn">+</span>');

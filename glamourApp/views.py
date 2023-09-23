@@ -78,7 +78,7 @@ class HomePageView(TemplateView):
 
                 product_wishlist_status = {}
 
-                for entry  in new_product_with_image:
+                for entry in new_product_with_image:
                     product = entry['product']
                     is_in_wishlist = product.id in wishlist_product_ids
                     product_wishlist_status[product.id] = is_in_wishlist
@@ -87,11 +87,14 @@ class HomePageView(TemplateView):
                 cart = request.session.get("cart", {})
                 total_items = sum(item["quantity"] for item in cart.values())
 
-                product_wishlist_status = {}
+                # Assuming all products are not in the wishlist for non-authenticated users
+                product_wishlist_status = {product_info['product'].id: False for product_info in new_product_with_image}
             
-            wishlist_statuses = [status for status in product_wishlist_status.values()]
-
-            products_in_wishlist = zip(new_product_with_image, wishlist_statuses)
+            wishlist_statuses = [product_wishlist_status[product_info['product'].id] for product_info in new_product_with_image]
+            # Combine products with wishlist statuses into a list of tuples
+            products_in_wishlist = list(zip(new_product_with_image, wishlist_statuses)) 
+            print(products_in_wishlist)           
+            print(wishlist_statuses)
             
             
             context = {
@@ -168,10 +171,13 @@ class WomenPageView(ListView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            # Assuming all products are not in the wishlist for non-authenticated users
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
+        # Combine products with wishlist statuses into a list of tuples
+
 
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
@@ -185,7 +191,8 @@ class WomenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
 
         women_products = Product.objects.filter(
             category__name__in=["Women"]
@@ -238,10 +245,12 @@ class MenPageView(ListView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            # Assuming all products are not in the wishlist for non-authenticated users
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
+        # Combine products with wishlist statuses into a list of tuples
 
 
         # Paginate the products
@@ -256,7 +265,7 @@ class MenPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
 
         men_products = Product.objects.filter(
             category__name__in=["Men"]
@@ -309,10 +318,12 @@ class UnisexPageView(ListView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            # Assuming all products are not in the wishlist for non-authenticated users
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
+        # Combine products with wishlist statuses into a list of tuples
 
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
@@ -326,7 +337,7 @@ class UnisexPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
 
         unisex_products = Product.objects.filter(category__name__in=["Unisex"])
         sub_categories = SubCategory.objects.filter(
@@ -377,10 +388,10 @@ class KidsPageView(ListView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
 
 
         # Paginate the products
@@ -395,7 +406,7 @@ class KidsPageView(ListView):
             products = paginator.page(paginator.num_pages)
 
         context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
 
         kids_products = Product.objects.filter(category__name__in=["Kids"])
         sub_categories = SubCategory.objects.filter(
@@ -445,10 +456,10 @@ class AccessoriesPageView(ListView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
 
         # Paginate the products
         paginator = Paginator(all_products, self.paginate_by)
@@ -463,7 +474,7 @@ class AccessoriesPageView(ListView):
 
         context["all_products"] = get_products_with_images(products)
 
-        products_in_wishlist = zip(get_products_with_images(products), wishlist_statuses)
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
 
         accessories_products = Product.objects.filter(
             category__name__in=["Accessories"]
@@ -506,15 +517,15 @@ class ShopPageView(TemplateView):
                 product_wishlist_status[product.id] = is_in_wishlist
                 
         else:
-            product_wishlist_status = {}
+            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [status for status in product_wishlist_status.values()]
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
 
         products_with_images = get_products_with_images(page_obj)
         categories = Category.objects.prefetch_related("subcategories").all()
 
-        products_in_wishlist = zip(products_with_images, wishlist_statuses)
+        products_in_wishlist = list(zip(products_with_images, wishlist_statuses))
 
         context = {
             "products": products_with_images,
@@ -620,7 +631,8 @@ class ShopCartPageView(TemplateView):
         if not cart_items:
             shipping_fee = 0.00
             total_amount = 0.00
-            total_amount_shipping = 0.00
+            total_amount_shipping = 0.
+
         context = {
             "total_items_in_cart": total_items,
             "cart_items": cart_items,

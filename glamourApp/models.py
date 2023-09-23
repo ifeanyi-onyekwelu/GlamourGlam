@@ -8,7 +8,7 @@ import string
 
 class Category(models.Model):
     id = models.UUIDField(
-        primary_key=True,
+        primary_key=True,   
         editable=False,
         default=uuid.uuid4
     )
@@ -43,8 +43,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
-    sizes = models.ManyToManyField('ProductSize', related_name='products', default="Default Size")
-    colors = models.ManyToManyField('ProductColor', related_name='products', default="Default Color")
+    sizes = models.ManyToManyField('ProductSize', related_name='products', default="",)
+    colors = models.ManyToManyField('ProductColor', related_name='products', default="")
     images = models.ManyToManyField('ProductImage', related_name='products')
 
 class ProductSize(models.Model):
