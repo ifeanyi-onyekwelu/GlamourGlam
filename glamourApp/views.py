@@ -36,7 +36,7 @@ from django.views.generic import (
 from .models import *
 from django.core.mail import send_mail
 from django.utils.decorators import method_decorator
-from .decorators import prevent_authenticated_access
+from .decorators import prevent_authenticated_access, cart_not_empty
 import paystack
 
 load_dotenv()
@@ -695,6 +695,7 @@ class ShopCartPageView(TemplateView):
         return render(request, "shop-cart.html", context)
 
 
+@method_decorator(cart_not_empty, name="dispatch")
 class CheckoutPageView(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         cart, created = Cart.objects.get_or_create(user=request.user)
