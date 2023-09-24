@@ -66,18 +66,21 @@
                             {% for cart_item in cart_items %}
                             <tr id="cart-item-{{ cart_item.id }}">
                                 <td class="cart__product__item">
-                                    <img src="{{ cart_item.first_image.image.url }}" alt="{{ cart_item.product.name }}"
-                                        style="width: 110px; height: 110px; object-fit: contain;">
-                                    <div class="cart__product__item__title">
-                                        <h6>{{ cart_item.product.name }} ({{ cart_item.color }})</h6>
-                                        <div class="rating">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
+                                    <a href="{% url 'app:product_detail_page' cart_item.product.id %}">
+                                        <img src="{{ cart_item.first_image.image.url }}"
+                                            alt="{{ cart_item.product.name }}"
+                                            style="width: 110px; height: 110px; object-fit: contain;">
+                                        <div class="cart__product__item__title">
+                                            <h6>{{ cart_item.product.name }} ({{ cart_item.color }})</h6>
+                                            <div class="rating">
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </td>
                                 <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
                                 <td class="cart__quantity">
@@ -87,7 +90,7 @@
                                             data-cart-item-size="{{ cart_item.size }}" id="form-{{ cart_item.id }}">
                                             {% csrf_token %}
                                             <input type="number" value="{{ cart_item.quantity }}" name="quantity"
-                                                min="1" class="qty-amt">
+                                                min="1" class="qty-amt" readonly>
                                         </form>
                                     </div>
                                 </td>

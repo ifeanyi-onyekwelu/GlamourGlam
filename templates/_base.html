@@ -9,10 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-        {{ APP_NAME }} | Elevate Your Style, Embrace Glamour || {% block title %}{%endblock title %}
+        {{ APP_NAME }} | Chic, Sustainable Fashion for All || {% block title %}{%endblock title %}
     </title>
 
-    <link rel="shortcut icon" href="{% static 'img/gg favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
 
     {% block customstyletemp %}
 
@@ -169,7 +169,12 @@
 
     {% url 'app:login_page' as login_page %}
     {% url 'app:register_page' as register_page %}
-    {% if login_page == request.path or register_page == request.path %}
+    {% url 'password_reset' as password_reset %}
+    {% url 'password_reset_done' as password_reset_done %}
+    {% url 'password_reset_confirm' as password_reset_confirm %}
+    {% url 'password_reset_complete' as password_reset_complete %}
+
+    {% if login_page == request.path or register_page == request.path or password_reset == request.path or password_reset_done == request.path or password_reset_confirm == request.path or password_reset_complete == request.path %}
     {% else %}
     <header class="header">
         <div class="container-fluid">
@@ -177,7 +182,7 @@
                 <div class="col-xl-3 col-lg-2">
                     <div class="header__logo">
                         <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
-                                width="200" /></a>
+                                width="300" /></a>
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-7">

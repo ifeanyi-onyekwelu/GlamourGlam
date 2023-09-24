@@ -7,6 +7,7 @@ from random import sample
 from django.template.loader import render_to_string
 from django.db.models import Sum
 from django.conf import settings
+from django.utils.crypto import get_random_string
 from django.contrib import messages
 from users.models import CustomUser
 from django.http import JsonResponse, Http404, HttpResponsePermanentRedirect
@@ -15,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from .utils import (
     get_products_with_images,
     send_message,
@@ -847,6 +849,7 @@ class RegisterPageView(TemplateView):
         return render(request, "register.html", {"APP_NAME": os.getenv("APP_NAME")})
 
 
+@method_decorator(prevent_authenticated_access("app:home_page"), name="dispatch")
 class ForgotPasswordPage(TemplateView):
     template_name = "forgot_password.html"
     

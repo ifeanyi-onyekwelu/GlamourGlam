@@ -2,6 +2,7 @@ from functools import wraps
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect, reverse
+from users.models import CustomUser
 
 def admin_only_login(f):
     @wraps(f)
@@ -24,3 +25,14 @@ def prevent_authenticated_access(redirect_url_name):
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
+
+def single_admin_registration(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # Check if there is an admin user in the system
+        if CustomUser.objects.filter(is_superuser=True).exists():
+            return redirect('my_admin:login')
+
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view

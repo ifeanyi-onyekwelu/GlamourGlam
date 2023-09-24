@@ -54,8 +54,8 @@
                                 onblur="this.placeholder = 'Confirm Password'" required>
                         </div>
                         <div class="col-md-12 form-group">
-                            <button type="submit" value="submit"
-                                class="btn custom-outline-background w-75">Register</button>
+                            <button type="submit" value="submit" class="btn custom-outline-background w-75"
+                                id="registerBtn">Register</button>
                         </div>
                     </form>
                 </div>
@@ -69,11 +69,14 @@
 {% block javascript %}
 <script>
     $(document).ready(function () {
-        $('#registration-form').submit(function (event) {
+        $('#registration-form').on("submit", function (event) {
             event.preventDefault(); // Prevent default form submission
 
-            var formData = $(this).serialize(); // Serialize form data
-            var url = "{% url 'app:handleUserRegistration' %}"; // URL for registration handler
+            $("#registerBtn").text("")
+            $("#registerBtn").append("<i class='fa fa-spinner fa-spin'></i>")
+
+            var formData = $(this).serialize();
+            var url = "{% url 'app:handleUserRegistration' %}";
 
             // AJAX request
             $.ajax({
@@ -87,11 +90,15 @@
                     } else {
                         // Display error message(s)
                         $('#registration-errors').text(response.message);
+                        $("#registerBtn").text("Register")
+                        $("#registerBtn").children().remove();
                     }
                 },
                 error: function () {
                     // Handle AJAX request error
                     $('#registration-errors').text('An error occurred. Please try again.');
+                    $("#registerBtn").text("Register")
+                    $("#registerBtn").children().remove();
                 }
             });
         });

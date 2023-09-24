@@ -144,6 +144,8 @@
                 },
                 error: function (xhr, textStatus, errorThrown) {
                     alert(errorThrown);
+                    $("#sendMsgBtn").text("SEND")
+                    $("#sendMsgBtn").children().remove();
                 },
                 complete: function () {
                     $("#sendMsgBtn").text("SEND")

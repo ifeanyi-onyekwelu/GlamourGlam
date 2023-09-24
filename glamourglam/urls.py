@@ -12,6 +12,7 @@ urlpatterns = [
     path('default-admin/', admin.site.urls),
     path('admin/', include('glamourAdmin.urls', namespace="my_admin")),
     path('', include('glamourApp.urls', namespace='app')),
+    path('', include('django.contrib.auth.urls')),
 ] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

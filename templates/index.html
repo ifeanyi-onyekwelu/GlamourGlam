@@ -2,8 +2,9 @@
 {% load static %}
 {% load humanize %}
 
-{% block cart_num %}
+{% block title %}Home{% endblock title %}
 
+{% block cart_num %}
 {% if total_items_in_cart == None %}
 0
 {% else %}

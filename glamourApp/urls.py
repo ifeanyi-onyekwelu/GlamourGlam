@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from django.contrib.auth import views as auth_views
 
 app_name = 'app'
 
@@ -24,10 +25,18 @@ urlpatterns = [
     path('order-complete/<uuid:order_id>/complete/', OrderCompletePageView.as_view(), name="order_complete"),
     path('login/', LoginPageView.as_view(), name="login_page"),
     path('register/', RegisterPageView.as_view(), name="register_page"),
+    path('forgot-password/', ForgotPasswordPage.as_view(), name="forgot_password_page"),
     path('faqs/', FAQPageView.as_view(), name="faqs_page"),
     path('terms-of-service/', TermsOfServicePageView.as_view(), name="terms_of_service_page"),
     path('returns-policy/', ReturnAndRefund.as_view(), name="returns_and_refunds_page"),
     path('dropshipping/', DropShipping.as_view(), name="dropshipping_page"),
+
+    # Forgot password urls
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
 
     # Handler urls
     path('handle-registration/', handleUserRegistration, name="handleUserRegistration"),

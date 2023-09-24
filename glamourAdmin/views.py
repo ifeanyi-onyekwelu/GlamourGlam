@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 import os
 from dotenv import load_dotenv
-from .decorators import admin_only_login, prevent_authenticated_access
+from .decorators import admin_only_login, prevent_authenticated_access, single_admin_registration
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import Group
@@ -812,6 +812,7 @@ def admin_login(request):
 
 
 @prevent_authenticated_access("my_admin:dashboard")
+@single_admin_registration
 def admin_signup(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')

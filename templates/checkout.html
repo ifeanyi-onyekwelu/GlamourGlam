@@ -30,6 +30,7 @@
         color: red;
         /* background: rgba(253, 0, 0, 0.833); */
     }
+
     .error-message {
         color: red;
         font-weight: 600;
@@ -61,7 +62,7 @@
             {% csrf_token %}
             <div class="row">
                 <div class="col-lg-8">
-                    <h5>Billing detail</h5>
+                    <h5>Shipping Address</h5>
                     <div id="checkout-errors" class="col-md-12 form-group text-danger"></div>
                     <div class="row">
                         <div class="col-lg-12">
@@ -92,7 +93,7 @@
                                 <input type="text" name="zipcode" id="zipcode">
                             </div>
                         </div>
-                        <!-- <div class="col-lg-12">
+                        <div class="col-lg-12">
                             <h5>Payment Details</h5>
                             <div class="checkout__form__input">
                                 <p>Card Number <span>*</span></p>
@@ -116,7 +117,58 @@
                                 <p>CVV <span>*</span></p>
                                 <input type="text">
                             </div>
-                        </div> -->
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="">
+                                <input type="checkbox" id="sameBillingAddress" name="same_billing_address" checked>
+                                <label for="sameBillingAddress">Billing address same as shipping address</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="billingAddressSection">
+                        <div class="col-lg-12">
+                            <h5>Billing Address</h5>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Street Address <span>*</span></p>
+                                        <input type="text" name="billing_address" class="billing-address-field">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Apartment, suite, etc. (optional)</p>
+                                        <input type="text" name="billing_address_optional"
+                                            class="billing-address-field">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>City <span>*</span></p>
+                                        <input type="text" name="billing_city" class="billing-address-field">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>State/Province <span>*</span></p>
+                                        <input type="text" name="billing_state" class="billing-address-field">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Postal/ZIP Code <span>*</span></p>
+                                        <input type="text" name="billing_zipcode" class="billing-address-field">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Country <span>*</span></p>
+                                        <input type="text" name="billing_country" class="billing-address-field">
+                                    </div>
+                                </div>
+                                <!-- Other billing address fields go here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -129,7 +181,8 @@
                                     <span class="top__text__right">Total</span>
                                 </li>
                                 {% for cart_item in cart_items %}
-                                <li>x {{ cart_item.quantity }} {{ cart_item.product.name }} <span>&#8358; {{ cart_item.subtotal|intcomma }}</span></li>
+                                <li>x {{ cart_item.quantity }} {{ cart_item.product.name }} <span>&#8358;
+                                        {{ cart_item.subtotal|intcomma }}</span></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -153,102 +206,29 @@
 
 {% block javascript %}
 <script>
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     const form = document.querySelector(".checkout__form");
-    //     const formInputs = form.querySelectorAll("input"); // Get all input fields
-    //     const phoneInput = document.getElementById("phone");
-    //     const countryInput = document.getElementById("country");
-    //     const stateInput = document.getElementById("state");
-    //     const addressInput = document.getElementById("address");
-    //     const cityInput = document.getElementById("city");
-    //     const zipcodeInput = document.getElementById("zipcode");
-
-    //     form.addEventListener("submit", function (event) {
-    //         event.preventDefault(); // Prevent the form from submitting normally
-
-    //         const validationErrors = {};
-
-    //         // Remove existing error messages and red borders
-    //         formInputs.forEach(input => {
-    //             input.classList.remove("inputError");
-    //             const errorMessage = input.parentElement.querySelector(".error-message");
-    //             if (errorMessage) {
-    //                 errorMessage.remove();
-    //             }
-    //         });
-
-    //         // Perform validation for each field
-    //         if (!validator.isMobilePhone(phoneInput.value, "en-NG")) {
-    //             validationErrors.phone = "Invalid phone number";
-    //             phoneInput.classList.add("inputError");
-    //             displayErrorMessage(phoneInput, "Invalid phone number");
-    //         }
-    //         if (!validator.isLength(countryInput.value, { min: 2 })) {
-    //             validationErrors.country = "Country is too short";
-    //             countryInput.classList.add("inputError");
-    //             displayErrorMessage(countryInput, "Country is too short");
-    //         }
-    //         if (!validator.isLength(stateInput.value, { min: 2 })) {
-    //             validationErrors.country = "State is too short";
-    //             stateInput.classList.add("inputError");
-    //             displayErrorMessage(stateInput, "State is too short");
-    //         }
-    //         if (!validator.isLength(addressInput.value, { min: 2 })) {
-    //             validationErrors.country = "Address is too short";
-    //             addressInput.classList.add("inputError");
-    //             displayErrorMessage(addressInput, "Address  is too short");
-    //         }
-    //         if (!validator.isLength(cityInput.value, { min: 2 })) {
-    //             validationErrors.country = "City is too short";
-    //             cityInput.classList.add("inputError");
-    //             displayErrorMessage(cityInput, "City is too short");
-    //         }
-    //         if (!validator.isLength(zipcodeInput.value, { min: 2 })) {
-    //             validationErrors.country = "Zipcode is too short";
-    //             zipcodeInput.classList.add("inputError");
-    //             displayErrorMessage(zipcodeInput, "Zipcode is too short");
-    //         }
-
-    //         // Display validation errors
-    //         if (Object.keys(validationErrors).length > 0) {
-    //             return;
-    //         }
-
-    //         // If all validations pass, submit the form
-    //         form.submit();
-    //     });
-
-    //     function displayErrorMessage(input, message) {
-    //         const errorMessage = document.createElement("span");
-    //         errorMessage.className = "error-message";
-    //         errorMessage.textContent = message;
-    //         input.parentElement.appendChild(errorMessage);
-    //     }
-    // });
-
-    $(document).ready(function() {
-        $('#checkout-btn').click(function(event) {
+    $(document).ready(function () {
+        $('#checkout-btn').click(function (event) {
             event.preventDefault(); // Prevent default form submission
-            
+
             // Disable the button
             $('#checkout-btn').prop('disabled', true);
-    
+
             var formData = $('#checkout__form').serialize(); // Serialize form data
             var url = "{% url 'app:checkout_page' %}"; // URL for login handler
-    
+
             // AJAX request
             $.ajax({
                 type: 'POST',
                 url: url,
                 data: formData,
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         location.href = '/order-complete/' + response.order_id + '/complete/'
                     } else {
                         $('#checkout-errors').text(response.message);
                     }
                 },
-                error: function() {
+                error: function () {
                     // Handle AJAX request error
                     $('#checkout-errors').text('An error occurred. Please try again.');
                 },
@@ -258,6 +238,23 @@
                 }
             });
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to toggle visibility of billing address fields
+        function toggleBillingAddressFields() {
+            const sameBillingAddressCheckbox = document.getElementById("sameBillingAddress");
+            const billingAddressSection = document.getElementById("billingAddressSection");
+
+            billingAddressSection.style.display = sameBillingAddressCheckbox.checked ? "none" : "block";
+        }
+
+        // Add an event listener to the checkbox to toggle the fields on change
+        const sameBillingAddressCheckbox = document.getElementById("sameBillingAddress");
+        sameBillingAddressCheckbox.addEventListener("change", toggleBillingAddressFields);
+
+        // Initial call to set the initial state
+        toggleBillingAddressFields();
     });
 
 </script>
