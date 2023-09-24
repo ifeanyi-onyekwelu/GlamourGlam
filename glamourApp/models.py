@@ -117,6 +117,7 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=20, choices=payment_status_choices, default="Pending")
     delivery_status = models.CharField(max_length=1, choices=DELIVERY_STATUS_CHOICES, default='P')
     shipping_address = models.ForeignKey('ShippingAddress', on_delete=models.SET_NULL, null=True)
+    billing_details = models.ForeignKey('BillingDetails', on_delete=models.SET_NULL, null=True)
 
     def save(self, *args, **kwargs):
         if not self.order_number:
@@ -155,6 +156,23 @@ class ShippingAddress(models.Model):
     state = models.CharField(max_length=200)
     zipcode = models.CharField(max_length=200)
     date_added = models.DateField(auto_now_add=True)
+
+class BillingDetails(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=255)
+    apartment_suite = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100)
+    state_province = models.CharField(max_length=100)
+    postal_zip_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "Billing Details"
 
 class Return(models.Model):
     id = models.UUIDField(
