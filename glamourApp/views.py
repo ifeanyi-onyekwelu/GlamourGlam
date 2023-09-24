@@ -793,6 +793,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     user=request.user,
                     shipping_address=shipping_address,
                     total_price=total_amount_shipping,
+                    billing_details=billing_address
                 )
                 order.save()
 

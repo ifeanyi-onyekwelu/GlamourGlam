@@ -28,7 +28,7 @@
         <div class="row">
             <div class="col-lg-6 p-0">
                 <div class="categories__item categories__large__item set-bg"
-                    data-setbg="{% static 'img/Mine/italian-wierdo.jpg' %}" style="background-position: center;">
+                    data-setbg="{% static 'img/categories/yellow.jpg' %}" style="background-position: top;">
                     <div class="categories__text">
                         <h1>Women’s fashion</h1>
                         <p class="text-white">Discover your signature style with our stunning women's<br> outfit
@@ -40,8 +40,7 @@
             <div class="col-lg-6">
                 <div class="row">
                     <div class="col-lg-12 col-md-6 col-sm-6 p-0">
-                        <div class="categories__item set-bg"
-                            data-setbg="{% static 'img/Mine/italan-man-suit-black.jpg' %}">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/man-scarf.jpg' %}">
                             <div class="categories__text">
                                 <h4>Men’s fashion</h4>
                                 <a href="{% url 'app:men_page' %}">Shop now</a>
@@ -49,7 +48,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 p-0">
-                        <div class="categories__item set-bg" data-setbg="{% static 'img/Mine/kid.jpg' %}">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/kid2.jpg' %}">
                             <div class="categories__text">
                                 <h4>Kid’s fashion</h4>
                                 <a href="{% url 'app:kids_page' %}">Shop now</a>
@@ -57,7 +56,7 @@
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 p-0">
-                        <div class="categories__item set-bg" data-setbg="{% static 'img/Mine/accessories-1.jpg' %}">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/candles.jpg' %}">
                             <div class="categories__text">
                                 <h4>Accessories</h4>
                                 <a href="{% url 'app:accessories_page' %}">Shop now</a>
@@ -102,20 +101,26 @@
                         <div class="label new">New</div>
                         {% endif %}
                         <ul class="product__hover">
-                            <li><a href="#" id="add-to-wishlist-button"><span class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o{% endif %}"  data-product-id="{{ product_info.product.id }}"></span></a></li>
+                            <li><a href="#" id="add-to-wishlist-button"><span
+                                        class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o{% endif %}"
+                                        data-product-id="{{ product_info.product.id }}"></span></a></li>
                             {% for color in product_info.product.colors.all %}
                             {% for size in product_info.product.sizes.all %}
                             {% if forloop.parentloop.first and forloop.first %}
-                            <li><a class="add-to-cart-link" href="#" id="add-to-cart-button" data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a></li>
+                            <li><a class="add-to-cart-link" href="#" id="add-to-cart-button"
+                                    data-product-id="{{ product_info.product.id }}" data-color-id="{{ color.color }}"
+                                    data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a></li>
                             {% else %}
                             {% endif %}
                             {% endfor %}
                             {% endfor %}
-                            <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span class="fa fa-plus"></span></a></li>
+                            <li><a href="{% url 'app:product_detail_page' product_info.product.id %}"><span
+                                        class="fa fa-plus"></span></a></li>
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                {{ product_info.product.name }}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -152,7 +157,8 @@
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                {{ product_info.product.name }}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -190,7 +196,8 @@
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                {{ product_info.product.name }}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -227,7 +234,8 @@
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                {{ product_info.product.name }}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -265,7 +273,8 @@
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">{{ product_info.product.name }}</a></h6>
+                        <h6><a href="{% url 'app:product_detail_page' product_info.product.id  %}">
+                                {{ product_info.product.name }}</a></h6>
                         <div class="rating">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
