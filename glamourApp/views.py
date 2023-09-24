@@ -751,6 +751,23 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     state=request.POST.get("state"),
                     zipcode=request.POST.get("zipcode"),
                 )
+                
+                # Check if the "same_billing" checkbox is checked
+                same_billing = request.POST.get("same_billing") == "on"
+
+                # Create billing address based on the checkbox value
+                if same_billing:
+                    billing_address = shipping_address
+                else:
+                    billing_address = BillingDetails.objects.create(
+                        user=request.user,
+                        street_address=request.POST.get("billing_address"),
+                        apartment_suite=request.POST.get("billing_address_optional"),
+                        city=request.POST.get("billing_city"),
+                        state_province=request.POST.get("billing_state"),
+                        postal_zip_code=request.POST.get("billing_zipcode"),
+                        country=request.POST.get("billing_country"),
+                    )
 
                 cart = Cart.objects.get(user=request.user)
                 cart_items = cart.items.all()
