@@ -72,7 +72,8 @@
             </div>
             <div class="col-lg-9 col-md-9">
                 <div class="row property__gallery">
-                    {% for product_info, in_wishlist in products_in_wishlist %}                    {% for sub_category in sub_categories %}
+                    {% for product_info, in_wishlist in products_in_wishlist %}                    
+                    {% for sub_category in sub_categories %}
                     {% if product_info.product.sub_category == sub_category %}
                     {% with sub_category_slug=sub_category.name|slugify %}
                     <div class="col-lg-3 col-md-4 col-sm-6 mix kids-{{ sub_category_slug }}">

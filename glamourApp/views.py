@@ -1010,7 +1010,6 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
 
 class WishListPage(ListView):
     template_name = "wishlist.html"
-    # paginate_by = 9
 
     def get_queryset(self):
         wishlist_item = []
@@ -1023,34 +1022,36 @@ class WishListPage(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        all_products = self.get_queryset()
         APP_NAME = os.getenv("APP_NAME")
 
         cart = None
         total_items = 0
-
         if self.request.user.is_authenticated:
-            wishlist_item = self.get_queryset()
-
             cart, created = Cart.objects.get_or_create(user=self.request.user)
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
                 "quantity__sum"
             ]
+
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
         else:
-            wishlist_item = []
-        
-        # Paginate the products
-        # paginator = Paginator(wishlist_item, self.paginate_by)
-        # page = self.request.GET.get("page")
+            product_wishlist_status = {product.id: False for product in all_products}
 
-        # try:
-        #     products = paginator.page(page)
-        # except PageNotAnInteger:
-        #     products = paginator.page(1)
-        # except EmptyPage:
-        #     products = paginator.page(paginator.num_pages)
 
-        context["all_products"] = get_products_with_images(self.get_queryset())
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
+
+        products_in_wishlist = list(zip(get_products_with_images(all_products), wishlist_statuses))
+
         context["total_items_in_cart"] = total_items
+        context["products_in_wishlist"] = products_in_wishlist
         context["APP_NAME"] = APP_NAME.title()
         return context
 

@@ -333,10 +333,10 @@
                 <div class="col-lg-4 col-md-8 col-sm-8">
                     <div class="footer__newslatter">
                         <h6>NEWSLETTER</h6>
-                        <form action="{% url 'app:handleSubscribeToNewsLetter' %}" method="post">
+                        <form method="post" id="subscibeToNewsLetterForm">
                             {% csrf_token %}
-                            <input type="email" name="email" id="email" placeholder="Email" required />
-                            <button type="submit" class="site-btn">Subscribe</button>
+                            <input type="email" name="email" id="newsletterEmail" placeholder="Email" required />
+                            <button type="submit" class="site-btn" id="subscribeBtn">Subscribe</button>
                         </form>
                         <div class="footer__social">
                             <a href="#"><i class="fa fa-facebook"></i></a>
@@ -417,6 +417,30 @@
             window.addEventListener('click', (e) => {
                 dropdown_is_visible = false;
                 toggleVisibility()
+            })
+        })
+    
+        $(document).ready(function() {
+            $("#subscibeToNewsLetterForm").on("submit", function(event) {
+                event.preventDefault();
+
+                $("#subscribeBtn").text("")
+                $("#subscribeBtn").append("<i class='fa fa-spinner fa-spin'></i>")
+                
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'app:handleSubscribeToNewsLetter' %}",
+                    data: $("newsletterEmail").val(),
+                    success: function(data) {
+                        if (data.success) {
+                            $("#subscribeBtn").text("Subscribed");
+                            $("#subscribeBtn").children().remove();
+                        }
+                    },
+                    error: function(xhr, statusText, errorThrown) {
+
+                    }
+                })
             })
         })
     </script>
