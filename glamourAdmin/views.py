@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 import os
 from dotenv import load_dotenv
-from .decorators import admin_only_login, prevent_authenticated_access, single_admin_registration
+from .decorators import admin_only_required, prevent_authenticated_access, single_admin_registration, admin_or_staff_required
 from users.models import CustomUser
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import Group
@@ -21,7 +21,8 @@ import calendar
 load_dotenv()
 
 
-@admin_only_login
+@admin_only_required
+@admin_or_staff_required
 def dashboard(request):
     orders = Order.objects.all()
     users = CustomUser.objects.all()
@@ -140,7 +141,8 @@ def dashboard(request):
 # ########################################
 # User
 # ########################################
-@admin_only_login
+@admin_only_required
+@admin_only_required
 def all_user(request):
     users = CustomUser.objects.all()
     context = {
@@ -151,19 +153,19 @@ def all_user(request):
     return render(request, 'admin_dashboard/user/all.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def user_detail(request, user_id):
     user = CustomUser.objects.get(id=user_id)
     return render(request, 'admin_dashboard/user/user_detail.html', {'user': user, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def mark_user_as_active(request, user_id):
     update_user_status(user_id, True)
     return redirect('my_admin:users')
 
 
-@admin_only_login
+@admin_only_required
 def mark_user_as_suspended(request, user_id):
     update_user_status(user_id, False)
     return redirect('my_admin:users')
@@ -172,7 +174,7 @@ def mark_user_as_suspended(request, user_id):
 # ########################################
 # Product
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_products(request):
     products = Product.objects.all()
 
@@ -187,7 +189,7 @@ def all_products(request):
     return render(request, 'admin_dashboard/product/all.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def product_detail(request, product_id):
     product = Product.objects.get(id=product_id)
     productImage = ProductImage.objects.filter(product=product)
@@ -206,7 +208,7 @@ def product_detail(request, product_id):
     return render(request, 'admin_dashboard/product/product_detail.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def add_product(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -263,7 +265,7 @@ def add_product(request):
     return render(request, 'admin_dashboard/product/add.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def edit_product(request, product_id):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -343,22 +345,27 @@ def edit_product(request, product_id):
     return render(request, 'admin_dashboard/product/edit.html', context)
 
 
+@admin_only_required
+def delete_product(request, product_id):
+    pass
+
+
 # ########################################
 # Category
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_category(request):
     categories = Category.objects.all()
     return render(request, 'admin_dashboard/category/all.html', {'categories': categories, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def category_detail(request, category_id):
     category = Category.objects.get(id=category_id)
     return render(request, 'admin_dashboard/category/category_detail.html', {'category': category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def add_category(request):
     if request.method == 'POST':
         category_form = CategoryForm(request.POST)
@@ -371,7 +378,7 @@ def add_category(request):
     return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def edit_category(request, category_id):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -393,7 +400,7 @@ def delete_category(request, category_id):
     return redirect('my_admin:categories')
 
 
-@admin_only_login
+@admin_only_required
 def delete_all_category(request):
     Category.objects.all().delete()
     return redirect('my_admin:categories')
@@ -402,7 +409,7 @@ def delete_all_category(request):
 # ########################################
 # Color
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_product_color(request):
     colors = ProductColor.objects.all()
     print(colors)
@@ -410,7 +417,7 @@ def all_product_color(request):
     return render(request, 'admin_dashboard/color/all.html', {'colors': colors, 'color_form': color_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def add_color(request):
     if request.method == 'POST':
         color_form = ColorForm(request.POST)
@@ -429,7 +436,7 @@ def delete_color(request, color_id):
     return redirect('my_admin:colors')
 
 
-@admin_only_login
+@admin_only_required
 def delete_all_colors(request):
     ProductColor.objects.all().delete()
     return redirect('my_admin:colors')
@@ -438,19 +445,19 @@ def delete_all_colors(request):
 # ########################################
 # Sub Category
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_sub_category(request):
     sub_categories = SubCategory.objects.all()
     return render(request, "admin_dashboard/sub_category/all.html", {'sub_categories': sub_categories, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def sub_category_detail(request, sub_category_id):
     sub_category = SubCategory.objects.get(id=sub_category_id)
     return render(request, "admin_dashboard/sub_category/sub_category_detail.html", {'sub_category': sub_category, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(), 'categories': Category.objects.all()})
 
 
-@admin_only_login
+@admin_only_required
 def add_sub_category(request):
     if request.method == 'POST':
         sub_category_form = SubCategoryForm(request.POST)
@@ -463,7 +470,7 @@ def add_sub_category(request):
     return render(request, "admin_dashboard/sub_category/add.html", {'sub_category_form': sub_category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def edit_sub_category(request, sub_category_id):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -488,7 +495,7 @@ def delete_sub_category(request, sub_category_id):
     return redirect('my_admin:sub_categories')
 
 
-@admin_only_login
+@admin_only_required
 def delete_all_sub_category(request):
     SubCategory.objects.all().delete()
     return redirect('my_admin:sub_categories')
@@ -497,7 +504,7 @@ def delete_all_sub_category(request):
 # ########################################
 # Order
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_order(request):
     orders = Order.objects.all()
     context = {
@@ -508,7 +515,7 @@ def all_order(request):
     return render(request, 'admin_dashboard/order/all.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order_items = order.items.all()
@@ -547,43 +554,43 @@ def order_detail(request, order_id):
     return render(request, 'admin_dashboard/order/order_detail.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def all_pending_orders(request):
     pending_orders = Order.objects.filter(delivery_status="P")
     return render(request, 'admin_dashboard/order/all_pending_orders.html', {'pending_orders': pending_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def all_shipped_orders(request):
     shipped_orders = Order.objects.filter(delivery_status="S")
     return render(request, 'admin_dashboard/order/all_shipped_orders.html', {'shipped_orders': shipped_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def all_delivered_orders(request):
     delivered_orders = Order.objects.filter(delivery_status="D")
     return render(request, 'admin_dashboard/order/all_delivered_orders.html', {'delivered_orders': delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def all_failed_delivery_orders(request):
     failed_delivered_orders = Order.objects.filter(delivery_status="F")
     return render(request, 'admin_dashboard/order/all_failed_delivered_orders.html', {'failed_delivered_orders': failed_delivered_orders, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def mark_order_as_shipped(request, order_id):
     update_order_delivery_status(order_id, 'S')
     return redirect('my_admin:orders')
 
 
-@admin_only_login
+@admin_only_required
 def mark_order_as_delivered(request, order_id):
     update_order_delivery_status(order_id, 'D')
     return redirect('my_admin:orders')
 
 
-@admin_only_login
+@admin_only_required
 def mark_order_as_failed_delivery(request, order_id):
     update_order_delivery_status(order_id, 'F')
     return redirect('order_detail', order_id=order_id)
@@ -592,7 +599,7 @@ def mark_order_as_failed_delivery(request, order_id):
 # ########################################
 # Discounts and Coupons
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_coupons(request):
     coupons = DiscountCode.objects.all()
     coupon_form = CouponForm()
@@ -606,13 +613,13 @@ def all_coupons(request):
     return render(request, 'admin_dashboard/coupons/all.html', context)
 
 
-@admin_only_login
+@admin_only_required
 def coupon_detail(request, coupon_id):
     coupon = DiscountCode.objects.get(id=coupon_id)
     return render(request, 'admin_dashboard/coupons/coupon_detail.html', {'coupon': coupon, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def create_coupon(request):
     if request.method == 'POST':
         coupon_form = CouponForm(request.POST)
@@ -642,7 +649,7 @@ def delete_coupon(request, coupon_id):
     return redirect('my_admin:discount_codes')
 
 
-@admin_only_login
+@admin_only_required
 def delete_all_coupons(request):
     DiscountCode.objects.all().delete()
     return redirect('my_admin:discount_codes')
@@ -651,7 +658,7 @@ def delete_all_coupons(request):
 # ########################################
 # News Letter
 # ########################################
-@admin_only_login
+@admin_only_required
 def news_letter_subscribers(request):
 
     group = Group.objects.get(name="registered for newsletter")
@@ -663,7 +670,7 @@ def news_letter_subscribers(request):
     }
     return render(request, 'admin_dashboard/newsletter/newsletter_subscribers.html', context)
 
-@admin_only_login
+@admin_only_required
 def remove_newsletter_subscriber(request, user_id):
     group = Group.objects.get(name='registered for newsletter')
 
@@ -676,7 +683,7 @@ def remove_newsletter_subscriber(request, user_id):
         user.groups.remove(group)
         return JsonResponse({'success': True, 'message': 'User removed successfully'})
 
-@admin_only_login
+@admin_only_required
 def compose_and_send_message(request):
     group = Group.objects.get(name="registered for newsletter")
 
@@ -711,13 +718,13 @@ def compose_and_send_message(request):
 # ########################################
 # Shipping
 # ########################################
-@admin_only_login
+@admin_only_required
 def all_shipping_address(request):
     shipping_address = ShippingAddress.objects.all()
     return render(request, 'admin_dashboard/shipping/all.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
 
-@admin_only_login
+@admin_only_required
 def shipping_detail(request, shipping_id):
     shipping_address = ShippingAddress.objects.get(id=shipping_id)
     return render(request, 'admin_dashboard/shipping/shipping_detail.html', {'shipping_address': shipping_address, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
@@ -729,7 +736,7 @@ def delete_shipping_address(request, shipping_id):
     return redirect('my_admin:shipping_addresses')
 
 
-@admin_only_login
+@admin_only_required
 def delete_all_shipping_addresses(request):
     ShippingAddress.objects.all().delete()
     return redirect('my_admin:shipping_addresses')
@@ -738,11 +745,11 @@ def delete_all_shipping_addresses(request):
 # ########################################
 # Admin Profile Page
 # ########################################
-@admin_only_login
+@admin_only_required
 def admin_profile_page(request):
     return render(request, 'admin_dashboard/profile.html', {'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
 
-@admin_only_login
+@admin_only_required
 def edit_profile(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
@@ -765,7 +772,7 @@ def edit_profile(request):
         user.save()
         return JsonResponse({'success': True, 'message': 'Profile updated successfully'})
 
-@admin_only_login
+@admin_only_required
 def change_password(request):
     if request.method == 'POST':
         oldPassword = request.POST.get('oldPassword')
@@ -848,16 +855,19 @@ def admin_logout(request):
     return redirect(reverse('my_admin:login'))
 
 # Error handling
+def admin_only(request):
+    return render(request, 'admin_dashboard/admin_only_error.html')
+
 def error404(request, e):
     APP_NAME = os.getenv('APP_NAME')
     context = {
         'APP_NAME': APP_NAME,
     }
-    return render(request, '404.html', context)
+    return render(request, 'error-404.html', context)
 
 def error500(request):
     APP_NAME = os.getenv('APP_NAME')
     context = {
         'APP_NAME': APP_NAME,
     }
-    return render(request, '500.html', context)
+    return render(request, 'error-500.html', context)

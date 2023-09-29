@@ -86,9 +86,6 @@ class HomePageView(TemplateView):
                     product_wishlist_status[product.id] = is_in_wishlist
 
             else:
-                cart = request.session.get("cart", {})
-                total_items = sum(item["quantity"] for item in cart.values())
-
                 # Assuming all products are not in the wishlist for non-authenticated users
                 product_wishlist_status = {product_info['product'].id: False for product_info in new_product_with_image}
             

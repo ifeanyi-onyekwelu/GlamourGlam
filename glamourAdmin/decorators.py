@@ -4,12 +4,23 @@ from django.contrib import messages
 from django.shortcuts import redirect, reverse
 from users.models import CustomUser
 
-def admin_only_login(f):
+def admin_only_required(f):
     @wraps(f)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect(reverse('my_admin:login'))
         elif not request.user.is_superuser:
+            return redirect(reverse('my_admin:login'))
+        else:
+            return f(request, *args, **kwargs)
+    return wrapper
+
+def admin_or_staff_required(f):
+    @wraps(f)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('my_admin:login'))
+        elif not request.user.is_superuser or not request.user.is_staff:
             return redirect(reverse('my_admin:login'))
         else:
             return f(request, *args, **kwargs)
