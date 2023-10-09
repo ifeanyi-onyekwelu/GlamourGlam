@@ -4,7 +4,7 @@ from .views import *
 app_name = 'my_admin'
 
 urlpatterns = [
-    path('', dashboard, name="dashboard"),
+    path('dashboard/', dashboard, name="dashboard"),
     # ########################################
     # Order urls
     # ########################################
@@ -20,6 +20,7 @@ urlpatterns = [
     path('product/<uuid:product_id>', product_detail, name="product_detail"),
     path('product/add/', add_product, name="add_product"),
     path('product/edit/<uuid:product_id>/', edit_product, name="edit_product"),
+    path('product/delete/<uuid:product_id>/', delete_product, name="delete_product"),
 
     # ########################################
     # Category urls
@@ -99,11 +100,10 @@ urlpatterns = [
     # ########################################
     # Authentication urls
     # ########################################
-    path('login/', admin_login, name="login"),
+    path('', admin_login, name="login"),
     path('signup/', admin_signup, name="signup"),
     path('logout/', admin_logout, name="logout"),
 
-    # Error handling
-    # path('error-404/', error404, name="error404"),
-    # path('error-500/', error500, name="error500"),
+    # Error handling urls
+    path('admin-only/', admin_only, name="admin_only"),
 ]

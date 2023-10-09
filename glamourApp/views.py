@@ -1502,7 +1502,7 @@ def handleAddToWishList(request):
             added = True
 
         return JsonResponse({"added": added})
-    return JsonResponse({"error": "Invalid request method"})
+    return JsonResponse({"message": "Invalid request method"})
 
 
 @login_required

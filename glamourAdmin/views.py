@@ -347,7 +347,9 @@ def edit_product(request, product_id):
 
 @admin_only_required
 def delete_product(request, product_id):
-    pass
+    product = Product.objects.get(id=product_id)
+    product.delete()
+    return redirect(reverse('my_admin:products'))
 
 
 # ########################################
@@ -371,8 +373,9 @@ def add_category(request):
         category_form = CategoryForm(request.POST)
 
         if category_form.is_valid():
+            print("Hello world")
             category = category_form.save()
-            return redirect('my_admin:category_detail', category_id=category.id)
+            return redirect('my_admin:add_category')
     else:
         category_form = CategoryForm()
     return render(request, 'admin_dashboard/category/add.html', {'category_form': category_form, 'APP_NAME': os.getenv('APP_NAME'), 'notifications': get_all_notifications(),})
@@ -661,7 +664,10 @@ def delete_all_coupons(request):
 @admin_only_required
 def news_letter_subscribers(request):
 
-    group = Group.objects.get(name="registered for newsletter")
+    try:
+        group = Group.objects.get(name="registered for newsletter")
+    except Group.DoesNotExist:
+        group = Group.objects.create(name="registered for newsletter")
 
     users_in_group = CustomUser.objects.filter(groups=group)
     context = {
@@ -807,11 +813,10 @@ def admin_login(request):
                 send_message("Login Successful!", f"Login Successful!\nWelcome back, {user.first_name}! You've logged in to your account", user.email, os.getenv("DEFAULT_EMAIL"))
                 return JsonResponse({'success': True, 'message': "Login Successful"})
             else:
-                messages.error(request, "Account does not exists")
-                return JsonResponse({'success': False, 'message': "Login Unsuccessful"})
+                return JsonResponse({'success': False, 'message': "Email or password is incorrect"})
 
     except CustomUser.DoesNotExist:
-        return JsonResponse({'success': False, 'message': "Account not found"})
+        return JsonResponse({'success': False, 'message': "Email or password is incorrect"})
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)})
 
@@ -857,17 +862,3 @@ def admin_logout(request):
 # Error handling
 def admin_only(request):
     return render(request, 'admin_dashboard/admin_only_error.html')
-
-def error404(request, e):
-    APP_NAME = os.getenv('APP_NAME')
-    context = {
-        'APP_NAME': APP_NAME,
-    }
-    return render(request, 'error-404.html', context)
-
-def error500(request):
-    APP_NAME = os.getenv('APP_NAME')
-    context = {
-        'APP_NAME': APP_NAME,
-    }
-    return render(request, 'error-500.html', context)

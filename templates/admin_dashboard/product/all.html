@@ -109,7 +109,10 @@
                                 <td>{{ product_info.product.description|truncatechars:10 }}</td>
                                 <td>&#8358;{{ product_info.product.price|intcomma }}</td>
                                 <td>{{ product_info.product.category }}</td>
-                                <td><a href="{% url 'my_admin:product_detail' product_info.product.id %}" class="btn btn-sm btn-primary">Detail</a></td>
+                                <td>
+                                    <a href="{% url 'my_admin:product_detail' product_info.product.id %}" class="btn btn-sm btn-primary">Detail</a>
+                                    <a href="{% url 'my_admin:delete_product' product_info.product.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -19,6 +19,8 @@ def cart_not_empty(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         # Check if the user is authenticated
+        cart = None
+        
         if request.user.is_authenticated:
             cart = CartItem.objects.filter(cart__user=request.user)
 

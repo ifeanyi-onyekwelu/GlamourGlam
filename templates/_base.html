@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-        {{ APP_NAME }} | Chic, Sustainable Fashion for All || {% block title %}{%endblock title %}
+        {{ APP_NAME }} | More Fashion, Less Effort || {% block title %}{%endblock title %}
     </title>
 
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
@@ -272,11 +272,21 @@
         </div>
     </header>
     {% endif %}
-
     <!-- Header Section End -->
+
+    <!-- <div class="mt-3">
+        <div id="modalToggle">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">Product added to wishlist.</div>
+                </div>
+            </div>
+        </div>
+    </div> -->
 
     {% block content %}
     {% endblock content %}
+
     <!-- Search Begin -->
     <div class="search-model">
         <div class="h-100 d-flex align-items-center justify-content-center">
@@ -299,8 +309,10 @@
                                     width="300" /></a>
                         </div>
                         <p>
-                            Discover your style at {{ APP_NAME }} - Your ultimate destination for fashion-forward finds.
-                            Shop the latest trends, exclusive collections.
+                            Welcome to the world of fashion where we believe in 'More Fashion, Less Effort.' Explore the latest trends, curated
+                            just for you. We're here to simplify your style journey, so you can effortlessly slay every look. Join us in celebrating
+                            the art of dressing up and discovering your unique style. Let's make fashion fun, accessible, and oh-so-stylish
+                            together!
                         </p>
                     </div>
                 </div>
@@ -339,9 +351,9 @@
                             <button type="submit" class="site-btn" id="subscribeBtn">Subscribe</button>
                         </form>
                         <div class="footer__social">
-                            <a href="#"><i class="fa fa-facebook"></i></a>
-                            <a href="#"><i class="fa fa-twitter"></i></a>
-                            <a href="https://www.instagram.com/glam_ourglam/"><i class="fa fa-instagram"></i></a>
+                            <a href="https://www.facebook.com/profile.php?id=61552267105449"><i class="fa fa-facebook"></i></a>
+                            <a href="https://twitter.com/LussoTerra"><i class="fa fa-twitter"></i></a>
+                            <a href="https://www.instagram.com/lusso_terra/"><i class="fa fa-instagram"></i></a>
                         </div>
                     </div>
                 </div>
@@ -373,7 +385,7 @@
 
     <!-- Js Plugins -->
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'assets/vendor/bootstrap/css/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/mixitup.min.js' %}"></script>
