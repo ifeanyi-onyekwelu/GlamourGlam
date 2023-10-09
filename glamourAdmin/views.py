@@ -21,7 +21,6 @@ import calendar
 load_dotenv()
 
 
-@admin_only_required
 @admin_or_staff_required
 def dashboard(request):
     orders = Order.objects.all()
@@ -142,7 +141,7 @@ def dashboard(request):
 # User
 # ########################################
 @admin_only_required
-@admin_only_required
+@admin_or_staff_required
 def all_user(request):
     users = CustomUser.objects.all()
     context = {
