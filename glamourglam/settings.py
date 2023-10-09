@@ -82,8 +82,8 @@ DATABASES = {
     # }
 }
 
-# database_url = os.getenv('DB_URL')
-# DATABASES['default'] = dj_database_url.parse(database_url)
+database_url = os.getenv('DB_URL')
+DATABASES['default'] = dj_database_url.parse(database_url)
 
 
 AUTH_PASSWORD_VALIDATORS = [
