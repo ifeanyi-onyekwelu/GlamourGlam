@@ -57,14 +57,32 @@ $(document).ready(function () {
       var price = parseFloat(
         $(this).data(selectedCurrency.toLowerCase() + "-price")
       );
+
+      price = price.toFixed(2);
+
       $(this).text(formatPrice(price, selectedCurrency));
     });
+
+    // Get the selected currency from the data attribute
+    var selectedCurrency = $(".cart__total").data("selected-currency");
+
+    // Update currency symbols and icons
+    var currencySymbol = "";
+    if (selectedCurrency === "USD") {
+      currencySymbol = "$";
+    } else if (selectedCurrency === "NGN") {
+      currencySymbol = "₦";
+    } else if (selectedCurrency === "EUR") {
+      currencySymbol = "€";
+    }
+
+    // Update the currency icon
+    $(".currency-icon").text(currencySymbol);
   }
 
   function formatPrice(price, selectedCurrency) {
-    // Assuming the currency symbol is "$" for USD, "₦" for NGN, and "€" for EUR
     var currencySymbol = "";
-    var decimalPlaces = 2; // You can adjust this to the desired number of decimal places
+    var decimalPlaces = 2;
 
     if (selectedCurrency === "USD") {
       currencySymbol = "$";
@@ -75,7 +93,9 @@ $(document).ready(function () {
     }
 
     // Format the price with currency symbol and decimal places
-    return currencySymbol + price.toFixed(decimalPlaces);
+    // Add thousands separators
+    price = price.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    return currencySymbol + " " + price;
   }
 
 });

@@ -345,6 +345,7 @@ class ShopCartPageView(TemplateView):
         shipping_fee = float(settings.SHIPPING_FEE)
         total_amount_shipping = 0
         APP_NAME = os.getenv("APP_NAME")
+        selected_currency = request.session.get('currency_preference')
 
         # If the user is authenticated, handle their cart
         if user.is_authenticated:
@@ -353,7 +354,7 @@ class ShopCartPageView(TemplateView):
 
             for cart_item in cart_items:
                 cart_item.first_image = cart_item.product.productimage_set.first()
-                cart_item.subtotal = cart_item.quantity * cart_item.product.price_ngn
+                cart_item.subtotal = cart_item.subtotal(selected_currency)
 
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
                 "quantity__sum"
@@ -994,6 +995,12 @@ def handleAddToCart(request, product_id, color_selected, size_selected, quantity
             quantity=int(quantity_selected),
             price=product_price,
         )
+    
+    # Calculate the subtotal for the cart_item based on the user's selected currency
+    selected_currency = request.session.get('currency_preference')
+    cart_item_subtotal = cart_item.subtotal(selected_currency)
+
+    print(cart_item_subtotal)
 
     return redirect(reverse("app:cart_page"))
 

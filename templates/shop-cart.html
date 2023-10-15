@@ -87,7 +87,7 @@
                                         data-selected-currency="{{ request.session.currency_preference }}"></td>
                                     <td class="cart__quantity">
                                         <div class="">
-                                            <form class="quantity-form pro-qty" data-product-id="{{ cart_item.product.id }}"
+                                            <form class="quantity-form pro-qty form-qty" data-product-id="{{ cart_item.product.id }}"
                                                 data-cart-item-color="{{ cart_item.color }}" data-cart-item-size="{{ cart_item.size }}"
                                                 id="form-{{ cart_item.id }}">
                                                 {% csrf_token %}
@@ -96,9 +96,7 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td class="product__price cart__total total" data-usd-price="{{ cart_item.subtotal }}"
-                                        data-ngn-price="{{ cart_item.subtotal }}" data-eur-price="{{ cart_item.subtotal }}"
-                                        data-selected-currency="{{ request.session.currency_preference }}"></td>
+                                    <td class="cart__total total" data-selected-currency="{{ request.session.currency_preference }}"><span class="currency-icon"></span> {{ cart_item.subtotal|intcomma }}</td>
                                     <td class="cart__close">
                                         <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item"
                                             data-cart-item-id="{{ cart_item.id }}">

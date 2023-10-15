@@ -90,8 +90,16 @@ class CartItem(models.Model):
     color = models.CharField(max_length=20, null=True, blank=True, default="Default Color")
     size = models.CharField(max_length=20, null=True, blank=True, default="Default Size")
 
-    def subtotal(self):
-        return self.product.price * self.quantity
+    def subtotal(self, selected_currency):
+        if selected_currency == 'USD':
+            return self.product.price_usd * self.quantity
+        elif selected_currency == 'NGN':
+            return self.product.price_ngn * self.quantity
+        elif selected_currency == 'EUR':
+            return self.product.price_eur * self.quantity
+        else:
+            # Handle the case when the selected currency is not recognized
+            return 0
 
 class Order(models.Model):
     id = models.UUIDField(

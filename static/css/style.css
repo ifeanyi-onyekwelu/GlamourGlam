@@ -1775,7 +1775,7 @@ ol {
   margin-right: 15px;
 }
 
-.pro-qty {
+.qyt-no-form {
   height: 50px;
   width: 150px;
   border: 1px solid #ebebeb;
@@ -1787,19 +1787,19 @@ ol {
   justify-content: center;
 }
 
-.pro-qty .qtybtn {
+.qyt-no-form .qtybtn {
   cursor: pointer;
   font-size: 13px;
   border-radius: 3px;
   padding: 10px;
-  background: rgb(210, 210, 210);
+  background: #bda06a9b;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   height: 30px;
 }
 
-.pro-qty input {
+.qyt-no-form input {
   font-size: 14px;
   color: #666666;
   font-weight: 500;
@@ -1808,6 +1808,42 @@ ol {
   width: 84px;
   text-align: center;
   height: 48px;
+}
+
+.form-qty {
+  height: 50px;
+  width: 150px;
+  border: 1px solid #ebebeb;
+  border-radius: 4px;
+  padding: 0 40px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-qty .qtybtn {
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 3px;
+  padding: 10px;
+  background: #bda06a9b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 25%;
+}
+
+.form-qty input {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 500;
+  border: none;
+  float: left;
+  text-align: center;
+  height: 48px;
+  width: 50%;
 }
 
 .product__details__button {
