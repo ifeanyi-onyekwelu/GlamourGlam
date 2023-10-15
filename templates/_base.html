@@ -98,6 +98,35 @@
                 width: 100%;
             }
         }
+
+        .currency_preference {
+            appearance: none;
+            padding: 7px 10px;
+            border: none;
+            background: #bda06a80;
+            border-radius: 4px;
+            outline: none;
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+        }
+
+        /* Style for the select element when hovered */
+        .currency_preference:hover {
+            color: #ffffff;
+        }
+
+        /* Style for the select element when focused */
+        .currency_preference:focus {
+            background: #bda06a;
+        }
+
+        .currency_preference option {
+            background: #ffffff;
+            color: #bda06a;
+        }
     </style>
 </head>
 
@@ -177,10 +206,10 @@
     <header class="header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xl-3 col-lg-2">
+                <div class="col-xl-2 col-lg-2">
                     <div class="header__logo">
                         <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
-                                width="300" /></a>
+                                width="200" /></a>
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-7">
@@ -219,21 +248,43 @@
                     </nav>
                 </div>
 
-                <div class="col-lg-3">
+                <div class="col-lg-4">
                     <div class="header__right">
                         {% if not request.user.is_authenticated %}
-                        <div class="header__right__auth">
+                        <div class="header__right__auth"> 
                             <a href="{% url 'app:login_page' %}">Login</a>
                             <a href="{% url 'app:register_page' %}">Register</a>
                         </div>
                         {% endif %}
                         <ul class="header__right__widget">
+                            <li>
+                                <form method="post" action="{% url 'app:set_currency_preference' %}">
+                                    {% csrf_token %}
+                                    <select name="currency_preference" onchange="this.form.submit()" class="currency_preference">
+                                        {% if request.session.currency_preference == 'USD'  %}
+                                            <option value="USD">USD</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="EUR">EUR</option>
+                                        {% elif request.session.currency_preference == 'NGN' %}
+                                        <option value="NGN">NGN</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        {% elif request.session.currency_preference == 'EUR' %}
+                                        <option value="EUR">EUR</option>
+                                        <option value="NGN">NGN</option>
+                                        <option value="USD">USD</option>
+                                        {% endif %}
+                                        <!-- Add more currency options as needed -->
+                                    </select>
+                                </form>
+                            </li>
                             <li><span class="icon_search search-switch"></span></li>
                             <li>
                                 <a href="{% url 'app:cart_page' %}"><span class="fa fa-shopping-basket"></span>
                                     <div class="tip">{% block cart_num %}{% endblock cart_num %}</div>
                                 </a>
                             </li>
+                        
                             <li class="account">
                                 <span class="fa fa-user user-dropdown-btn"></span>
                                 <ul class="user-dropdown-menu">
@@ -308,8 +359,7 @@
                         </div>
                         <p>
                             Welcome to the world of fashion where we believe in 'More Fashion, Less Effort.' Explore the latest trends, curated
-                            just for you. We're here to simplify your style journey, so you can effortlessly slay every look. Join us in celebrating
-                            the art of dressing up and discovering your unique style. Let's make fashion fun, accessible, and oh-so-stylish
+                            just for you. We're here to simplify your style journey, so you can effortlessly slay every look.
                             together!
                         </p>
                     </div>
@@ -383,7 +433,7 @@
 
     <!-- Js Plugins -->
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/mixitup.min.js' %}"></script>

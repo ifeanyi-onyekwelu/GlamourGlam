@@ -192,14 +192,10 @@ def all_products(request):
 def product_detail(request, product_id):
     product = Product.objects.get(id=product_id)
     productImage = ProductImage.objects.filter(product=product)
-    original_price = product.price
-    price_with_increase = float(original_price) * 1.25
 
     context = {
         'product': product,
         'productImage': productImage,
-        'original_price': original_price,
-        'price_with_increase': price_with_increase,
         'APP_NAME': os.getenv('APP_NAME'),
         'notifications': get_all_notifications(),
     }
@@ -212,7 +208,9 @@ def add_product(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
-        price = request.POST.get('price')
+        price_usd = request.POST.get('price_usd')
+        price_ngn = request.POST.get('price_ngn')
+        price_eur = request.POST.get('price_eur')
         category = request.POST.get('category')
         category_matched = Category.objects.get(name=category)
         sub_category = request.POST.get('sub_category')
@@ -224,7 +222,9 @@ def add_product(request):
             name=name,
             sub_category=sub_category_matched,
             description=description,
-            price=price,
+            price_usd = price_usd,
+            price_ngn = price_ngn,
+            price_eur = price_eur,
             category=category_matched
         )
 
@@ -269,7 +269,9 @@ def edit_product(request, product_id):
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
-        price = request.POST.get('price')
+        price_usd = request.POST.get('price_usd')
+        price_ngn = request.POST.get('price_ngn')
+        price_eur = request.POST.get('price_eur')
         category = request.POST.get('category')
         category_matched = Category.objects.get(name=category)
         sub_category = request.POST.get('sub_category')
@@ -283,7 +285,9 @@ def edit_product(request, product_id):
             product.name = name
             product.sub_category = sub_category_matched
             product.description = description
-            product.price = price
+            product.price_usd = price_usd
+            product.price_ngn = price_ngn
+            product.price_eur = price_eur
             product.category = category_matched
 
             # Handling sizes

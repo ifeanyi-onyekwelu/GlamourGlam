@@ -2,10 +2,11 @@ import random
 import re
 import string
 import os
+import requests
 from dotenv import load_dotenv
 from random import sample
 from django.template.loader import render_to_string
-from django.db.models import Sum
+from django.db.models import Sum, F, ExpressionWrapper, FloatField
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.contrib import messages
@@ -43,6 +44,73 @@ import paystack
 
 load_dotenv()
 
+class CategoryPageView(ListView):
+    model = Product
+    template_name = ""
+    context_object_name = "products"
+    paginate_by = 12
+    category_name = "" 
+
+    def get_queryset(self):
+        category = get_object_or_404(Category, name=self.category_name)
+
+        return Product.objects.filter(category=category).order_by("id")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_products = self.get_queryset()
+        APP_NAME = os.getenv("APP_NAME")
+
+        cart = None
+        total_items = 0
+
+        if self.request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=self.request.user)
+            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
+                "quantity__sum"
+            ]
+
+            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
+            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
+
+            product_wishlist_status = {}
+
+            for product in all_products:
+                is_in_wishlist = product.id in wishlist_product_ids
+                product_wishlist_status[product.id] = is_in_wishlist
+                
+        else:
+            product_wishlist_status = {product.id: False for product in all_products}
+
+        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
+
+        # Paginate the products
+        paginator = Paginator(all_products, self.paginate_by)
+        page = self.request.GET.get("page")
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        context["all_products"] = get_products_with_images(products)
+        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
+
+        category_products = Product.objects.filter(
+            category__name__in=[self.category_name]
+        )
+        sub_categories = SubCategory.objects.filter(
+            product__in=category_products
+        ).distinct()
+        
+        context["page_obj"] = products
+        context["sub_categories"] = sub_categories
+        context["products_in_wishlist"] = products_in_wishlist
+        context["total_items_in_cart"] = total_items
+        context["APP_NAME"] = APP_NAME.title()
+        return context
 
 # Create your views here.
 class HomePageView(TemplateView):
@@ -134,359 +202,29 @@ class AboutPageView(TemplateView):
         return context
 
 
-class WomenPageView(ListView):
-    model = Product
+class WomenPageView(CategoryPageView):
+    category_name = "Women"
     template_name = "women.html"
-    context_object_name = "products"
-    paginate_by = 12
-
-    def get_queryset(self):
-        category = None
-        try:
-            category = get_object_or_404(Category, name="Women")
-        except Exception as e:
-            print("No category found")
-        return Product.objects.filter(category=category).order_by("id")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_products = self.get_queryset()
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum" 
-            ]
-            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
-            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-
-            product_wishlist_status = {}
-
-            for product in all_products:
-                is_in_wishlist = product.id in wishlist_product_ids
-                product_wishlist_status[product.id] = is_in_wishlist
-                
-        else:
-            # Assuming all products are not in the wishlist for non-authenticated users
-            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
-        # Combine products with wishlist statuses into a list of tuples
-
-
-        # Paginate the products
-        paginator = Paginator(all_products, self.paginate_by)
-        page = self.request.GET.get("page")
-
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-
-        context["all_products"] = get_products_with_images(products)
-
-        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
-
-        women_products = Product.objects.filter(
-            category__name__in=["Women"]
-        )
-        sub_categories = SubCategory.objects.filter(
-            product__in=women_products
-        ).distinct()
-        context["sub_categories"] = sub_categories
-        context["products_in_wishlist"] = products_in_wishlist
-        context["products"] = products
-        context["total_items_in_cart"] = total_items
-        context["APP_NAME"] = APP_NAME.title()
-        return context
-
-
-class MenPageView(ListView):
-    model = Product
+class MenPageView(CategoryPageView):
+    category_name = "Men"
     template_name = "men.html"
-    context_object_name = "products"
-    paginate_by = 12
-
-    def get_queryset(self):
-        category = None
-        try:
-            category = get_object_or_404(Category, name="Men")
-        except Exception as e:
-            print("No category found")
-        return Product.objects.filter(category=category).order_by("id")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_products = self.get_queryset()
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
-            ]
-
-            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
-            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-
-            product_wishlist_status = {}
-
-            for product in all_products:
-                is_in_wishlist = product.id in wishlist_product_ids
-                product_wishlist_status[product.id] = is_in_wishlist
-                
-        else:
-            # Assuming all products are not in the wishlist for non-authenticated users
-            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
-        # Combine products with wishlist statuses into a list of tuples
-
-
-        # Paginate the products
-        paginator = Paginator(all_products, self.paginate_by)
-        page = self.request.GET.get("page")
-
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-
-        context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
-
-        men_products = Product.objects.filter(
-            category__name__in=["Men"]
-        )
-        sub_categories = SubCategory.objects.filter(
-            product__in=men_products
-        ).distinct()
-        context["page_obj"] = products
-        context["sub_categories"] = sub_categories
-        context["total_items_in_cart"] = total_items
-        context["products_in_wishlist"] = products_in_wishlist
-        context["APP_NAME"] = APP_NAME.title()
-        return context
-
-
-class UnisexPageView(ListView):
-    model = Product
+class UnisexPageView(CategoryPageView):
+    category_name = "Unisex"
     template_name = "unisex.html"
-    context_object_name = "products"
-    paginate_by = 12
-
-    def get_queryset(self):
-        category = None
-        try:
-            category = get_object_or_404(Category, name="Unisex")
-        except Exception as e:
-            print("No category found")
-        return Product.objects.filter(category=category).order_by("id")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_products = self.get_queryset()
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
-            ]
-            
-            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
-            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-
-            product_wishlist_status = {}
-
-            for product in all_products:
-                is_in_wishlist = product.id in wishlist_product_ids
-                product_wishlist_status[product.id] = is_in_wishlist
-                
-        else:
-            # Assuming all products are not in the wishlist for non-authenticated users
-            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
-        # Combine products with wishlist statuses into a list of tuples
-
-        # Paginate the products
-        paginator = Paginator(all_products, self.paginate_by)
-        page = self.request.GET.get("page")
-
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-
-        context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
-
-        unisex_products = Product.objects.filter(category__name__in=["Unisex"])
-        sub_categories = SubCategory.objects.filter(
-            product__in=unisex_products
-        ).distinct()
-        context["page_obj"] = products
-        context["sub_categories"] = sub_categories
-        context["products_in_wishlist"] = products_in_wishlist
-        context["total_items_in_cart"] = total_items
-        context["APP_NAME"] = APP_NAME.title()
-        return context
-
-
-class KidsPageView(ListView):
-    model = Product
+class KidsPageView(CategoryPageView):
+    category_name = "Kids"
     template_name = "kids.html"
-    context_object_name = "products"
-    paginate_by = 12
-
-    def get_queryset(self):
-        category = None
-        try:
-            category = get_object_or_404(Category, name="Kids")
-        except Exception as e:
-            print("No category found")
-        return Product.objects.filter(category=category).order_by("id")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_products = self.get_queryset()
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
-            ]
-
-            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
-            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-
-            product_wishlist_status = {}
-
-            for product in all_products:
-                is_in_wishlist = product.id in wishlist_product_ids
-                product_wishlist_status[product.id] = is_in_wishlist
-                
-        else:
-            product_wishlist_status = {product.id: False for product in all_products}
 
 
-        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
-
-
-        # Paginate the products
-        paginator = Paginator(all_products, self.paginate_by)
-        page = self.request.GET.get("page")
-
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-
-        context["all_products"] = get_products_with_images(products)
-        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
-
-        kids_products = Product.objects.filter(category__name__in=["Kids"])
-        sub_categories = SubCategory.objects.filter(
-            product__in=kids_products
-        ).distinct()
-        context["sub_categories"] = sub_categories
-        context["total_items_in_cart"] = total_items
-        context["products_in_wishlist"] = products_in_wishlist
-        context["APP_NAME"] = APP_NAME.title()
-        return context
-
-
-class AccessoriesPageView(ListView):
-    model = Product
+class AccessoriesPageView(CategoryPageView):
+    category_name = "Accessories"
     template_name = "accessories.html"
-    context_object_name = "products"
-    paginate_by = 12
-
-    def get_queryset(self):
-        category = None
-        try:
-            category = get_object_or_404(Category, name="Accessories")
-        except Exception as e:
-            print("No category found")
-        return Product.objects.filter(category=category).order_by("id")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        all_products = self.get_queryset()
-        APP_NAME = os.getenv("APP_NAME")
-
-        cart = None
-        total_items = 0
-        if self.request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=self.request.user)
-            total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
-                "quantity__sum"
-            ]
-
-            user_wishlist_items = WishListItem.objects.filter(user=self.request.user)
-            wishlist_product_ids = user_wishlist_items.values_list("product__id", flat=True)
-
-            product_wishlist_status = {}
-
-            for product in all_products:
-                is_in_wishlist = product.id in wishlist_product_ids
-                product_wishlist_status[product.id] = is_in_wishlist
-                
-        else:
-            product_wishlist_status = {product.id: False for product in all_products}
-
-
-        wishlist_statuses = [product_wishlist_status[product.id] for product in all_products]
-
-        # Paginate the products
-        paginator = Paginator(all_products, self.paginate_by)
-        page = self.request.GET.get("page")
-
-        try:
-            products = paginator.page(page)
-        except PageNotAnInteger:
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-
-        context["all_products"] = get_products_with_images(products)
-
-        products_in_wishlist = list(zip(get_products_with_images(products), wishlist_statuses))
-
-        accessories_products = Product.objects.filter(
-            category__name__in=["Accessories"]
-        )
-        sub_categories = SubCategory.objects.filter(
-            product__in=accessories_products
-        ).distinct()
-        context["page_obj"] = products
-        context["sub_categories"] = sub_categories
-        context["products_in_wishlist"] = products_in_wishlist
-        context["total_items_in_cart"] = total_items
-        context["APP_NAME"] = APP_NAME.title()
-        return context
 
 
 class ShopPageView(TemplateView):
@@ -569,9 +307,6 @@ class ProductDetailPageView(DetailView):
         except ProductImage.DoesNotExist:
             product_image = None
 
-        original_price = self.object.price
-        price_with_increase = float(original_price) * 1.25
-
         cart = None
         total_items = 0
 
@@ -588,7 +323,6 @@ class ProductDetailPageView(DetailView):
 
         reviews = Review.objects.filter(product=self.object)
 
-        context["price_with_increase"] = price_with_increase
         context["product_image"] = product_image
         context["total_items_in_cart"] = total_items
         context["product_in_wishlist"] = product_in_wishlist
@@ -619,7 +353,7 @@ class ShopCartPageView(TemplateView):
 
             for cart_item in cart_items:
                 cart_item.first_image = cart_item.product.productimage_set.first()
-                cart_item.subtotal = cart_item.quantity * cart_item.product.price
+                cart_item.subtotal = cart_item.quantity * cart_item.product.price_ngn
 
             total_items = CartItem.objects.filter(cart=cart).aggregate(Sum("quantity"))[
                 "quantity__sum"
@@ -1221,12 +955,26 @@ def handleUserLogout(request):
     return redirect(reverse("app:home_page"))
 
 
+def set_currency_preference(request):
+    if request.method == 'POST':
+        currency_preference = request.POST.get('currency_preference')
+        print(currency_preference)
+
+        if currency_preference:
+            request.session['currency_preference'] = currency_preference
+            request.session['prices_converted'] = False
+
+            print(request.session.get('currency_preference', 'NGN'))
+
+    return redirect(request.META.get('HTTP_REFERER', ''))
+
+
 @login_required
 def handleAddToCart(request, product_id, color_selected, size_selected, quantity_selected):
     product = get_object_or_404(Product, id=product_id)
     user = request.user
 
-    product_price = product.price
+    product_price = product.price_ngn
     # If the user is authenticated, handle their cart
     cart, created = Cart.objects.get_or_create(user=user)
 

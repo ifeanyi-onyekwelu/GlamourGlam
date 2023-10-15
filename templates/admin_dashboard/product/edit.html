@@ -111,11 +111,19 @@
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <input name="description" id="description" class="form-control" value="{{ product.description }}">
+                        <textarea name="description" id="description" class="form-control">{{ product.description }}</textarea>
                     </div>
                     <div class="form-group">
-                        <label for="price">Price</label>
-                        <input type="number" id="price" name="price" class="form-control" value="{{ product.price }}">
+                        <label for="price">Price (NGN)</label>
+                        <input type="number" id="price" name="price_ngn" class="form-control" value="{{ product.price_ngn }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (USD)</label>
+                        <input type="number" id="price" name="price_usd" class="form-control" value="{{ product.price_usd }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (EUR)</label>
+                        <input type="number" id="price" name="price_eur" class="form-control" value="{{ product.price_eur }}">
                     </div>
                     <div class="form-group">
                         <label for="category">Category</label>

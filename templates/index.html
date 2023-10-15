@@ -129,7 +129,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        <div class="product__price" data-usd-price="{{ product_info.product.price_usd }}" data-ngn-price="{{ product_info.product.price_ngn }}" data-eur-price="{{ product_info.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}">₦ {{ product_info.product.price_ngn }}</div>
                     </div>
                 </div>
             </div>
@@ -167,7 +167,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        <div class="product__price" data-usd-price="{{ product_info.product.price_usd }}" data-ngn-price="{{ product_info.product.price_ngn }}" data-eur-price="{{ product_info.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}">₦ {{ product_info.product.price_ngn }}</div>
                     </div>
                 </div>
             </div>
@@ -206,7 +206,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        <div class="product__price" data-usd-price="{{ product_info.product.price_usd }}" data-ngn-price="{{ product_info.product.price_ngn }}" data-eur-price="{{ product_info.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}">₦ {{ product_info.product.price_ngn }}</div>
                     </div>
                 </div>
             </div>
@@ -244,7 +244,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">&#8358; {{ product_info.product.price|intcomma }}</div>
+                        <div class="product__price" data-usd-price="{{ product_info.product.price_usd }}" data-ngn-price="{{ product_info.product.price_ngn }}" data-eur-price="{{ product_info.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}">₦ {{ product_info.product.price_ngn }}</div>
                     </div>
                 </div>
             </div>
@@ -283,7 +283,7 @@
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
                         </div>
-                        <div class="product__price">&#8358; {{ product_info.product.price|intcomma|intcomma }}</div>
+                        <div class="product__price" data-usd-price="{{ product_info.product.price_usd }}" data-ngn-price="{{ product_info.product.price_ngn }}" data-eur-price="{{ product_info.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}">₦ {{ product_info.product.price_ngn }}</div>
                     </div>
                 </div>
             </div>
@@ -320,7 +320,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            <div class="product__price" data-usd-price="{{ product.product.price_usd }}" data-ngn-price="{{ product.product.price_ngn }}" data-eur-price="{{ product.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}"></div>
                         </div>
                     </div>
                     {% endfor %}
@@ -348,7 +348,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            <div class="product__price" data-usd-price="{{ product.product.price_usd }}" data-ngn-price="{{ product.product.price_ngn }}" data-eur-price="{{ product.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}"></div>
                         </div>
                     </div>
                     {% endfor %}
@@ -376,7 +376,7 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">&#8358; {{ product.product.price|intcomma }}</div>
+                            <div class="product__price" data-usd-price="{{ product.product.price_usd }}" data-ngn-price="{{ product.product.price_ngn }}" data-eur-price="{{ product.product.price_eur }}" data-selected-currency="{{ request.session.currency_preference }}"></div>
                         </div>
                     </div>
                     {% endfor %}

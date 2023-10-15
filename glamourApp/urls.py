@@ -44,6 +44,7 @@ urlpatterns = [
     path('add-to-cart/<uuid:product_id>/<str:color_selected>/<str:size_selected>/<int:quantity_selected>/', handleAddToCart, name="handleAddToCart"),
     path('remove-item/<uuid:cart_item_id>/', handleRemoveCartItem, name="handleRemoveCartItem"),
     path('send-message/', handleContactForm, name="handleContactForm"),
+    path('set-currency/', set_currency_preference, name="set_currency_preference"),
     path('search/', handleSearchForm, name="handleSearchForm"),
     path('subscribe-to-newsletter/', handleSubscribeToNewsLetter, name="handleSubscribeToNewsLetter"),
     path('update-profile/', handleUpdateProfileDetail, name="handleUpdateProfileDetail"),

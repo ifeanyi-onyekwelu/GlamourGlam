@@ -39,18 +39,19 @@ class Product(models.Model):
     name = models.CharField(max_length=255, default="")
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     description = models.TextField(default="")
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
     sizes = models.ManyToManyField('ProductSize', related_name='products', default="",)
     colors = models.ManyToManyField('ProductColor', related_name='products', default="")
     images = models.ManyToManyField('ProductImage', related_name='products')
+    price_usd = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price_ngn = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price_eur = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 class ProductSize(models.Model):
     name = models.CharField(max_length=20)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
 
 class ProductColor(models.Model):
     color = models.CharField(max_length=255)

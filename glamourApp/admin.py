@@ -1,125 +1,124 @@
-from django.contrib import admin
-from .models import (
-    Product,
-    Order,
-    ShippingAddress,
-    OrderItem,
-    Review,
-    Category,
-    Cart,
-    CartItem,
-    ProductImage,
-    DiscountCode,
-    ProductSize, 
-    Notification,
-    ProductColor
-)
+# from django.contrib import admin
+# from .models import (
+#     Product,
+#     Order,
+#     ShippingAddress,
+#     OrderItem,
+#     Review,
+#     Category,
+#     Cart,
+#     CartItem,
+#     ProductImage,
+#     DiscountCode,
+#     ProductSize, 
+#     Notification,
+#     ProductColor
+# )
 
-# Register your models here.
+# # Register your models here.
 
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
+# class ProductImageInline(admin.TabularInline):
+#     model = ProductImage
 
-class ProductSizeInline(admin.TabularInline):
-    model = ProductSize
+# class ProductSizeInline(admin.TabularInline):
+#     model = ProductSize
 
-class ReviewAdmin(admin.TabularInline):
-    model = Review
+# class ReviewAdmin(admin.TabularInline):
+#     model = Review
 
-class ProductAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "description",
-        'sub_category',
-        "price",
-        "category",
-        "date_created",
-    ]
+# class ProductAdmin(admin.ModelAdmin):
+#     list_display = [
+#         "name",
+#         "description",
+#         'sub_category',
+#         "category",
+#         "date_created",
+#     ]
 
-    inlines = [ProductImageInline,  ProductSizeInline, ReviewAdmin]
-
-
-class CategoryAdmin(admin.ModelAdmin):
-    model = Category
-    list_display = ["name", "description"]
-
-class NotificationAdmin(admin.ModelAdmin):
-    model = Notification
-    list_display = ["title", "notification_type", 'notification', 'date_created']
-
-class ColorAdmin(admin.ModelAdmin):
-    model = ProductColor
-    list_display = ["color"]
+#     inlines = [ProductImageInline,  ProductSizeInline, ReviewAdmin]
 
 
-class CartItemInline(admin.TabularInline):
-    model = CartItem
+# class CategoryAdmin(admin.ModelAdmin):
+#     model = Category
+#     list_display = ["name", "description"]
+
+# class NotificationAdmin(admin.ModelAdmin):
+#     model = Notification
+#     list_display = ["title", "notification_type", 'notification', 'date_created']
+
+# class ColorAdmin(admin.ModelAdmin):
+#     model = ProductColor
+#     list_display = ["color"]
 
 
-class CartAdmin(admin.ModelAdmin):
-    list_display = ["user", "created_at", "updated_at", "get_cart_items"]
-
-    def get_cart_items(self, obj):
-        return ", ".join([item.product.name for item in obj.items.all()])
-
-    get_cart_items.short_decription = "Cart items"
-    inlines = [CartItemInline]
+# class CartItemInline(admin.TabularInline):
+#     model = CartItem
 
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
+# class CartAdmin(admin.ModelAdmin):
+#     list_display = ["user", "created_at", "updated_at", "get_cart_items"]
+
+#     def get_cart_items(self, obj):
+#         return ", ".join([item.product.name for item in obj.items.all()])
+
+#     get_cart_items.short_decription = "Cart items"
+#     inlines = [CartItemInline]
 
 
-class OrderAdmin(admin.ModelAdmin):
-    list_display = [
-        "user",
-        "total_price",
-        "created_at",
-        "order_number",
-        "payment_status",
-        "shipping_address",
-        "get_order_items",
-    ]
-
-    def get_order_items(self, obj):
-        return ", ".join([item.product.name for item in obj.items.all()])
-
-    get_order_items.short_decription = "Order items"
-    inlines = [OrderItemInline]
+# class OrderItemInline(admin.TabularInline):
+#     model = OrderItem
 
 
-class ShippingAdmin(admin.ModelAdmin):
-    model = ShippingAddress
-    list_display = [
-        "user",
-        "order",
-        "phone",
-        "country",
-        "appartment",
-        "address",
-        "city",
-        "state",
-        "zipcode",
-        "date_added",
-    ]
+# class OrderAdmin(admin.ModelAdmin):
+#     list_display = [
+#         "user",
+#         "total_price",
+#         "created_at",
+#         "order_number",
+#         "payment_status",
+#         "shipping_address",
+#         "get_order_items",
+#     ]
 
-class DiscountAdmin(admin.ModelAdmin):
-    model = DiscountCode
-    list_display = [
-        "code",
-        "percentage",
-        "valid_from",
-        "valid_to",
-        "active"
-    ]
+#     def get_order_items(self, obj):
+#         return ", ".join([item.product.name for item in obj.items.all()])
+
+#     get_order_items.short_decription = "Order items"
+#     inlines = [OrderItemInline]
 
 
+# class ShippingAdmin(admin.ModelAdmin):
+#     model = ShippingAddress
+#     list_display = [
+#         "user",
+#         "order",
+#         "phone",
+#         "country",
+#         "appartment",
+#         "address",
+#         "city",
+#         "state",
+#         "zipcode",
+#         "date_added",
+#     ]
 
-admin.site.register(Product, ProductAdmin)
-admin.site.register(Order, OrderAdmin)
-admin.site.register(ShippingAddress, ShippingAdmin)
-admin.site.register(Cart, CartAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(DiscountCode, DiscountAdmin)
-admin.site.register(Notification, NotificationAdmin)
-admin.site.register(ProductColor, ColorAdmin)
+# class DiscountAdmin(admin.ModelAdmin):
+#     model = DiscountCode
+#     list_display = [
+#         "code",
+#         "percentage",
+#         "valid_from",
+#         "valid_to",
+#         "active"
+#     ]
+
+
+
+# admin.site.register(Product, ProductAdmin)
+# admin.site.register(Order, OrderAdmin)
+# admin.site.register(ShippingAddress, ShippingAdmin)
+# admin.site.register(Cart, CartAdmin)
+# admin.site.register(Category, CategoryAdmin)
+# admin.site.register(DiscountCode, DiscountAdmin)
+# admin.site.register(Notification, NotificationAdmin)
+# admin.site.register(ProductColor, ColorAdmin)

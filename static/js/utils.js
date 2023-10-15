@@ -43,4 +43,39 @@ $(document).ready(function () {
       },
     });
   });
+
+  updatePrices();
+
+  // Listen for changes in the currency preference
+  $("select.currency_preference").on("change", function() {
+      updatePrices();
+  });
+
+  function updatePrices() {
+    var selectedCurrency = $("select.currency_preference").val();
+    $(".product__price").each(function () {
+      var price = parseFloat(
+        $(this).data(selectedCurrency.toLowerCase() + "-price")
+      );
+      $(this).text(formatPrice(price, selectedCurrency));
+    });
+  }
+
+  function formatPrice(price, selectedCurrency) {
+    // Assuming the currency symbol is "$" for USD, "₦" for NGN, and "€" for EUR
+    var currencySymbol = "";
+    var decimalPlaces = 2; // You can adjust this to the desired number of decimal places
+
+    if (selectedCurrency === "USD") {
+      currencySymbol = "$";
+    } else if (selectedCurrency === "NGN") {
+      currencySymbol = "₦";
+    } else if (selectedCurrency === "EUR") {
+      currencySymbol = "€";
+    }
+
+    // Format the price with currency symbol and decimal places
+    return currencySymbol + price.toFixed(decimalPlaces);
+  }
+
 });

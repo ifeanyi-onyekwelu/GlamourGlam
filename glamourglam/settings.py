@@ -18,8 +18,8 @@ ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
 SHIPPING_FEE = os.getenv('SHIPPING_FEE', 10000.00)
 
-
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'glamourApp.middleware.DefaultCurrencyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

@@ -1779,7 +1779,7 @@ ol {
   height: 50px;
   width: 150px;
   border: 1px solid #ebebeb;
-  border-radius: 50px;
+  border-radius: 4px;
   padding: 0 50px;
   overflow: hidden;
   display: flex;
@@ -1788,16 +1788,15 @@ ol {
 }
 
 .pro-qty .qtybtn {
-  font-size: 14px;
-  color: black;
-  border-radius: 100px;
   cursor: pointer;
-  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 3px;
+  padding: 10px;
+  background: rgb(210, 210, 210);
   display: flex;
   align-items: center;
   justify-content: center;
   height: 30px;
-  line-height: 46px;
 }
 
 .pro-qty input {
@@ -1824,7 +1823,7 @@ ol {
   font-weight: 600 !important;
   text-transform: uppercase !important;
   padding: 14px 30px 15px !important;
-  border-radius: 50px !important;
+  border-radius: 4px !important;
   float: left !important;
   margin-right: 10px !important;
   margin-bottom: 10px !important;

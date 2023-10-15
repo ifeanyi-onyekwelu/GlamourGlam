@@ -82,7 +82,9 @@
                                             </div>
                                         </a>
                                     </td>
-                                    <td class="cart__price">&#8358; {{ cart_item.product.price|intcomma }}</td>
+                                    <td class="product__price cart__price" data-usd-price="{{ cart_item.product.price_usd }}"
+                                        data-ngn-price="{{ cart_item.product.price_ngn }}" data-eur-price="{{ cart_item.product.price_eur }}"
+                                        data-selected-currency="{{ request.session.currency_preference }}"></td>
                                     <td class="cart__quantity">
                                         <div class="">
                                             <form class="quantity-form pro-qty" data-product-id="{{ cart_item.product.id }}"
@@ -94,10 +96,9 @@
                                             </form>
                                         </div>
                                     </td>
-                                    <td class="cart__total total-column">&#8358; {{ cart_item.subtotal|intcomma }}</td>
-                                    <td class="cart__action">
-                            
-                                    </td>
+                                    <td class="product__price cart__total total" data-usd-price="{{ cart_item.subtotal }}"
+                                        data-ngn-price="{{ cart_item.subtotal }}" data-eur-price="{{ cart_item.subtotal }}"
+                                        data-selected-currency="{{ request.session.currency_preference }}"></td>
                                     <td class="cart__close">
                                         <a href="{% url 'app:handleRemoveCartItem' cart_item.id %}" class="remove-cart-item"
                                             data-cart-item-id="{{ cart_item.id }}">
@@ -239,8 +240,8 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         var proQty = $('.pro-qty');
-        proQty.prepend('<span class="dec qtybtn">-</span>');
-        proQty.append('<span class="inc qtybtn">+</span>');
+        proQty.prepend('<span class="dec qtybtn">&minus;</span>');
+        proQty.append('<span class="inc qtybtn">&plus;</span>');
         proQty.on('click', '.qtybtn', function () {
             var $button = $(this);
             var oldValue = $button.parent().find('.qty-amt').val();

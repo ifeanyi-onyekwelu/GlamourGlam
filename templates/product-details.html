@@ -79,7 +79,10 @@
                             <i class="fa fa-star"></i>
                             <span>( 138 reviews )</span>
                         </div>
-                        <div class="product__details__price">&#8358; {{ product.price|intcomma }} <span>&#8358; {{ price_with_increase|floatformat:2|intcomma }}</span></div>
+                        <div class="product__price product__details__price" data-usd-price="{{ product.price_usd }}"
+                            data-ngn-price="{{ product.price_ngn }}" data-eur-price="{{ product.price_eur }}"
+                            data-selected-currency="{{ request.session.currency_preference }}">
+                        </div>
                         <div class="product__details__button">
                             <div class="quantity">
                                 <span>Quantity:</span>
@@ -87,7 +90,7 @@
                                     <input type="text" value="1" readonly>
                                 </div>
                             </div>
-                            <a href="" class="cart-btn-product-details" id="add-to-cart-button"><span class="icon_bag_alt"></span> Add to cart</a>
+                            <a href="" class="cart-btn-product-details" id="add-to-cart-button"><span class="fa fa-shopping-basket"> </span> Add to cart</a>
                             <ul>
                                 <li><a href="#" style="color: #BDA06A;" class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}" id="add-to-wishlist-button" data-product-id="{{ product.id }}"></a></li>
                             </ul>
@@ -133,7 +136,41 @@
                         </div>
                     </div>
                 </div>
-                <section class="product_description_area">
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( 2 )</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <h6>Description</h6>
+                                
+                                <p>{{ product.description }}</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                <h6>Reviews ( 2 )</h6>
+                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
+                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
+                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
+                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
+                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
+                                    consequat massa quis enim.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
+                                    quis, sem.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- <section class="product_description_area">
                     <div class="container">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item">
@@ -145,11 +182,16 @@
                                     aria-controls="review" aria-selected="false">Reviews</a>
                             </li>
                         </ul>
+
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                <p>{{ product.description }}</p>
+                            <div class="tab-pane show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                <div class="row">
+                                    <div class="col-lg-12 bg-danger">
+                                        <p>{{ product.description }}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+                            <div class="tab-pane" id="review" role="tabpanel" aria-labelledby="review-tab">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="row total_rate">
@@ -277,7 +319,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> -->
             </div>
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -307,7 +349,10 @@
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
                             </div>
-                            <div class="product__price">{{ related_product.price|intcomma }}</div>
+                            <div class="product__price" data-usd-price="{{ related_product.price_usd }}"
+                                data-ngn-price="{{ related_product.price_ngn }}" data-eur-price="{{ related_product.price_eur }}"
+                                data-selected-currency="{{ request.session.currency_preference }}">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -342,8 +387,8 @@
         });
 
         var proQty = $('.pro-qty');
-        proQty.prepend('<span class="dec qtybtn">-</span>');
-        proQty.append('<span class="inc qtybtn">+</span>');
+        proQty.prepend('<span class="dec qtybtn">&minus;</span>');
+        proQty.append('<span class="inc qtybtn">&plus;</span>');
         proQty.on('click', '.qtybtn', function () {
             var $button = $(this);
             var oldValue = $button.parent().find('input').val();
