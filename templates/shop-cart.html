@@ -146,9 +146,21 @@
                 <div class="cart__total__procced">
                     <h6>Cart total</h6>
                     <ul>
-                        <li>Shipping Fee <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
-                        <li>Subtotal <span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></li>
-                        <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
+                        {% if request.session.currency_preference == 'USD' %}
+                        <li>Shipping Fee <span><label class="currency"></label> {{ shipping_fee_usd|floatformat:2|intcomma }}</span></li>
+                        <li>Subtotal <span><label class="currency"></label> {{ total_amount|floatformat:2|intcomma }}</span></li>
+                        <li>Total <span><label class="currency"></label> {{ total_amount_shipping_usd|floatformat:2|intcomma }}</span></li>
+
+                        {% elif request.session.currency_preference == 'EUR' %}
+                        <li>Shipping Fee <span><label class="currency"></label> {{ shipping_fee_eur|floatformat:2|intcomma }}</span></li>
+                        <li>Subtotal <span><label class="currency"></label> {{ total_amount|floatformat:2|intcomma }}</span></li>
+                        <li>Total <span><label class="currency"></label> {{ total_amount_shipping_eur|floatformat:2|intcomma }}</span></li>
+
+                        {% else %}
+                        <li>Shipping Fee <span><label class="currency"></label> {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                        <li>Subtotal <span><label class="currency"></label> {{ total_amount|floatformat:2|intcomma }}</span></li>
+                        <li>Total <span><label class="currency"></label> {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
+                        {% endif %}
                     </ul>
 
                     {% if total_items_in_cart >= 1 %}

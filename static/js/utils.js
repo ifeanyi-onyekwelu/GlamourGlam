@@ -78,6 +78,7 @@ $(document).ready(function () {
 
     // Update the currency icon
     $(".currency-icon").text(currencySymbol);
+    $(".currency").text(currencySymbol);
   }
 
   function formatPrice(price, selectedCurrency) {

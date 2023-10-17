@@ -343,6 +343,8 @@ class ShopCartPageView(TemplateView):
         cart_items = None
         cart = None
         shipping_fee = float(settings.SHIPPING_FEE)
+        shipping_fee_usd = float(settings.SHIPPING_FEE_USD)
+        shipping_fee_eur = float(settings.SHIPPING_FEE_EUR)
         total_amount_shipping = 0
         APP_NAME = os.getenv("APP_NAME")
         selected_currency = request.session.get('currency_preference')
@@ -361,11 +363,15 @@ class ShopCartPageView(TemplateView):
             ]
             total_amount = sum(cart_item.subtotal for cart_item in cart_items)
             total_amount_shipping = int(total_amount) + shipping_fee
+            total_amount_shipping_usd = int(total_amount) + shipping_fee_usd
+            total_amount_shipping_eur = int(total_amount) + shipping_fee_eur
 
         if not cart_items:
             shipping_fee = 0.00
             total_amount = 0.00
-            total_amount_shipping = 0.
+            total_amount_shipping = 0.00
+            total_amount_shipping_usd = 0.00
+            total_amount_shipping_eur = 0.00
 
         context = {
             "total_items_in_cart": total_items,
@@ -373,7 +379,11 @@ class ShopCartPageView(TemplateView):
             "cart": cart,
             "total_amount": total_amount,
             "shipping_fee": shipping_fee,
+            "shipping_fee_usd": shipping_fee_usd,
+            "shipping_fee_eur": shipping_fee_eur,
             "total_amount_shipping": total_amount_shipping,
+            "total_amount_shipping_usd": total_amount_shipping_usd,
+            "total_amount_shipping_eur": total_amount_shipping_eur,
             "APP_NAME": APP_NAME,
         }
 

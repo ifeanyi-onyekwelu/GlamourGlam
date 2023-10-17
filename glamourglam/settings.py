@@ -17,6 +17,8 @@ DEBUG = os.getenv('DEBUG', "False").lower() == 'true'
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
 SHIPPING_FEE = os.getenv('SHIPPING_FEE', 10000.00)
+SHIPPING_FEE_USD = os.getenv('SHIPPING_FEE_USD', 10.00)
+SHIPPING_FEE_EUR = os.getenv('SHIPPING_FEE_EUR', 10.00)
 
 # Application definition
 
