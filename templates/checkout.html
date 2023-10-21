@@ -97,25 +97,25 @@
                             <h5>Payment Details</h5>
                             <div class="checkout__form__input">
                                 <p>Card Number <span>*</span></p>
-                                <input type="text">
+                                <input type="text" id="card-number" name="card-number">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Name on card <span>*</span></p>
-                                <input type="text">
+                                <input type="text" id="card-name" name="card-name">
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="checkout__form__input">
                                 <p>Expiry Date <span>*</span></p>
-                                <input type="text">
+                                <input type="text" id="card-expiry" name="card-expiry">
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="checkout__form__input">
                                 <p>CVV <span>*</span></p>
-                                <input type="text">
+                                <input type="text" id="card-cvv" name="card-cvv">
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -173,6 +173,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="checkout__order">
+                        <span class="cart__total" data-selected-currency="{{ request.session.currency_preference }}"></span>
                         <h5>Your order</h5>
                         <div class="checkout__order__product">
                             <ul>
@@ -181,16 +182,16 @@
                                     <span class="top__text__right">Total</span>
                                 </li>
                                 {% for cart_item in cart_items %}
-                                <li>x {{ cart_item.quantity }} {{ cart_item.product.name }} <span>&#8358;
+                                <li>x {{ cart_item.quantity }} {{ cart_item.product.name }} <span><label class="currency"></label>
                                         {{ cart_item.subtotal|intcomma }}</span></li>
                                 {% endfor %}
                             </ul>
                         </div>
                         <div class="checkout__order__total">
-                            <ul>
-                                <li>Shipping Fee <span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></li>
-                                <li>Subtotal <span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></li>
-                                <li>Total <span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
+                            <ul>    
+                                <li>Shipping Fee <span><label class="currency"></label> {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                                <li>Subtotal <span><label class="currency"></label> {{ total_amount|floatformat:2|intcomma }}</span></li>
+                                <li>Total <span><label class="currency"></label> {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
                             </ul>
                         </div>
                         <button type="submit" class="site-btn" id="checkout-btn">Place oder</button>
@@ -205,6 +206,8 @@
 {% endblock content %}
 
 {% block javascript %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
 <script>
     $(document).ready(function () {
         $('#checkout-btn').click(function (event) {
@@ -213,30 +216,71 @@
             // Disable the button
             $('#checkout-btn').prop('disabled', true);
 
-            var formData = $('#checkout__form').serialize(); // Serialize form data
-            var url = "{% url 'app:checkout_page' %}"; // URL for login handler
+            // Retrieve the payment details from the form
+            var cardNumber = document.getElementById("card-number").value;
+            var cardName = document.getElementById("card-name").value;
+            var cardExpiry = document.getElementById("card-expiry").value;
+            var cardCVV = document.getElementById("card-cvv").value;
 
-            // AJAX request
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: formData,
-                success: function (response) {
-                    if (response.success) {
-                        location.href = '/order-complete/' + response.order_id + '/complete/'
+            // Create a Paystack card object with the payment details
+            var card = {
+                number: cardNumber,
+                name: cardName,
+                expiry: cardExpiry,
+                cvv: cardCVV,
+            };
+
+            // Initialize Paystack with your public key
+            var handler = PaystackPop.setup({
+                key: '{{ PAYSTACK_PUBLIC_KEY }}',
+                email: '{{ user_email }}',
+                amount: '{{ total_amount_shipping }}' * 100,
+                card: card,
+                onClose: function () {
+                    console.log('Payment modal closed');
+                },
+                callback: function (response) {
+                    console.log("The response: ", response);
+
+                    if (response.status === 'success') {
+                        // Payment was successful; continue with the form submission
+                        var formData = $('#checkout__form').serialize(); // Serialize form data
+                        var url = "{% url 'app:checkout_page' %}"; // URL for the form submission
+
+                        // Add the Paystack response data to the form data
+                        formData += '&paystack_reference=' + response.reference;
+
+                        // AJAX request for the combined form and payment data
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            data: formData,
+                            success: function (response) {
+                                if (response.success) {
+                                    location.href = '/order-complete/' + response.order_id + '/complete/';
+                                } else {
+                                    $('#checkout-errors').text(response.message);
+                                }
+                            },
+                            error: function (xhr, status, errorThrown) {
+                                // Handle AJAX request error
+                                $('#checkout-errors').text('An error occurred. Please try again.');
+                                console.log(errorThrown);
+                            },
+                            complete: function () {
+                                // Re-enable the button after the request is complete
+                                $('#checkout-btn').prop('disabled', false);
+                            }
+                        });
                     } else {
-                        $('#checkout-errors').text(response.message);
+                        // Payment failed; you may handle this as needed
+                        console.log('Payment failed: ' + response.message);
                     }
-                },
-                error: function () {
-                    // Handle AJAX request error
-                    $('#checkout-errors').text('An error occurred. Please try again.');
-                },
-                complete: function () {
-                    // Re-enable the button after the request is complete
-                    $('#checkout-btn').prop('disabled', false);
                 }
             });
+
+            // Open the Paystack payment modal
+            handler.openIframe();
         });
     });
 
@@ -256,8 +300,6 @@
         // Initial call to set the initial state
         toggleBillingAddressFields();
     });
-
 </script>
-
 
 {% endblock javascript %}

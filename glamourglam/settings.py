@@ -16,9 +16,9 @@ DEBUG = os.getenv('DEBUG', "False").lower() == 'true'
 
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
-SHIPPING_FEE = os.getenv('SHIPPING_FEE', 10000.00)
-SHIPPING_FEE_USD = os.getenv('SHIPPING_FEE_USD', 10.00)
-SHIPPING_FEE_EUR = os.getenv('SHIPPING_FEE_EUR', 10.00)
+SHIPPING_FEE = os.getenv('SHIPPING_FEE')
+SHIPPING_FEE_USD = os.getenv('SHIPPING_FEE_USD')
+SHIPPING_FEE_EUR = os.getenv('SHIPPING_FEE_EUR')
 
 # Application definition
 
@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
@@ -121,7 +121,7 @@ STATICFILES_DIRS = os.path.join(BASE_DIR / 'static'),
 if not DEBUG:
     # Tell Django to copy statics to the `staticfiles` directory
     # in your application directory on Render.
-    STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles')
+    STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles1')
 
     # Turn on WhiteNoise storage backend that takes care of compressing static files
     # and creating unique names for each version so they can safely be cached forever.

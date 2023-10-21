@@ -1,5 +1,6 @@
 import random
 import re
+import time
 import string
 import os
 import requests
@@ -24,7 +25,8 @@ from .utils import (
     create_notification,
     send_order_email,
     send_admin_order_email,
-    calculate_discounted_total
+    calculate_discounted_total,
+    calculate_order_details
 )
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -40,6 +42,7 @@ from .models import *
 from django.core.mail import send_mail
 from django.utils.decorators import method_decorator
 from .decorators import prevent_authenticated_access, cart_not_empty
+from .paystack import Paystack
 import paystack
 
 load_dotenv()
@@ -342,12 +345,17 @@ class ShopCartPageView(TemplateView):
         total_items = 0
         cart_items = None
         cart = None
-        shipping_fee = float(settings.SHIPPING_FEE)
-        shipping_fee_usd = float(settings.SHIPPING_FEE_USD)
-        shipping_fee_eur = float(settings.SHIPPING_FEE_EUR)
         total_amount_shipping = 0
+        shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
+        
         selected_currency = request.session.get('currency_preference')
+
+        if selected_currency == 'USD':
+            shipping_fee = float(settings.SHIPPING_FEE_USD)
+        elif selected_currency == 'EUR':
+            shipping_fee = float(settings.SHIPPING_FEE_EUR)
+    
 
         # If the user is authenticated, handle their cart
         if user.is_authenticated:
@@ -362,16 +370,13 @@ class ShopCartPageView(TemplateView):
                 "quantity__sum"
             ]
             total_amount = sum(cart_item.subtotal for cart_item in cart_items)
-            total_amount_shipping = int(total_amount) + shipping_fee
-            total_amount_shipping_usd = int(total_amount) + shipping_fee_usd
-            total_amount_shipping_eur = int(total_amount) + shipping_fee_eur
+            total_amount_shipping = float(total_amount) + shipping_fee
 
         if not cart_items:
             shipping_fee = 0.00
             total_amount = 0.00
             total_amount_shipping = 0.00
-            total_amount_shipping_usd = 0.00
-            total_amount_shipping_eur = 0.00
+            shipping_fee = 0.00
 
         context = {
             "total_items_in_cart": total_items,
@@ -379,11 +384,7 @@ class ShopCartPageView(TemplateView):
             "cart": cart,
             "total_amount": total_amount,
             "shipping_fee": shipping_fee,
-            "shipping_fee_usd": shipping_fee_usd,
-            "shipping_fee_eur": shipping_fee_eur,
             "total_amount_shipping": total_amount_shipping,
-            "total_amount_shipping_usd": total_amount_shipping_usd,
-            "total_amount_shipping_eur": total_amount_shipping_eur,
             "APP_NAME": APP_NAME,
         }
 
@@ -395,7 +396,7 @@ class ShopCartPageView(TemplateView):
         total_items = 0
         cart_items = None
         cart = None
-        shipping_fee = float(settings.SHIPPING_FEE)
+        shipping_fee = settings.SHIPPING_FEE
         total_amount_shipping = 0
         APP_NAME = os.getenv("APP_NAME")
 
@@ -447,13 +448,22 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             "quantity__sum"
         ]
         cart_items = cart.items.all()
+        # Default shipping fee (in NGN)
         shipping_fee = float(settings.SHIPPING_FEE)
+        selected_currency = request.session.get('currency_preference')
+
+        if selected_currency == 'USD':
+            shipping_fee = float(settings.SHIPPING_FEE_USD)
+        elif selected_currency == 'EUR':
+            shipping_fee = float(settings.SHIPPING_FEE_EUR)
+
         APP_NAME = os.getenv("APP_NAME")
+        PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
+        selected_currency = request.session.get('currency_preference')
 
         for cart_item in cart_items:
             cart_item.first_image = cart_item.product.productimage_set.first()
-
-            cart_item.subtotal = cart_item.quantity * cart_item.product.price
+            cart_item.subtotal = cart_item.subtotal(selected_currency)
 
         discount_code = request.session.get("discount_code", None)
         try:
@@ -477,6 +487,8 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
             "shipping_fee": shipping_fee,
             "total_amount_shipping": total_amount_shipping,
             "APP_NAME": APP_NAME,
+            "PAYSTACK_PUBLIC_KEY": PAYSTACK_PUBLIC_KEY,
+            "user_email": request.user.email,
         }
 
         return render(request, "checkout.html", context)
@@ -493,13 +505,26 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     state=request.POST.get("state"),
                     zipcode=request.POST.get("zipcode"),
                 )
+
+                shipping_address.save()
                 
                 # Check if the "same_billing" checkbox is checked
-                same_billing = request.POST.get("same_billing") == "on"
+                same_billing = request.POST.get("same_billing_address") == "on"
+                print("Same billing: ", same_billing)
 
                 # Create billing address based on the checkbox value
                 if same_billing:
-                    billing_address = shipping_address
+                    billing_address = BillingDetails.objects.create(
+                        user=request.user,
+                        street_address=request.POST.get("address"),
+                        apartment_suite=request.POST.get("billing_address_optional"),
+                        city=request.POST.get("city"),
+                        state_province=request.POST.get("state"),
+                        postal_zip_code=request.POST.get("zipcode"),
+                        country=request.POST.get("country"),
+                    )
+
+                    billing_address.save()
                 else:
                     billing_address = BillingDetails.objects.create(
                         user=request.user,
@@ -510,12 +535,19 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                         postal_zip_code=request.POST.get("billing_zipcode"),
                         country=request.POST.get("billing_country"),
                     )
+                    billing_address.save()
 
                 cart = Cart.objects.get(user=request.user)
                 cart_items = cart.items.all()
 
-                total_price = sum(item.product.price * item.quantity for item in cart_items)
+                total_price = sum(item.product.price_ngn * item.quantity for item in cart_items)
                 shipping_fee = float(settings.SHIPPING_FEE)
+                
+                if selected_currency == 'USD':
+                    shipping_fee = float(settings.SHIPPING_FEE_USD)
+                elif selected_currency == 'EUR':
+                    shipping_fee = float(settings.SHIPPING_FEE_EUR)
+
                 discount_code = request.session.get("discount_code", None)
                 try:
                     discount = DiscountCode.objects.get(code=discount_code)
@@ -529,33 +561,77 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                     discount.is_used = True
                     discount.save()
                 else:
-                    total_amount_shipping = int(total_price) + shipping_fee  
+                    total_amount_shipping = int(total_price) + shipping_fee
 
-                order = Order.objects.create(
-                    user=request.user,
-                    shipping_address=shipping_address,
-                    total_price=total_amount_shipping,
-                    billing_details=billing_address
-                )
-                order.save()
+                # Verify the payment
+                reference = request.POST.get("paystack_reference")
+                print(reference)
+                if reference:
+                    # Verify the payment using the Paystack class or method you've implemented
+                    paystack = Paystack()
+                    status, result = paystack.verify_payment(reference)
+                    print(status)
+                    print(result)
 
-                for cart_item in cart_items:
-                    order_items = OrderItem.objects.create(
-                        order=order,
-                        product=cart_item.product,
-                        quantity=cart_item.quantity,
-                        price=cart_item.product.price,
-                        size=cart_item.size,
-                        color=cart_item.color,
-                    )
+                    if status:
+                        # Check if result is a string (i.e., an error message)
+                        if isinstance(result, str):
+                            return JsonResponse({"success": False, "message": f"Paystack API Error: {result}"})
 
-                    order.items.add(order_items)
-                cart.delete()
-                cart.save()
+                        # Payment was successful; continue with order creation
+                        payment = Payment.objects.create(
+                            user=request.user,
+                            amount=total_amount_shipping,  # Update with the correct amount
+                            ref=reference
+                        )
+                        payment.save()
+                        result['amount'] = int(result['amount'] / 100)
 
-                send_order_email(request, order)
-                send_admin_order_email(request, order)
-                return JsonResponse({"success": True, 'order_id': order.id})
+                        # Check if the 'amount' key is present in the result dictionary
+                        if 'amount' in result and isinstance(result['amount'], int):
+                            result_amount = float(result['amount'])
+
+                            if result_amount == payment.amount:
+                                # Mark the payment as verified in your database
+                                payment.verified = True
+                                payment.save()
+
+                                order = Order.objects.create(
+                                    user=request.user,
+                                    shipping_address=shipping_address,
+                                    total_price=total_amount_shipping,
+                                    billing_details=billing_address
+                                )
+                                order.payment_status = 'Paid'
+                                order.save()
+
+                                for cart_item in cart_items:
+                                    order_items = OrderItem.objects.create(
+                                        order=order,
+                                        product=cart_item.product,
+                                        quantity=cart_item.quantity,
+                                        price=cart_item.product.price_ngn,
+                                        size=cart_item.size,
+                                        color=cart_item.color,
+                                    )
+
+                                    order.items.add(order_items)
+                                cart.delete()
+                                cart.save()
+
+                                selected_currency = request.session.get('currency_preference')
+                                send_order_email(request, order, selected_currency)
+
+                                send_admin_order_email(request, order, selected_currency)
+                                return JsonResponse({"success": True, 'order_id': order.id})
+                            else:
+                                return JsonResponse({"success": False, "message": "Invalid payment amount"})
+                        else:
+                            return JsonResponse({"success": False, "message": "Unexpected response format from Paystack"})
+                    else:
+                        return JsonResponse({"success": False, "message": result['message']})
+                else:
+                    return JsonResponse({"success": False, "message": "Missing reference parameter"})
 
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)})
@@ -664,6 +740,7 @@ class OrderHistoryPage(LoginRequiredMixin, TemplateView):
         return render(request, "order_history.html", context)
 
 
+# views.py
 class OrderDetailsPage(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         order = get_object_or_404(Order, id=kwargs["order_id"])
@@ -675,34 +752,17 @@ class OrderDetailsPage(LoginRequiredMixin, DetailView):
         shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
 
-        for order_item in order_items:
-            order_item.first_image = order_item.product.productimage_set.first()
-            order_item.subtotal = order_item.quantity * order_item.product.price
-
         discount_code = request.session.get("discount_code", None)
-        try:
-            discount = DiscountCode.objects.get(code=discount_code)
-            discount_percentage = discount.percentage
-        except DiscountCode.DoesNotExist:
-            discount = None
-
-        total_amount = float(sum(order_item.subtotal for order_item in order_items))
-        total_amount_shipping = int(total_amount) + shipping_fee
-
-        if discount:
-            discount_amount = (discount.percentage / 100) * total_amount
-            total_amount -= discount_amount
-            total_amount_shipping = int(total_amount) + shipping_fee
+        currency_preference = request.session.get('currency_preference', 'NGN')
 
         context = {
             "total_items_in_cart": total_items,
             "order_items": order_items,
             "order": order,
-            "total_amount": total_amount,
-            "shipping_fee": shipping_fee,
-            "total_amount_shipping": total_amount_shipping,
             "APP_NAME": APP_NAME,
         }
+
+        context.update(calculate_order_details(order_items, discount_code, currency_preference))
 
         return render(request, "order_details.html", context)
 
@@ -715,37 +775,19 @@ class OrderCompletePageView(LoginRequiredMixin, DetailView):
             "quantity__sum"
         ]
         order_items = order.items.all()
-        shipping_fee = float(settings.SHIPPING_FEE)
         APP_NAME = os.getenv("APP_NAME")
 
-        for order_item in order_items:
-            order_item.first_image = order_item.product.productimage_set.first()
-            order_item.subtotal = order_item.quantity * order_item.product.price
-
         discount_code = request.session.get("discount_code", None)
-        try:
-            discount = DiscountCode.objects.get(code=discount_code)
-            discount_percentage = discount.percentage
-        except DiscountCode.DoesNotExist:
-            discount = None
-
-        total_amount = float(sum(order_item.subtotal for order_item in order_items))
-        total_amount_shipping = int(total_amount) + shipping_fee
-
-        if discount:
-            discount_amount = (discount.percentage / 100) * total_amount
-            total_amount -= discount_amount
-            total_amount_shipping = int(total_amount) + shipping_fee
+        currency_preference = request.session.get('currency_preference', 'NGN')
 
         context = {
             "total_items_in_cart": total_items,
             "order_items": order_items,
             "order": order,
-            "total_amount": total_amount,
-            "shipping_fee": shipping_fee,
-            "total_amount_shipping": total_amount_shipping,
             "APP_NAME": APP_NAME,
         }
+
+        context.update(calculate_order_details(order_items, discount_code, currency_preference))
 
         return render(request, "order_complete.html", context)
 
@@ -1279,19 +1321,3 @@ def handleDeleteAccount(request):
 
         return redirect(reverse('app:login_page'))
     return JsonResponse({"error": "Invalid request method"})
-
-
-def custom_error_404(request, exception):
-    APP_NAME = os.getenv("APP_NAME")
-    context = {
-        "APP_NAME": APP_NAME,
-    }
-    return render(request, "404.html", context, status=404)
-
-
-def custom_error_500(request):
-    APP_NAME = os.getenv("APP_NAME")
-    context = {
-        "APP_NAME": APP_NAME,
-    }
-    return render(request, "500.html", context, status=500)

@@ -136,6 +136,27 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__close">+</div>
         <ul class="offcanvas__widget">
+            <li>
+                <form method="post" action="{% url 'app:set_currency_preference' %}">
+                    {% csrf_token %}
+                    <select name="currency_preference" onchange="this.form.submit()" class="currency_preference">
+                        {% if request.session.currency_preference == 'USD' %}
+                        <option value="USD">USD</option>
+                        <option value="NGN">NGN</option>
+                        <option value="EUR">EUR</option>
+                        {% elif request.session.currency_preference == 'NGN' %}
+                        <option value="NGN">NGN</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        {% elif request.session.currency_preference == 'EUR' %}
+                        <option value="EUR">EUR</option>
+                        <option value="NGN">NGN</option>
+                        <option value="USD">USD</option>
+                        {% endif %}
+                        <!-- Add more currency options as needed -->
+                    </select>
+                </form>
+            </li>
             <li><span class="icon_search search-switch"></span></li>
             {% if request.user.is_authenticated %}
             <li>
@@ -209,7 +230,7 @@
                 <div class="col-xl-2 col-lg-2">
                     <div class="header__logo">
                         <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
-                                width="200" /></a>
+                                width="300" /></a>
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-7">
@@ -266,13 +287,13 @@
                                             <option value="NGN">NGN</option>
                                             <option value="EUR">EUR</option>
                                         {% elif request.session.currency_preference == 'NGN' %}
-                                        <option value="NGN">NGN</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
                                         {% elif request.session.currency_preference == 'EUR' %}
-                                        <option value="EUR">EUR</option>
-                                        <option value="NGN">NGN</option>
-                                        <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="USD">USD</option>
                                         {% endif %}
                                         <!-- Add more currency options as needed -->
                                     </select>

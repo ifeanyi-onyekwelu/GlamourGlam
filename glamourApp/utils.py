@@ -41,18 +41,20 @@ def create_notification(title, notification, notification_type='Reports'):
     )
     new_notification.save()
 
-def send_order_email(request, order):
-    subject = f"Your Order Confirmation - Order #{order.id}"
-    recipient_email = order.user.email  # Assuming you have the user's email
+def get_order_email_context(request, order, selected_currency):
+    order_items = order.items.all()
+    shipping_fee = float(settings.SHIPPING_FEE)
     APP_NAME = os.getenv('APP_NAME')
     APP_URL = os.getenv('APP_URL')
 
-    order_items = order.items.all()
-    shipping_fee = float(settings.SHIPPING_FEE)
+    if selected_currency == 'USD':
+        shipping_fee = float(settings.SHIPPING_FEE_USD)
+    elif selected_currency == 'EUR':
+        shipping_fee = float(settings.SHIPPING_FEE_EUR)
 
     for order_item in order_items:
         order_item.first_image = order_item.product.productimage_set.first()
-        order_item.subtotal = order_item.quantity * order_item.product.price
+        order_item.subtotal = order_item.subtotal(selected_currency)
 
     discount_code = request.session.get("discount_code", None)
     try:
@@ -62,80 +64,84 @@ def send_order_email(request, order):
         discount = None
 
     total_amount = float(sum(order_item.subtotal for order_item in order_items))
-    total_amount_shipping = int(total_amount) + shipping_fee
+    print(total_amount)
+    total_amount_shipping = float(total_amount) + shipping_fee
 
     if discount:
         discount_amount = (discount.percentage / 100) * total_amount
         total_amount -= discount_amount
-        total_amount_shipping = int(total_amount) + shipping_fee
+        total_amount_shipping = float(total_amount) + shipping_fee
 
-    context = {
+    return {
         "order_items": order_items,
         "order": order,
         "total_amount": total_amount,
         "shipping_fee": shipping_fee,
         "total_amount_shipping": total_amount_shipping,
-        "APP_NAME": APP_NAME,
-        "APP_URL": APP_URL
     }
+
+def send_order_email(request, order, selected_currency):
+    subject = f"Your Order Confirmation - Order #{order.id}"
+    recipient_email = order.user.email
+
+    context = get_order_email_context(request, order, selected_currency)
 
     message = render_to_string("email/order_confirmation.html", context)
 
     send_mail(
         subject,
         "",
-        settings.DEFAULT_EMAIL,  # Sender's email
-        [recipient_email],  # Recipient's email
+        settings.DEFAULT_EMAIL,
+        [recipient_email],
         html_message=message,
     )
 
-def send_admin_order_email(request, order):
+def send_admin_order_email(request, order, selected_currency):
     subject = f"Order Confirmation - Order #{order.order_number}"
     recipient_email = settings.DEFAULT_EMAIL
-    APP_NAME = os.getenv('APP_NAME')
-    APP_URL = os.getenv('APP_URL')
 
-    order_items = order.items.all()
-    shipping_fee = float(settings.SHIPPING_FEE)
-
-    for order_item in order_items:
-        order_item.first_image = order_item.product.productimage_set.first()
-        order_item.subtotal = order_item.quantity * order_item.product.price
-
-    discount_code = request.session.get("discount_code", None)
-    try:
-        discount = DiscountCode.objects.get(code=discount_code)
-        discount_percentage = discount.percentage
-    except DiscountCode.DoesNotExist:
-        discount = None
-
-    total_amount = float(sum(order_item.subtotal for order_item in order_items))
-    total_amount_shipping = int(total_amount) + shipping_fee
-
-    if discount:
-        discount_amount = (discount.percentage / 100) * total_amount
-        total_amount -= discount_amount
-        total_amount_shipping = int(total_amount) + shipping_fee
-
-    context = {
-        "order_items": order_items,
-        "order": order,
-        "total_amount": total_amount,
-        "shipping_fee": shipping_fee,
-        "total_amount_shipping": total_amount_shipping,
-        "APP_NAME": APP_NAME,
-        "APP_URL": APP_URL
-    }
+    context = get_order_email_context(request, order, selected_currency)
 
     message = render_to_string("email/admin_order_confirmation.html", context)
 
     send_mail(
         subject,
         "",
-        settings.DEFAULT_EMAIL,  # Sender's email
-        [recipient_email],  # Recipient's email
+        settings.DEFAULT_EMAIL,
+        [recipient_email],
         html_message=message,
     )
+
+# views.py
+
+def calculate_order_details(order_items, discount_code, selected_currency):
+    total_amount = 0
+    total_amount_shipping = 0
+    shipping_fee = float(settings.SHIPPING_FEE)
+
+    if selected_currency == 'USD':
+        shipping_fee = float(settings.SHIPPING_FEE_USD)
+    elif selected_currency == 'EUR':
+        shipping_fee = float(settings.SHIPPING_FEE_EUR)
+
+    for order_item in order_items:
+        order_item.first_image = order_item.product.productimage_set.first()
+        order_item.subtotal = order_item.subtotal(selected_currency)
+
+    total_amount = float(sum(order_item.subtotal for order_item in order_items))
+    total_amount_shipping = float(total_amount) + shipping_fee
+
+    if discount_code:
+        discount_amount = calculate_discount_amount(discount_code)
+        total_amount -= discount_amount
+        total_amount_shipping = float(total_amount) + shipping_fee
+
+    return {
+        "total_amount": total_amount,
+        "shipping_fee": shipping_fee,
+        "total_amount_shipping": total_amount_shipping,
+    }
+
 
 def calculate_discounted_total(total, discount_percentage):
     discount_amount = (discount_percentage / 100) * total

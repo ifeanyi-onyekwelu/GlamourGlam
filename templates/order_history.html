@@ -50,8 +50,7 @@
                             <div class="card-body">
                                 <p class="card-text d-flex align-items-center justify-content-between">
                                 <div class="row">
-                                    <span class="col-lg-10">Order Number: {{ order_item_data.order.order_number
-                                        }}</span>
+                                    <span class="col-lg-10">Order Number: {{ order_item_data.order.order_number }}</span>
                                     <span class="col-lg-2"><a
                                             href="{% url 'app:order_details' order_item_data.order.id %}"
                                             class="btn btn-sm custom-outline-background">Order Details</a></span>

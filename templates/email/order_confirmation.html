@@ -461,43 +461,69 @@ h6 {
                 <h2>Order Details</h2>
                 <div class="table-responsive">
                     <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Product Details</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order_item in order_items %}
-                            <tr>
-                                <td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
-                                <td>x {{ order_item.quantity }}</td>
-                                <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
-                            </tr>
-                            {% endfor %}
-                            <tr>
-                                <td>SUBTOTAL</td>
-                                <td>
-                                    <h5></h5>
-                                </td>
-                                <td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
-                            </tr>
-                            <tr>
-                                <td>SHIPPING</td>
-                                <td>
-                                    <h5></h5>
-                                </td>
-                                <td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
-                            </tr>
-                            <tr>
-                                <td>TOTAL</td>
-                                <td>
-                                    <h5></h5>
-                                </td>
-                                <td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
-                            </tr>
-                        </tbody>
+                      <thead>
+                        <tr>
+                          <th scope="col">Product Details</th>
+                          <th scope="col">Quantity</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for order_item in order_items %}
+                        <tr>
+                          <td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
+                          <td>x {{ order_item.quantity }}</td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ order_item.subtotal|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ order_item.subtotal|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
+                          {% endif %}
+                        
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                          <td>SUBTOTAL</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                        <tr>
+                          <td>SHIPPING</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                        <tr>
+                          <td>TOTAL</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                    
+                      </tbody>
                     </table>
                 </div>
             </div>

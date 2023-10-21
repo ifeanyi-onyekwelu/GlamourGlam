@@ -4,6 +4,8 @@ import uuid
 import random
 from django.utils import timezone
 import string
+import secrets
+from .paystack import Paystack
 
 
 class Category(models.Model):
@@ -147,8 +149,16 @@ class OrderItem(models.Model):
     color = models.CharField(max_length=20, null=True, blank=True, default="Default Color")
     size = models.CharField(max_length=20, null=True, blank=True, default="Default Size")
 
-    def subtotal(self):
-        return self.item_price * self.quantity
+    def subtotal(self, selected_currency):
+        if selected_currency == 'USD':
+            return self.product.price_usd * self.quantity
+        elif selected_currency == 'NGN':
+            return self.product.price_ngn * self.quantity
+        elif selected_currency == 'EUR':
+            return self.product.price_eur * self.quantity
+        else:
+            # Handle the case when the selected currency is not recognized
+            return 0
 
 class ShippingAddress(models.Model):
     id = models.UUIDField(
@@ -270,3 +280,43 @@ class WishListItem(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="wishlist_item", on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
+
+class Payment(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    ref = models.CharField(max_length=200)
+    email = models.EmailField()
+    verified = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('date_created',)
+
+    def __str__(self):
+        return f"Payment: {self.amount}"
+
+    def save(self, *args, **kwargs):
+        while not self.ref:
+            ref = secrets.token_urlsafe(50)
+            object_with_similar_ref = Payment.objects.filter(ref=ref)
+            
+            if not object_with_similar_ref:
+                self.ref = ref
+
+        super().save(*args, **kwargs)
+
+
+    def amount_value(self):
+        return float(self.amount) * 100
+
+
+    def verify_payment(self):
+        paystack = Paystack()
+        status, result = paystack.verify_payment(self.ref, self.amount)
+        if status:
+            if result['amount'] / 100 == self.amount:
+                self.verified = True
+            self.save()
+        if self.verified:
+            return True
+        return False

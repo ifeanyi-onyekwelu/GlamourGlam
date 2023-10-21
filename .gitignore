@@ -32,4 +32,4 @@ __pycache__/
 # Ignore local development settings (if you have different settings for local development)
 settings_local.py
 
-
+/media/

@@ -1,4 +1,4 @@
-# from django.contrib import admin
+from django.contrib import admin
 # from .models import (
 #     Product,
 #     Order,
@@ -14,6 +14,8 @@
 #     Notification,
 #     ProductColor
 # )
+
+from .models import Payment
 
 # # Register your models here.
 
@@ -112,6 +114,10 @@
 #         "active"
 #     ]
 
+class  PaymentAdmin(admin.ModelAdmin):
+    list_display  = ["id", "ref", 'amount', "verified", "date_created"]
+
+admin.site.register(Payment, PaymentAdmin)
 
 
 # admin.site.register(Product, ProductAdmin)
