@@ -42,7 +42,7 @@ class Product(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     description = models.TextField(default="")
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
 
     sizes = models.ManyToManyField('ProductSize', related_name='products', default="",)
     colors = models.ManyToManyField('ProductColor', related_name='products', default="")
@@ -76,7 +76,7 @@ class Cart(models.Model):
         editable=False
     )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
 class CartItem(models.Model):
@@ -112,7 +112,7 @@ class Order(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     items = models.ManyToManyField('OrderItem', related_name='orders')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     order_number = models.CharField(max_length=200, default="")
     payment_status_choices = [
         ('PENDING', 'Pending'),
@@ -174,7 +174,7 @@ class ShippingAddress(models.Model):
     city = models.CharField(max_length=200)
     state = models.CharField(max_length=200)
     zipcode = models.CharField(max_length=200)
-    date_added = models.DateField(auto_now_add=True)
+    date_added = models.DateField(default=timezone.now)
 
 class BillingDetails(models.Model):
     id = models.UUIDField(
@@ -206,7 +206,7 @@ class Return(models.Model):
         ('A', 'Approved'),
         ('R', 'Rejected')
     ), default='P')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class DiscountCode(models.Model):
     id = models.UUIDField(
@@ -254,7 +254,7 @@ class Notification(models.Model):
     title = models.CharField(max_length=255)
     notification = models.CharField(max_length=255)
     notification_type = models.CharField(max_length=255, choices=NOTIFICATION_TYPE, default='Reports')
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
 
     def formatted_datetime(self):
         return self.date_created.strftime("%B %d, %Y")
@@ -271,7 +271,7 @@ class Review(models.Model):
     authorEmail = models.CharField(max_length=255, default="")
     authorPhoneNumber = models.CharField(max_length=255, default="")
     ratings = models.CharField(max_length=10, default="1")
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
 
 class NewsletterSubscribers(models.Model):
     email = models.CharField(max_length=255, default="")
@@ -279,7 +279,7 @@ class NewsletterSubscribers(models.Model):
 class WishListItem(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="wishlist_item", on_delete=models.CASCADE)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
 
 class Payment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
@@ -287,7 +287,7 @@ class Payment(models.Model):
     ref = models.CharField(max_length=200)
     email = models.EmailField()
     verified = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ('date_created',)

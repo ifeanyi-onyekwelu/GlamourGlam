@@ -21,6 +21,14 @@
 {% endif %}
 {% endblock cart_num_offcanvas %}
 
+{% block customstyletemp %}
+   <style>
+    p strong {
+        font-size: 18px;
+    }
+   </style>
+{% endblock customstyletemp %}
+
 {% block content %}
 <!-- Breadcrumb Begin -->
 <div class="breadcrumb-option">
@@ -96,30 +104,29 @@
             - On occasion, we may issue partial refunds for products returned with missing parts, packaging damage, or
             indications of use that significantly affect the product's value.</p>
 
-        <p><strong>3. Exchanges</strong></p>
-
-        <p><strong>3.1. Exchanges:</strong><br>
+        <p><strong>3. Exchanges</strong> <br>
             - At present, we don't facilitate direct product exchanges. If you desire an exchange, you'll need to return
             the
-            original item and then place a new order.</p>
+            original item and then place a new order.
+        </p>
 
-        <p><strong>4. Damaged or Defective Products</strong></p>
-
-        <p><strong>4.1. Damaged or Defective Products:</strong><br>
+        <p><strong>4. Damaged or Defective Products</strong> <br>
             - Should you receive a product damaged during shipping or with a defect, please notify us within 7 days of
             receiving the item.<br>
-            - To expedite the resolution process, we may request photographic evidence of the damage or defect.</p>
+            - To expedite the resolution process, we may request photographic evidence of the damage or defect.
+        </p>
+
 
         <p><strong>5. Contact Us</strong></p>
 
-        <p>If you have any inquiries or concerns about our Return & Refund Policy, please don't hesitate to reach out to
+        <p>- If you have any inquiries or concerns about our Return & Refund Policy, please don't hesitate to reach out to
             our
             dependable customer support team at [customer support email/phone number].</p>
 
-        <p>Please keep in mind that this policy is subject to change without prior notice. It's your responsibility to
+        <p>- Please keep in mind that this policy is subject to change without prior notice. It's your responsibility to
             periodically review the policy for updates.</p>
 
-        <p>By making a purchase on {{ APP_NAME }}, you acknowledge that you have read, understood, and
+        <p>- By making a purchase on {{ APP_NAME }}, you acknowledge that you have read, understood, and
             accepted the terms of this Return & Refund Policy.</p>
     </div>
 </section>

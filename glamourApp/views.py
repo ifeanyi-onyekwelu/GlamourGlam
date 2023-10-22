@@ -1054,7 +1054,7 @@ def handleAddToCart(request, product_id, color_selected, size_selected, quantity
 
     print(cart_item_subtotal)
 
-    return redirect(reverse("app:cart_page"))
+    return redirect(request.META.get('HTTP_REFERER', ''))
 
 
 @login_required

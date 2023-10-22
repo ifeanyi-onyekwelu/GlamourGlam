@@ -77,7 +77,10 @@ $(document).ready(function () {
     }
 
     // Update the currency icon
+    console.log(currencySymbol)
     $(".currency-icon").text(currencySymbol);
+    $(".currency").text(currencySymbol);
+    $(".currency-checkout").text(currencySymbol);
   }
 
   function formatPrice(price, selectedCurrency) {

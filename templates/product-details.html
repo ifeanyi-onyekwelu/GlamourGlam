@@ -334,9 +334,20 @@
                         <div class="product__item__pic set-bg" data-setbg="{{ image.image.url }}">
                             <div class="label new">New</div>
                             <ul class="product__hover">
-                                <li><a href="{{ image.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                <li><a class="add-to-cart-link" href="" data-product-id="{{ related_product.id }}"><span class="icon_bag_alt"></span></a></li>
-                                <li><a href="{% url 'app:product_detail_page' related_product.id %}"><span class="icon_link_alt"></span></a></li>
+                                <li><a href="#" id="add-to-wishlist-button"><span
+                                            class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o{% endif %}"
+                                            data-product-id="{{ product_info.product.id }}"></span></a></li>
+                                {% for color in related_product.colors.all %}
+                                {% for size in related_product.sizes.all %}
+                                {% if forloop.parentloop.first and forloop.first %}
+                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button" data-product-id="{{ related_product.id }}"
+                                        data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a>
+                                </li>
+                                {% else %}
+                                {% endif %}
+                                {% endfor %}
+                                {% endfor %}
+                                <li><a href="{% url 'app:product_detail_page' related_product.id %}"><span class="fa fa-plus"></span></a></li>
                             </ul>
                         </div>
                         {% endwith %}
