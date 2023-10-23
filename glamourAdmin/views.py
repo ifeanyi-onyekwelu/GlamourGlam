@@ -784,7 +784,7 @@ def edit_profile(request):
 @admin_only_required
 def change_password(request):
     if request.method == 'POST':
-        oldPassword = request.POST.get('oldPassword')
+        oldPassword = request.POST.get('currentPassword')
         newPassword = request.POST.get('newPassword')
 
         user = CustomUser.objects.get(username=request.user.username, email=request.user.email)

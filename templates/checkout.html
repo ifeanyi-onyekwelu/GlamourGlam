@@ -68,29 +68,29 @@
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Phone <span>*</span></p>
-                                <input type="text" name="phone" id="phone">
+                                <input type="text" name="phone" id="phone" placeholder="Phone Number" required>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Country <span>*</span></p>
-                                <input type="text" name="country" id="country">
+                                <input type="text" name="country" id="country" placeholder="Country" required>
                             </div>
                             <div class="checkout__form__input">
                                 <p>State <span>*</span></p>
-                                <input type="text" name="state" id="state">
+                                <input type="text" name="state" id="state" placeholder="State" required>
                             </div>
                             <div class="checkout__form__input">
                                 <p>Address <span>*</span></p>
-                                <input type="text" name="address" id="address" placeholder="Street Address">
+                                <input type="text" name="address" id="address" placeholder="Street Address" required>
                             </div>
                             <div class="checkout__form__input">
                                 <p>Town/City <span>*</span></p>
-                                <input type="text" name="city" id="city">
+                                <input type="text" name="city" id="city" placeholder="City" required> 
                             </div>
                             <div class="checkout__form__input">
                                 <p>Postcode/Zip <span>*</span></p>
-                                <input type="text" name="zipcode" id="zipcode">
+                                <input type="text" name="zipcode" id="zipcode" placeholder="Postal/Zip" required>
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -132,38 +132,38 @@
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>Street Address <span>*</span></p>
-                                        <input type="text" name="billing_address" class="billing-address-field">
+                                        <input type="text" name="billing_address" class="billing-address-field" placeholder="Street Address">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>Apartment, suite, etc. (optional)</p>
                                         <input type="text" name="billing_address_optional"
-                                            class="billing-address-field">
+                                            class="billing-address-field" placeholder="Apartment, suite, etc. (optional)">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>City <span>*</span></p>
-                                        <input type="text" name="billing_city" class="billing-address-field">
+                                        <input type="text" name="billing_city" class="billing-address-field" placeholder="City">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>State/Province <span>*</span></p>
-                                        <input type="text" name="billing_state" class="billing-address-field">
+                                        <input type="text" name="billing_state" class="billing-address-field" placeholder="State/Province">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>Postal/ZIP Code <span>*</span></p>
-                                        <input type="text" name="billing_zipcode" class="billing-address-field">
+                                        <input type="text" name="billing_zipcode" class="billing-address-field" placeholder="Postal/Zip">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="checkout__form__input">
                                         <p>Country <span>*</span></p>
-                                        <input type="text" name="billing_country" class="billing-address-field">
+                                        <input type="text" name="billing_country" class="billing-address-field" placeholder="Country">
                                     </div>
                                 </div>
                                 <!-- Other billing address fields go here -->
@@ -215,6 +215,40 @@
 
             // Disable the button
             $('#checkout-btn').prop('disabled', true);
+            $("#checkout-btn").text("")
+            $("#checkout-btn").append("<i class='fa fa-spinner fa-spin'></i>")
+
+            // Retrieve the state and country details from the form
+            let phone = document.getElementById("phone").value;
+            let state = document.getElementById("state").value;
+            let country = document.getElementById("country").value;
+            let address = document.getElementById("address").value;
+            let city = document.getElementById("city").value;
+            let zipcode = document.getElementById("zipcode").value;
+
+            // Check if either the state or country field is empty
+            if (phone ==="" || state === "" || country === "" || address === "" || city === "" || zipcode === "") {
+                // At least one of the fields is empty, highlight them in red
+                if (state === "") {
+                    document.getElementById("state").style.borderColor = "red";
+                }
+                if (phone === "") {
+                    document.getElementById("phone").style.borderColor = "red";
+                }
+                if (address === "") {
+                    document.getElementById("address").style.borderColor = "red";
+                }
+                if (country === "") {
+                    document.getElementById("country").style.borderColor = "red";
+                }
+                if (city === "") {
+                    document.getElementById("city").style.borderColor = "red";
+                }
+                if (zipcode === "") {
+                    document.getElementById("zipcode").style.borderColor = "red";
+                }
+                return; // Do not proceed with the payment
+            }
 
             // Retrieve the payment details from the form
             var cardNumber = document.getElementById("card-number").value;
@@ -260,12 +294,15 @@
                                     location.href = '/order-complete/' + response.order_id + '/complete/';
                                 } else {
                                     $('#checkout-errors').text(response.message);
+                                    $("#checkout-btn").text("Register")
+                                    $("#checkout-btn").children().remove();
                                 }
                             },
                             error: function (xhr, status, errorThrown) {
                                 // Handle AJAX request error
                                 $('#checkout-errors').text('An error occurred. Please try again.');
-                                console.log(errorThrown);
+                                $("#checkout-btn").text("Register");
+                                $("#checkout-btn").children().remove();
                             },
                             complete: function () {
                                 // Re-enable the button after the request is complete

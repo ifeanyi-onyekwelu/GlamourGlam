@@ -543,6 +543,7 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                 total_price = sum(item.product.price_ngn * item.quantity for item in cart_items)
                 shipping_fee = float(settings.SHIPPING_FEE)
                 
+                selected_currency = request.session.get('currency_preference')
                 if selected_currency == 'USD':
                     shipping_fee = float(settings.SHIPPING_FEE_USD)
                 elif selected_currency == 'EUR':
@@ -619,7 +620,6 @@ class CheckoutPageView(LoginRequiredMixin, CreateView):
                                 cart.delete()
                                 cart.save()
 
-                                selected_currency = request.session.get('currency_preference')
                                 send_order_email(request, order, selected_currency)
 
                                 send_admin_order_email(request, order, selected_currency)
@@ -1164,6 +1164,7 @@ def handleUpdateCart(request, color, size):
 def handleSubscribeToNewsLetter(request):
     if request.method == "POST":
         email = request.POST.get("email")
+        print(email)
 
         # HANDLE SEND EMAIL AFTER REGISTRATION
         subject = "💌 Thanks for Joining Our Newsletter! 🎉"
