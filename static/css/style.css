@@ -1799,6 +1799,10 @@ ol {
   height: 30px;
 }
 
+.qyt-no-form .qtybtn:hover {
+  background: #bda06a;
+}
+
 .qyt-no-form input {
   font-size: 14px;
   color: #666666;
