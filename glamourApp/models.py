@@ -3,9 +3,14 @@ from django.contrib.auth import get_user_model
 import uuid
 import random
 from django.utils import timezone
+import datetime
 import string
 import secrets
 from .paystack import Paystack
+
+now = timezone.now()
+naive_datetime = datetime.datetime(year=now.year, month=now.month, day=now.day, hour=now.hour, minute=now.minute, second=now.second)
+aware_datetime = timezone.make_aware(naive_datetime, timezone=timezone.get_current_timezone())
 
 
 class Category(models.Model):
@@ -42,7 +47,7 @@ class Product(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     description = models.TextField(default="")
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    date_created = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=aware_datetime)
 
     sizes = models.ManyToManyField('ProductSize', related_name='products', default="",)
     colors = models.ManyToManyField('ProductColor', related_name='products', default="")
@@ -254,7 +259,7 @@ class Notification(models.Model):
     title = models.CharField(max_length=255)
     notification = models.CharField(max_length=255)
     notification_type = models.CharField(max_length=255, choices=NOTIFICATION_TYPE, default='Reports')
-    date_created = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=aware_datetime)
 
     def formatted_datetime(self):
         return self.date_created.strftime("%B %d, %Y")
@@ -271,7 +276,7 @@ class Review(models.Model):
     authorEmail = models.CharField(max_length=255, default="")
     authorPhoneNumber = models.CharField(max_length=255, default="")
     ratings = models.CharField(max_length=10, default="1")
-    date_created = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=aware_datetime)
 
 class NewsletterSubscribers(models.Model):
     email = models.CharField(max_length=255, default="")
@@ -279,7 +284,7 @@ class NewsletterSubscribers(models.Model):
 class WishListItem(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="wishlist_item", on_delete=models.CASCADE)
-    date_created = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=aware_datetime)
 
 class Payment(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
@@ -287,7 +292,7 @@ class Payment(models.Model):
     ref = models.CharField(max_length=200)
     email = models.EmailField()
     verified = models.BooleanField(default=False)
-    date_created = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=aware_datetime)
 
     class Meta:
         ordering = ('date_created',)

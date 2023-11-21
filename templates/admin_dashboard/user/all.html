@@ -110,11 +110,13 @@
                                 {% else %}
                                 <td><span class="badge badge-danger">Suspended</span></td>
                                 {% endif %}
-                            
+
                                 {% if user.is_active == True %}
-                                <td><a href="{% url 'my_admin:mark_user_as_suspended' user.id %}" class="btn btn-sm btn-danger">Suspend</a></td>
+                                <td><a href="{% url 'my_admin:mark_user_as_suspended' user.id %}"
+                                        class="btn btn-sm btn-danger">Suspend</a></td>
                                 {% else %}
-                                <td><a href="{% url 'my_admin:mark_user_as_active' user.id %}" class="btn btn-sm btn-info">Activate</a></td>
+                                <td><a href="{% url 'my_admin:mark_user_as_active' user.id %}"
+                                        class="btn btn-sm btn-info">Activate</a></td>
                                 {% endif %}
                                 <!-- <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td> -->
                             </tr>

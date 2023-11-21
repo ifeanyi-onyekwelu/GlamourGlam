@@ -12,7 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', "False").lower() == 'true'
+DEBUG = os.getenv('DEBUGG').lower() == 'true'
+
 
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
 
@@ -75,18 +76,18 @@ WSGI_APPLICATION = 'glamourglam.wsgi.application'
 
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': os.getenv('DB_NAME'),
-    #     'USER': os.getenv('DB_USER'),
-    #     'PASSWORD': os.getenv('DB_PASSWORD'),
-    #     'HOST': os.getenv('DB_HOST'),
-    #     'PORT': os.getenv('DB_PORT'),
-    # }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+    }
 }
 
-database_url = os.getenv('DB_URL')
-DATABASES['default'] = dj_database_url.parse(database_url)
+# database_url = os.getenv('DB_URL')
+# DATABASES['default'] = dj_database_url.parse(database_url)
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,7 +121,6 @@ STATICFILES_DIRS = os.path.join(BASE_DIR / 'static'),
 
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles')
-
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # MEDIA CONFIGURATION

@@ -115,7 +115,7 @@ class CategoryPageView(ListView):
         context["APP_NAME"] = APP_NAME.title()
         return context
 
-# Create your views here.
+
 class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:

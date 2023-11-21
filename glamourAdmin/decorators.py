@@ -19,11 +19,10 @@ def admin_or_staff_required(f):
     @wraps(f)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect(reverse('my_admin:login'))
-        elif not request.user.is_superuser or not request.user.is_staff:
+            return redirect(reverse('app:login_page'))
+        if not request.user.is_superuser or not request.user.is_staff:
             return redirect(reverse('my_admin:admin_only'))
-        else:
-            return f(request, *args, **kwargs)
+        return f(request, *args, **kwargs)
     return wrapper
 
 def prevent_authenticated_access(redirect_url_name):
