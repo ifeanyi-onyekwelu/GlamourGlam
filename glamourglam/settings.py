@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUGG").lower() == "true"
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 SHIPPING_FEE = os.getenv("SHIPPING_FEE")
 SHIPPING_FEE_USD = os.getenv("SHIPPING_FEE_USD")
