@@ -1,0 +1,73 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Dropshipping{% endblock title %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Dropshipping</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<section class="shop spad">
+    <div class="container">
+        <p style="font-size: 23px;"><strong>Dropshipping Policy</strong></p>
+
+        <p>Thank you for shopping at {{ APP_NAME }}. This Dropshipping Policy explains how dropshipping works on our platform and outlines the terms and conditions related to dropshipped products. By making a purchase on our website, you acknowledge and agree to the terms outlined in this policy.</p>
+
+        <p style="font-size: 17px;"><strong>1. Definition of Dropshipping:</strong></p>
+        <p>Dropshipping is a business model where we partner with third-party suppliers who directly fulfill and ship orders to customers. This means that when you place an order for a dropshipped product, the product will be shipped to you directly from our supplier's warehouse.</p>
+
+        <p style="font-size: 17px;"><strong>2. Product Availability:</strong></p>
+        <p>Products available for purchase on our website may include both products we stock in-house and products that are dropshipped. Dropshipped products are sourced from trusted suppliers who meet our quality standards.</p>
+
+        <p style="font-size: 17px;"><strong>3. Shipping and Delivery:</strong></p>
+        <p>Shipping times for dropshipped products may vary based on the supplier's location, shipping method, and destination. Please refer to the individual product page for estimated shipping times. We strive to provide accurate delivery estimates, but these may be subject to change due to unforeseen circumstances.</p>
+
+        <p style="font-size: 17px;"><strong>4. Returns and Refunds:</strong></p>
+        <p>Returns and refunds for dropshipped products are subject to our standard <a href="{% url 'app:returns_and_refunds_page' %}" style="color: #666666; text-decoration: underline;">Returns policy</a>. Please review this policy for details on how returns and refunds are handled.</p>
+
+        <p style="font-size: 17px;"><strong>5. Product Quality:</strong></p>
+        <p>We work closely with our dropshipping suppliers to ensure the quality of the products they provide. However, we cannot directly inspect each individual product before shipping. If you receive a dropshipped product that does not meet your expectations or arrives damaged, please follow our return process as outlined in our <a href="{% url 'app:returns_and_refunds_page' %}" style="color: #666666; text-decoration: underline;">Returns policy</a>.</p>
+
+        <p style="font-size: 17px;"><strong>6. Product Information and Images:</strong></p>
+        <p>Product information and images provided on our website are based on the information provided by our suppliers. We strive to ensure accuracy, but we cannot guarantee that product descriptions and images are entirely error-free. If you have any concerns about a product's description or appearance, please contact our customer support team.</p>
+
+        <p style="font-size: 17px;"><strong>7. Contact Us:</strong></p>
+        <p>If you have any questions or concerns regarding our Dropshipping Policy, please feel free to contact our customer support team at [customer support email/phone number].</p>
+
+        <p style="font-size: 17px;"><strong>8. Changes to the Dropshipping Policy:</strong></p>
+        <p>We reserve the right to update or modify this Dropshipping Policy at any time. Any changes will be posted on this page, and the effective date will be updated accordingly. It is your responsibility to review this policy periodically for updates.</p>
+
+    </div>
+</section>
+
+{% endblock %}

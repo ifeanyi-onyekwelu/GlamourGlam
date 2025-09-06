@@ -1,0 +1,82 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+
+{% block title %}Admin login{% endblock title %}
+
+{% block content %}
+<!-- Login Content -->
+<div class="container-login">
+  <div class="row justify-content-center">
+    <div class="col-xl-6 col-lg-12 col-md-9">
+      <div class="card shadow-sm my-5">
+        <div class="card-body p-0">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="login-form">
+                <div class="text-center">
+                  <h1 class="h4 text-gray-900 mb-4">Login</h1>
+                </div>
+                <form class="userForm" method="post">
+                  {% csrf_token %}
+                  <div class="errorMsg" style="text-align: center; margin-bottom: 10px; color: red; font-weight: bold;"></div>
+                  <div class="form-group">
+                    <input type="email" class="form-control" id="exampleInputEmail" name="email" aria-describedby="emailHelp"
+                      placeholder="Enter Email Address">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" class="form-control" id="exampleInputPassword" name="password" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <input type="submit" value="Login" class="btn btn-primary btn-block">
+                  </div>
+                  <hr>
+                  <a href="{% url 'my_admin:signup' %}">Don't have an account?</a>
+                </form>
+                <hr>
+                <div class="text-center">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Login Content -->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+  $(document).ready(function () {
+
+    $('.errorMsg').text('');
+
+    $('.userForm').on('submit', function (event) {
+      event.preventDefault();
+
+
+      $.ajax({
+        method: 'POST',
+        url: "{% url 'my_admin:login' %}",
+        data: {
+          'email': $('#exampleInputEmail').val(),
+          'password': $('#exampleInputPassword').val(),
+          'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        success: function (data) {
+          if (data.success) {
+            location.href = "{% url 'my_admin:dashboard' %}"
+          } else if (!(data.success)) {
+            $(".errorMsg").text(data.message);
+          }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          $(".errorMsg").text(errorThrown);
+        }
+      })
+    })
+
+  })
+</script>
+{% endblock javascript %}

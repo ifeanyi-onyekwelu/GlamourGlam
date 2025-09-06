@@ -1,0 +1,109 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Terms Of Service{% endblock title %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block customstyletemp %}
+<style>
+    p strong {
+        font-size: 18px;
+    }
+
+    p {
+        margin: 2rem 0 !important;
+    }
+</style>
+{% endblock customstyletemp %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Terms of Service</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+
+
+<section class="product spad">
+    <div class="container">
+        <p><strong>Terms of Service</strong></p>
+
+
+        <p><strong>1. Acceptance of Terms:</strong><br>
+            - By accessing and using our website ("Website"), you agree to be bound by these Terms and Conditions ("T&C"). If you do
+            not agree to these T&C, please do not use our Website.</p>
+
+        <p><strong>2 Products and Services:</strong><br>
+            - Our Website offers products and services for sale. Prices, availability, and descriptions of products and services are
+            subject to change without notice.</p>
+
+        <p><strong>3 Orders and Payment:</strong><br>
+            - When you place an order, you agree to provide accurate and complete information. You authorize us to charge the provided
+            payment method for the total amount of the order, including taxes and shipping fees. Payment is processed upon order
+            confirmation.</p>
+
+        <p><strong>4 Shipping and Delivery:</strong><br>
+            - Shipping and delivery times are estimated and subject to change. We are not responsible for delays caused by external
+            factors.</p>
+
+        <p><strong>5 Returns and Refunds:</strong><br>
+            - Please review our Return and Refund Policy for information about returning products and obtaining refunds.</p>
+
+        <p><strong>6 User Accounts:</strong><br>
+            - You may need to create a user account to access certain features of the Website. You are responsible for maintaining the
+            confidentiality of your account information and for all activities that occur under your account.</p>
+ 
+        <p><strong>7 Intellectual Property:</strong><br>
+            - All content on the Website, including text, images, logos, and trademarks, is the property of {{ APP_NAME }} or its
+            licensors and is protected by intellectual property laws.</p>
+ 
+        <p><strong>8 Privacy:</strong><br>
+            - Your use of the Website is also governed by our Privacy Policy, which can be found on our Website.</p>
+        
+        <p><strong>9 Limitation of Liability:</strong><br>
+            - To the extent permitted by law, {{ APP_NAME }} shall not be liable for any direct, indirect, incidental, consequential,
+            or punitive damages arising from the use or inability to use the Website or products/services purchased through the
+            Website.</p>
+        
+        <p><strong>10 Indemnification:</strong><br>
+            - You agree to indemnify and hold {{ APP_NAME }} harmless from any claims, losses, liabilities, and expenses (including
+            legal fees) arising out of your use of the Website.</p>
+        
+        <p><strong>11 Changes to T&C:</strong><br>
+            - We reserve the right to update or modify these T&C at any time. Changes will be effective upon posting on the Website.
+            Your continued use of the Website after changes constitutes your acceptance of the revised T&C.</p>
+        
+        <p><strong>12 Governing Law:</strong><br>
+            - These T&C are governed by and construed in accordance with the laws of [Your Jurisdiction]. Any disputes arising from
+            these T&C shall be subject to the exclusive jurisdiction of the courts in [Your Jurisdiction].</p>
+
+    </div>
+</section>
+{% endblock %}

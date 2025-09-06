@@ -1,0 +1,127 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Delivered Orders{% endblock title %}
+
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Orders</li>
+            <li class="breadcrumb-item active" aria-current="page">Delivered</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="custom-background">
+                            <tr>
+                                <th>User</th>
+                                <th>Total Price</th>
+                                <th>Date Ordered</th>
+                                <th>Payment Atatus</th>
+                                <th>Shipping Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in delivered_orders %}
+                            <tr>
+                                <td><a href="{% url 'my_admin:order_detail' order.id %}">{{ order.user.first_name }} {{ order.user.last_name }}</a></td>
+                                <td>&#8358;{{ order.total_price|intcomma }}</td>
+                                <td>{{ order.created_at|date:"F d, Y" }}</td>
+                                {% if order.payment_status == 'Pending' %}
+                                <td><span class="badge badge-warning">Not Paid</span></td>
+                                {% elif order.payment_status == 'Paid' %}
+                                <td><span class="badge badge-success">Paid</span></td>
+                                {% else %}
+                                <td><span class="badge badge-danger">Cancelled</span></td>
+                                {% endif %}
+                                <td>{{ order.shipping_address.address|truncatechars:15 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

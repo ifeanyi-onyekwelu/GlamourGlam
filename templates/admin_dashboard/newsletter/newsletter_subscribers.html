@@ -1,0 +1,152 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All users{% endblock title %}
+
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Newsletter</li>
+            <li class="breadcrumb-item active" aria-current="page">Subscribers</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="custom-background">
+                            <tr>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>Email Address</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in subscribed_users %}
+                            <tr>
+                                <td><a href="{% url 'my_admin:user_detail' user.id %}">{{ user.first_name }}</a></td>
+                                <td>{{ user.last_name }}</td>
+                                <td>{{ user.email }}</td>
+                                {% if user.is_active == True %}
+                                <td><span class="badge badge-success">Active</span></td>
+                                {% else %}
+                                <td><span class="badge badge-danger">Suspended</span></td>
+                                {% endif %}
+                                <td><a href="#" class="btn btn-outline-danger btn-sm" id="removeUserFromGroupBtn"
+                                        data-user-id="{{ user.id }}">Remove</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $('#removeUserFromGroupBtn').on('click', function (event) {
+            event.preventDefault();
+
+            user_id = $(this).data('user-id');
+
+            $.ajax({
+                method: 'POST',
+                url: `/admin/remove-from-newsletter/${user_id}/`,
+                data: {
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        location.reload();
+                    }
+                }
+            })
+        })
+
+    })
+</script>
+{% endblock javascript %}

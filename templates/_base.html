@@ -1,0 +1,537 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="GlamourGlam" />
+    <meta name="keywords" content="Ashion, unica, creative, html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+        {{ APP_NAME }} | More Fashion, Less Effort || {% block title %}{%endblock title %}
+    </title>
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
+
+    {% block customstyletemp %}
+
+    {% endblock customstyletemp %}
+
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/elegant-icons.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+
+    {% block customstyle %}
+
+    {% endblock customstyle %}
+    <style>
+        .user-dropdown-btn {
+            position: relative;
+            padding: 7px 10px;
+            border: 1px solid #000000;
+            border-radius: 50px;
+            transition: all .4s ease-in-out;
+        }
+
+        .user-dropdown-btn:hover {
+            border-color: #bda06a;
+            color: #bda06a;
+        }
+
+        .user-dropdown-menu {
+            transition: all .4s ease-in-out;
+            display: none;
+            position: absolute;
+            width: 200px;
+            padding: 10px;
+            border-radius: 5px;
+            flex-flow: column;
+            align-items: start;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+            background: #fff;
+            z-index: 2;
+            right: 0;
+            opacity: 0;
+        }
+
+        .user-dropdown-item {
+            padding: 5px;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            justify-content: space-around;
+            border-radius: 4px;
+            display: flex;
+        }
+
+        .user-dropdown-item:hover {
+            background: #bda06a;
+            color: #fff;
+        }
+
+        .user-dropdown-item:hover a {
+            color: #fff;
+        }
+
+        .user-dropdown-item a {
+            font-size: 14px !important;
+            font-weight: 700;
+            display: block;
+            /* Make the link a block-level element */
+            padding: 5px 5px;
+            /* Add padding for spacing and click area */
+        }
+
+        .user-dropdown-item i {
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        @media screen and (max-width: 990px) {
+            .user-dropdown-menu {
+                width: 100%;
+            }
+        }
+
+        .currency_preference {
+            appearance: none;
+            padding: 7px 10px;
+            border: none;
+            background: #bda06a80;
+            border-radius: 4px;
+            outline: none;
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+        }
+
+        /* Style for the select element when hovered */
+        .currency_preference:hover {
+            color: #ffffff;
+        }
+
+        /* Style for the select element when focused */
+        .currency_preference:focus {
+            background: #bda06a;
+        }
+
+        .currency_preference option {
+            background: #ffffff;
+            color: #bda06a;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Offcanvas Menu Begin -->
+    <div class="offcanvas-menu-overlay"></div>
+    <div class="offcanvas-menu-wrapper">
+        <div class="offcanvas__close">+</div>
+        <ul class="offcanvas__widget">
+            <li>
+                <form method="post" action="{% url 'app:set_currency_preference' %}">
+                    {% csrf_token %}
+                    <select name="currency_preference" onchange="this.form.submit()" class="currency_preference">
+                        {% if request.session.currency_preference == 'USD' %}
+                        <option value="USD">USD</option>
+                        <option value="NGN">NGN</option>
+                        <option value="EUR">EUR</option>
+                        {% elif request.session.currency_preference == 'NGN' %}
+                        <option value="NGN">NGN</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        {% elif request.session.currency_preference == 'EUR' %}
+                        <option value="EUR">EUR</option>
+                        <option value="NGN">NGN</option>
+                        <option value="USD">USD</option>
+                        {% endif %}
+                        <!-- Add more currency options as needed -->
+                    </select>
+                </form>
+            </li>
+            <li><span class="icon_search search-switch"></span></li>
+            {% if request.user.is_authenticated %}
+            <li>
+                <a href="{% url 'app:cart_page' %}"><span class="fa fa-shopping-cart"></span>
+                    <div class="tip">{% block cart_num_offcanvas %}{% endblock cart_num_offcanvas %}</div>
+                </a>
+            </li>
+            {% else %}
+            <li>
+                <a href="{% url 'app:cart_page' %}"><span class="icon_bag_alt"></span>
+                    <div class="tip">0</div>
+                </a>
+            </li>
+            {% endif %}
+            <li class="account">
+                <span class="fa fa-user user-dropdown-btn"></span>
+                <ul class="user-dropdown-menu">
+                    {% if request.user.is_authenticated %}
+                    <li class="user-dropdown-item"><a href="{% url 'app:wish_list_page' %}"><i class="fa fa-heart"></i>
+                            Wishlist</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i class="fa fa-history"></i>
+                            Order History</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i class="fa fa-user"></i>
+                            Account</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i
+                                class="fa fa-sign-out"></i> Logout</a></li>
+                    {% else %}
+                    <li class="user-dropdown-item"><a href="{% url 'app:login_page' %}"><i class="fa fa-lock"></i>
+                            Login</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:register_page' %}"><i
+                                class="fa fa-user-circle"></i> Register</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:about_page' %}"><i
+                                class="fa fa-info-circle"></i> About Us</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:contact_page' %}"><i class="fa fa-envelope"></i>
+                            Contact Us</a></li>
+                    <li class="user-dropdown-item"><a href="{% url 'app:faqs_page' %}"><i
+                                class="fa fa-question-circle"></i> FAQs</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+        </ul>
+        <div class="offcanvas__logo">
+            <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt="" /></a>
+        </div>
+        <div id="mobile-menu-wrap"></div>
+
+        {% if not request.user.is_authenticated %}
+        <div class="offcanvas__auth">
+            <a href="{% url 'app:login_page' %}">Login</a>
+            <a href="{% url 'app:register_page' %}">Register</a>
+        </div>
+        {% endif %}
+
+    </div>
+    <!-- Offcanvas Menu End -->
+
+    <!-- Header Section Begin -->
+
+    {% url 'app:login_page' as login_page %}
+    {% url 'app:register_page' as register_page %}
+    {% url 'password_reset' as password_reset %}
+    {% url 'password_reset_done' as password_reset_done %}
+    {% url 'password_reset_confirm' as password_reset_confirm %}
+    {% url 'password_reset_complete' as password_reset_complete %}
+
+    {% if login_page == request.path or register_page == request.path or password_reset == request.path or password_reset_done == request.path or password_reset_confirm == request.path or password_reset_complete == request.path %}
+    {% else %}
+    <header class="header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xl-2 col-lg-2">
+                    <div class="header__logo">
+                        <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
+                                width="300" /></a>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6">
+                    <nav class="header__menu">
+                        <ul>
+                            {% url 'app:home_page' as home_page %}
+                            <li class="{% if home_page == request.path %} active {% endif %}">
+                                <a href="{{ home_page }}">Home</a>
+                            </li>
+
+                            {% url 'app:women_page' as women_page %}
+                            <li class="{% if women_page == request.path %} active {% endif %}">
+                                <a href="{{women_page}}">Women’s</a>
+                            </li>
+                            {% url 'app:men_page' as men_page %}
+                            <li class="{% if men_page == request.path %} active {% endif %}">
+                                <a href="{{ men_page }}">Men’s</a>
+                            </li>
+                            {% url 'app:kids_page' as kids_page %}
+                            <li class="{% if kids_page == request.path %} active {% endif %}">
+                                <a href="{{ kids_page }}">Kid's</a>
+                            </li>
+                            {% url 'app:unisex_page' as unisex_page %}
+                            <li class="{% if unisex_page == request.path %} active {% endif %}">
+                                <a href="{{ unisex_page }}">Unisex</a>
+                            </li>
+                            {% url 'app:accessories_page' as accessories_page %}
+                            <li class="{% if accessories_page == request.path %} active {% endif %}">
+                                <a href="{{ accessories_page }}">Accessories</a>
+                            </li>
+                            {% url 'app:shop_page' as shop_page %}
+                            <li class="{% if shop_page == request.path %} active {% endif %}">
+                                <a href="{{ shop_page }}">Shop</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="header__right">
+                        {% if not request.user.is_authenticated %}
+                        <div class="header__right__auth"> 
+                            <a href="{% url 'app:login_page' %}">Login</a>
+                            <a href="{% url 'app:register_page' %}">Register</a>
+                        </div>
+                        {% endif %}
+                        <ul class="header__right__widget">
+                            <li>
+                                <form method="post" action="{% url 'app:set_currency_preference' %}">
+                                    {% csrf_token %}
+                                    <select name="currency_preference" onchange="this.form.submit()" class="currency_preference">
+                                        {% if request.session.currency_preference == 'USD'  %}
+                                            <option value="USD">USD</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="EUR">EUR</option>
+                                        {% elif request.session.currency_preference == 'NGN' %}
+                                            <option value="NGN">NGN</option>
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                        {% elif request.session.currency_preference == 'EUR' %}
+                                            <option value="EUR">EUR</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="USD">USD</option>
+                                        {% endif %}
+                                        <!-- Add more currency options as needed -->
+                                    </select>
+                                </form>
+                            </li>
+                            <li><span class="icon_search search-switch"></span></li>
+                            <li>
+                                <a href="{% url 'app:cart_page' %}"><span class="fa fa-shopping-basket"></span>
+                                    <div class="tip">{% block cart_num %}{% endblock cart_num %}</div>
+                                </a>
+                            </li>
+                        
+                            <li class="account">
+                                <span class="fa fa-user user-dropdown-btn"></span>
+                                <ul class="user-dropdown-menu">
+                                    {% if request.user.is_authenticated %}
+                                    <li class="user-dropdown-item"><a href="{% url 'app:wish_list_page' %}"><i
+                                                class="fa fa-heart"></i> Wishlist</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:order_history' %}"><i
+                                                class="fa fa-history"></i> Order History</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:account_page' %}"><i
+                                                class="fa fa-user"></i> Account</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:handleUserLogout' %}"><i
+                                                class="fa fa-sign-out"></i> Logout</a></li>
+                                    {% else %}
+                                    <li class="user-dropdown-item"><a href="{% url 'app:login_page' %}"><i
+                                                class="fa fa-lock"></i> Login</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:register_page' %}"><i
+                                                class="fa fa-user-circle"></i> Register</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:about_page' %}"><i
+                                                class="fa fa-info-circle"></i> About Us</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:contact_page' %}"><i
+                                                class="fa fa-envelope"></i> Contact Us</a></li>
+                                    <li class="user-dropdown-item"><a href="{% url 'app:faqs_page' %}"><i
+                                                class="fa fa-question-circle"></i> FAQs</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="canvas__open">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </header>
+    {% endif %}
+    <!-- Header Section End -->
+
+    <!-- <div class="mt-3">
+        <div id="modalToggle">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">Product added to wishlist.</div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    {% block content %}
+    {% endblock content %}
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form" method="get" action="{% url 'app:handleSearchForm' %}">
+                {% csrf_token %}
+                <input type="search" id="search_query" name="search_query" placeholder="Search here....." />
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="footer__about">
+                        <div class="footer__logo">
+                            <a href="{% url 'app:home_page' %}"><img src="{% static 'img/logo.png' %}" alt=""
+                                    width="300" /></a>
+                        </div>
+                        <p>
+                            Welcome to the world of fashion where we believe in 'More Fashion, Less Effort.' Explore the latest trends, curated
+                            just for you. We're here to simplify your style journey, so you can effortlessly slay every look.
+                            together!
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Quick links</h6>
+                        <ul>
+                            <li><a href="{% url 'app:about_page' %}">About Us</a></li>
+                            <li><a href="{% url 'app:contact_page' %}">Contact Us</a></li>
+                            <li><a href="{% url 'app:returns_and_refunds_page' %}">Returns</a></li>
+                            <li><a href="{% url 'app:dropshipping_page' %}">Dropshipping</a></li>
+                            <li><a href="{% url 'app:terms_of_service_page' %}">Terms of Service</a></li>
+                            <li><a href="{% url 'app:faqs_page' %}">FAQ</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                    <div class="footer__widget">
+                        <h6>Categories</h6>
+                        <ul>
+                            <li><a href="{% url 'app:women_page' %}">Women</a></li>
+                            <li><a href="{% url 'app:men_page' %}">Men</a></li>
+                            <li><a href="{% url 'app:kids_page' %}">Kids</a></li>
+                            <li><a href="{% url 'app:shop_page' %}">Shop</a></li>
+                            <li><a href="{% url 'app:unisex_page' %}">Unisex</a></li>
+                            <li><a href="{% url 'app:accessories_page' %}">Accessories</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-8 col-sm-12">
+                    <div class="footer__newslatter">
+                        <h6>NEWSLETTER</h6>
+                        <form method="post" id="subscibeToNewsLetterForm">
+                            {% csrf_token %}
+                            <input type="email" name="email" id="newsletterEmail" placeholder="Email" required />
+                            <button type="submit" class="site-btn" id="subscribeBtn">Subscribe</button>
+                        </form>
+                        <div class="footer__social">
+                            <a href="https://www.facebook.com/profile.php?id=61552267105449"><i class="fa fa-facebook"></i></a>
+                            <a href="https://twitter.com/LussoTerra"><i class="fa fa-twitter"></i></a>
+                            <a href="https://www.instagram.com/lusso_terra/"><i class="fa fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    <div class="footer__copyright__text">
+
+                        <div class="footer__payment">
+                            <a href="#"><img src="{% static 'img/payment/payment-1.png' %}" alt="" /></a>
+                            <a href="#"><img src="{% static 'img/payment/payment-2.png' %}" alt="" /></a>
+                            <a href="#"><img src="{% static 'img/payment/payment-4.png' %}" alt="" /></a>
+                        </div>
+                        <p>
+                            Copyright &copy;
+                            <script>
+                                document.write(new Date().getFullYear())
+                            </script>
+                            All rights reserved | {{ APP_NAME }}
+                        </p>
+                    </div>
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <!-- Js Plugins -->
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/mixitup.min.js' %}"></script>
+    <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const user_dropdown_btn = document.querySelectorAll(".user-dropdown-btn");
+            const user_dropdown_menu = document.querySelectorAll(".user-dropdown-menu");
+            let dropdown_is_visible = false;
+
+            function toggleVisibility() {
+                if (dropdown_is_visible) {
+                    user_dropdown_menu.forEach(menu => {
+                        menu.style.display = "flex";
+                        menu.style.marginTop = "20px";
+                        menu.style.opacity = "1";
+                    })
+                } else {
+                    user_dropdown_menu.forEach(menu => {
+                        menu.style.display = "none";
+                        menu.style.marginTop = "0";
+                        menu.style.opacity = "0";
+                    })
+                }
+            }
+
+            user_dropdown_btn.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    dropdown_is_visible = !dropdown_is_visible;
+                    toggleVisibility()
+                })
+            })
+
+            window.addEventListener('click', (e) => {
+                dropdown_is_visible = false;
+                toggleVisibility()
+            })
+        })
+    
+        $(document).ready(function() {
+            $("#subscibeToNewsLetterForm").on("submit", function(event) {
+                event.preventDefault();
+
+                $("#subscribeBtn").text("")
+                $("#subscribeBtn").append("<i class='fa fa-spinner fa-spin'></i>")
+                $.ajax({
+                    method: "POST",
+                    url: "{% url 'app:handleSubscribeToNewsLetter' %}",
+                    data: {
+                        email: $("#newsletterEmail").val(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            $("#subscribeBtn").text("Subscribed");
+                            $("#subscribeBtn").children().remove();
+                        }
+                    },
+                    error: function(xhr, statusText, errorThrown) {
+
+                    }
+                })
+            })
+        })
+    </script>
+
+    <!-- Footer Section Begin -->
+
+    {% block javascript %}
+    {% endblock javascript %}
+</body>
+
+</html>

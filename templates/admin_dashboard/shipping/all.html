@@ -1,0 +1,134 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | All Shipping Addresses{% endblock title %}
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'my_admin:dashboard' %}">Home</a></li>
+            <li class="breadcrumb-item">Shipping Addresses</li>
+            <li class="breadcrumb-item active" aria-current="page">All</li>
+        </ol>
+
+        <a href="{% url 'my_admin:delete_all_shipping_address' %}" class="btn btn-sm btn-danger">Delete All</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Simple Tables -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="custom-background">
+                            <tr>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Country</th>
+                                <th>Apartment</th>
+                                <th>Address</th>
+                                <th>City</th>
+                                <th>State</th>
+                                <th>Zipcode</th>
+                                <th>Date Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shipAddress in shipping_address %}
+                            <tr>
+                                <td>{{ shipAddress.user.first_name }} {{ shipAddress.user.last_name }}</td>
+                                <td>{{ shipAddress.phone }}</td>
+                                <td>{{ shipAddress.country }}</td>
+                                <td>{{ shipAddress.appartment }}</td>
+                                <td>{{ shipAddress.address|truncatechars:10 }}</td>
+                                <td>{{ shipAddress.city }}</td>
+                                <td>{{ shipAddress.state }}</td>
+                                <td>{{ shipAddress.zipcode }}</td>
+                                <td>{{ shipAddress.date_added|date:"F d, Y" }}</td>
+                                <td class="d-flex" style="gap: 5px;">
+                                    <a href="{% url 'my_admin:shipping_detail' shipAddress.id %}" class="btn btn-sm custom-background">Details</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer"></div>
+            </div>
+        </div>
+    </div>
+    <!--Row-->
+</div>
+<!---Container Fluid-->
+{% endblock content %}

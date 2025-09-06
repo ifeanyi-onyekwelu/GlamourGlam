@@ -1,0 +1,119 @@
+{% extends "_base.html" %}
+{% load static %}
+
+
+{% block title %}Login{% endblock %}
+
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock customstyle %}
+
+
+{% block cart_num %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+
+<!--================Login Box Area =================-->
+<section class="login_box_area section_gap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="login_box_img h-100 w-100">
+                    <img class="img-fluid h-100" src="{% static 'img/blog/blog-7.jpg' %}" alt="">
+                    <div class="hover">
+                        <h4>Welcome to {{ APP_NAME }}</h4>
+                        <p>Join the community and start shopping! Create an account to discover the latest products,
+                            enjoy exclusive offers, and manage your orders. Sign up now to unlock a world of seamless
+                            shopping.</p>
+                        <a class="btn custom-background" href="{% url 'app:register_page' %}">Create an Account</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="login_form_inner">
+                    <h3>Login to continue</h3>
+                    <form class="row login_form" method="post" id="contactForm">
+                        {% csrf_token %}
+                        <div id="login-errors" class="col-md-12 form-group text-danger"></div>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="name" name="email" placeholder="Email Address"
+                                onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email Address'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="name" name="password" placeholder="Password"
+                                onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <div class="creat_account">
+                                <input type="checkbox" id="f-option2" name="selector">
+                                <label for="f-option2">Keep me logged in</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" class="btn custom-outline-background w-75"
+                                id="login-button">Login</button>
+                            <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--================End Login Box Area =================-->
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $('#login-button').click(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            var formData = $('#contactForm').serialize(); // Serialize form data
+            var url = "{% url 'app:handleUserLogin' %}"; // URL for login handler
+
+            $("#login-button").text("")
+            $("#login-button").append("<i class='fa fa-spinner fa-spin'></i>")
+
+            // AJAX request
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        location.href = "{% url 'app:home_page' %}"
+                    } else {
+                        // Display error message(s)
+                        $('#login-errors').text(response.message);
+                        $("#login-button").text("Register")
+                        $("#login-button").children().remove();
+                    }
+                },
+                error: function () {
+                    // Handle AJAX request error
+                    $('#login-errors').text('An error occurred. Please try again.');
+                    $("#login-button").text("Register")
+                    $("#login-button").children().remove();
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock javascript %}

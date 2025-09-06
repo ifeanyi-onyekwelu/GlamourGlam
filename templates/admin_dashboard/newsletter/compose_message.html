@@ -1,0 +1,158 @@
+{% extends 'admin_dashboard/_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard | Compose Message{% endblock title %}
+
+{% block notification %}
+{% for notification in notifications %}
+<a class="dropdown-item d-flex align-items-center" href="#">
+    {% if notification.notification_type == "REPORTS" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-primary">
+            <i class="fas fa-file-alt text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "FINANCE" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-success">
+            <i class="fas fa-donate text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ALERT" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "REGISTRATION" %}
+    <div class="mr-3">
+        <div class="icon-circle custom-background">
+            <i class="fas fa-user text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ORDER" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-shopping-cart text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% elif notification.notification_type == "ACTIVITY" %}
+    <div class="mr-3">
+        <div class="icon-circle bg-info">
+            <i class="fas fa-bell text-white"></i>
+        </div>
+    </div>
+    <div>
+        <div class="small text-gray-500">{{ notification.formatted_datetime }}</div>
+        <span class="font-weight-bold">{{ notification.title }}</span>
+    </div>
+    {% endif %}
+</a>
+{% endfor %}
+{% endblock notification %}
+
+{% block content %}
+<!-- Container Fluid-->
+<div class="container-fluid" id="container-wrapper">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="./">Home</a></li>
+            <li class="breadcrumb-item">Newsletter</li>
+            <li class="breadcrumb-item active" aria-current="page">Compose</li>
+        </ol>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form class="card mb-4 newsletterForm">
+                {% csrf_token %}
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Compose Message</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" name="subject" id="subject" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea name="message" id="message" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="images">Images:</label>
+                        <input type="file" name="image" id="images" class="form-control" multiple>
+                    </div>
+
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <button type="submit" class="btn custom-background m-auto" id="sendMsgBtn">SEND</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!---Container Fluid-->
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        $(".newsletterForm").on("submit", function (event) {
+            event.preventDefault();
+
+            $("#sendMsgBtn").text("")
+            $("#sendMsgBtn").append("<i class='fa fa-spinner fa-spin'></i>")
+
+            $.ajax({
+                method: "POST",
+                url: "{% url 'my_admin:compose_and_send_message' %}",
+                data: {
+                    "subject": $("#subject").val(),
+                    "message": $("#message").val(),
+                    "images": $("#images").val(),
+                    "csrfmiddlewaretoken": "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $("#sendMsgBtn").prop("value", "SEND")
+                    } else if (!(data.success)) {
+                        alert(data.message)
+                        $("#sendMsgBtn").text("SEND")
+                        $("#sendMsgBtn").children().remove();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $("#sendMsgBtn").text("SEND")
+                    $("#sendMsgBtn").children().remove();
+                },
+                complete: function () {
+                    $("#sendMsgBtn").text("SEND")
+                    $("#sendMsgBtn").children().remove();
+                }
+            })
+        })
+    });
+</script>
+{% endblock javascript %}

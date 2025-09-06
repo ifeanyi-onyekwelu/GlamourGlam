@@ -1,0 +1,338 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block customstyletemp %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock customstyletemp %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+    
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+    0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block title %}{{ product.name }}{% endblock title %}
+
+{% block customstyle %}
+{% endblock customstyle %}
+
+
+{% block content %}
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>{{ product.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__left product__thumb nice-scroll">
+                            {% for image in product_image %}
+                            <a class="pt active" href="#product-{{ image.id }}">
+                                <img src="{{ image.image.url }}" alt="">
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="product__details__slider__content">
+                            <div class="product__details__pic__slider owl-carousel">
+                                {% for image in product_image %}
+                                <img data-hash="product-{{ image.id }}" class="product__big__img" src="{{ image.image.url }}" alt="">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text">
+                        <h3>{{ product.name }} <span>Category: {{ product.category.name }}</span></h3>
+                        <div class="rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <span>( 138 reviews )</span>
+                        </div>
+                        <div class="product__price product__details__price" data-usd-price="{{ product.price_usd }}"
+                            data-ngn-price="{{ product.price_ngn }}" data-eur-price="{{ product.price_eur }}"
+                            data-selected-currency="{{ request.session.currency_preference }}">
+                        </div>
+                        <div class="product__details__button">
+                            <div class="quantity">
+                                <span>Quantity:</span>
+                                <div class="pro-qty qyt-no-form">
+                                    <input type="text" value="1" readonly>
+                                </div>
+                            </div>
+                            <a href="" class="cart-btn-product-details" id="add-to-cart-button"><span class="fa fa-shopping-basket"> </span> Add to cart</a>
+                            <ul>
+                                <li><a href="#" style="color: #BDA06A;" class="fa {% if product_in_wishlist %} fa-heart {% else %}fa-heart-o {% endif %}" id="add-to-wishlist-button" data-product-id="{{ product.id }}"></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__details__widget">
+                            <ul>
+                                <li>
+                                    <span>Availability:</span>
+                                    <div class="stock__checkbox">
+                                        <p>In Stock</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Available color:</span>
+                                    <div class="color__checkbox">
+                                        {% for color in product.colors.all %}
+                                        {% if color.color == "White" %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}" {% if forloop.first %}checked{% endif %}>
+                                            <span class="custom-checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
+                                        </label>
+                                        {% else %}
+                                        <label for="{{ color.color }}">
+                                            <input type="radio" name="color__radio" id="{{ color.color }}" {% if forloop.first %}checked{% endif %}>
+                                            <span class="checkmark" style="background-color: {{ color.color }}; box-shadow:0 5px 10px rgba(0, 0, 0, .4)"></span>
+                                        </label>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Available size:</span>
+                                    <div class="size__btn">
+                                        {% for size in product.sizes.all %}
+                                        <label for="{{ size.name }}-btn" class="{% if forloop.first %}active{% endif %}">
+                                            <input type="radio" id="{{ size.name }}" name="size__radio" {% if forloop.first %}checked{% endif %}>
+                                            {{ size.name }}
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( 2 )</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <h6>Description</h6>
+                                
+                                <p>{{ product.description }}</p>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                <h6>Reviews ( 2 )</h6>
+                                <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed
+                                    quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt loret.
+                                    Neque porro lorem quisquam est, qui dolorem ipsum quia dolor si. Nemo enim ipsam
+                                    voluptatem quia voluptas sit aspernatur aut odit aut loret fugit, sed quia ipsu
+                                    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Nulla
+                                    consequat massa quis enim.</p>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
+                                    dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                    nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium
+                                    quis, sem.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="related__title">
+                        <h5>RELATED PRODUCTS</h5>
+                    </div>
+                </div>
+                {% for related_product in related_products %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        {% with image=related_product.productimage_set.first %}
+                        <div class="product__item__pic set-bg" data-setbg="{{ image.image.url }}">
+                            <div class="label new">New</div>
+                            <ul class="product__hover">
+                                <li><a href="#" id="add-to-wishlist-button"><span
+                                            class="fa {% if in_wishlist %} fa-heart {% else %}fa-heart-o{% endif %}"
+                                            data-product-id="{{ product_info.product.id }}"></span></a></li>
+                                {% for color in related_product.colors.all %}
+                                {% for size in related_product.sizes.all %}
+                                {% if forloop.parentloop.first and forloop.first %}
+                                <li><a class="add-to-cart-link" href="#" id="add-to-cart-button" data-product-id="{{ related_product.id }}"
+                                        data-color-id="{{ color.color }}" data-size-id="{{ size.name }}"><span class="fa fa-shopping-cart"></span></a>
+                                </li>
+                                {% else %}
+                                {% endif %}
+                                {% endfor %}
+                                {% endfor %}
+                                <li><a href="{% url 'app:product_detail_page' related_product.id %}"><span class="fa fa-plus"></span></a></li>
+                            </ul>
+                        </div>
+                        {% endwith %}
+                        <div class="product__item__text">
+                            <h6><a href="{% url 'app:product_detail_page' related_product.id %}">{{ related_product.name }}</a></h6>
+                            <div class="rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product__price" data-usd-price="{{ related_product.price_usd }}"
+                                data-ngn-price="{{ related_product.price_ngn }}" data-eur-price="{{ related_product.price_eur }}"
+                                data-selected-currency="{{ request.session.currency_preference }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+    
+{% endblock content %}
+    
+{% block javascript %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const addToCartButton = document.getElementById("add-to-cart-button");
+        
+        addToCartButton.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            const productId = "{{ product.id }}";
+            const selectedColorElement = document.querySelector('input[name="color__radio"]:checked');
+            const selectedSizeElement = document.querySelector('input[name="size__radio"]:checked');
+            const selectedQuantity = document.querySelector('.pro-qty input').value;
+
+            const selectedColor = selectedColorElement.id;
+            const selectedSize = selectedSizeElement.id;
+
+            const addToCartUrl = `/add-to-cart/${productId}/${selectedColor}/${selectedSize}/${selectedQuantity}/`;
+
+            // Redirect to the generated URL
+            window.location.href = addToCartUrl;
+        });
+
+        var proQty = $('.pro-qty');
+        proQty.prepend('<span class="dec qtybtn">&minus;</span>');
+        proQty.append('<span class="inc qtybtn">&plus;</span>');
+        proQty.on('click', '.qtybtn', function () {
+            var $button = $(this);
+            var oldValue = $button.parent().find('input').val();
+            if ($button.hasClass('inc')) {
+                var newVal = parseFloat(oldValue) + 1;
+            } else {
+                // Don't allow decrementing below zero
+                if (oldValue > 0) {
+                    var newVal = parseFloat(oldValue) - 1;
+                } else {
+                    newVal = 0;
+                }
+            }
+            $button.parent().find('input').val(newVal);
+        });
+    });
+
+    $(document).ready(function() {
+        
+        let selectedRating = 1;
+
+        $('#rating-container li i').click(function() {
+            selectedRating = $(this).data('rating');
+            $('#rating-container li i').removeClass('fa-star').addClass('fa-star-o');
+            $(this).prevAll().addBack().removeClass('fa-star-o').addClass('fa-star');
+        });
+
+        $('#submit-review-button').click(function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            let productId = "{{ product.id }}";
+            let review_error = document.getElementById("review-errors");
+            review_error.textContent = "";
+
+            let name = document.getElementById("reviewAuthorFullName").value
+            let email = document.getElementById("reviewAuthorEmail").value
+            let number = document.getElementById("reviewAuthorNumber").value
+            let message = document.getElementById("reviewMessage").value
+
+            // AJAX request
+            $.ajax({
+                type: 'POST',
+                url: '/product/add-review/' + productId + '/',
+                data: {
+                    fullName: name,
+                    email: email,
+                    phone: number,
+                    message: message,
+                    rating: selectedRating,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function(response) {
+                    location.reload();
+                },
+                error: function() {
+                    // Handle AJAX request error
+                    $('#review-errors').text('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+
+    $(document).ready(function () {
+            $('#add-to-wishlist-button').click(function (e) {
+                e.preventDefault()
+
+                let icon = $(this);
+                let productId = icon.data('product-id');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/product/add-to-wishlist/',
+                    data: {
+                        product_id: productId,
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function (data) {
+                        if (data.added) {
+                            icon.removeClass('fa-heart-o').addClass('fa-heart')
+                        } else {
+                            icon.removeClass('fa-heart').addClass('fa-heart-o')
+                        }
+                    }
+                })
+            })
+        })
+</script>
+{% endblock javascript %}

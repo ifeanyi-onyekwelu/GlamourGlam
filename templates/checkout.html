@@ -1,0 +1,342 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+
+{% block title %}Checkout{% endblock title %}
+
+{% block customstyle %}
+<style>
+    .inputError {
+        border: 1px solid red !important;
+        color: red;
+        /* background: rgba(253, 0, 0, 0.833); */
+    }
+
+    .error-message {
+        color: red;
+        font-weight: 600;
+    }
+</style>
+{% endblock customstyle %}
+
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Shopping cart</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Checkout Section Begin -->
+<section class="checkout spad">
+    <div class="container">
+        <form class="checkout__form" method="post" id="checkout__form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5>Shipping Address</h5>
+                    <div id="checkout-errors" class="col-md-12 form-group text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="checkout__form__input">
+                                <p>Phone <span>*</span></p>
+                                <input type="text" name="phone" id="phone" placeholder="Phone Number" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="checkout__form__input">
+                                <p>Country <span>*</span></p>
+                                <input type="text" name="country" id="country" placeholder="Country" required>
+                            </div>
+                            <div class="checkout__form__input">
+                                <p>State <span>*</span></p>
+                                <input type="text" name="state" id="state" placeholder="State" required>
+                            </div>
+                            <div class="checkout__form__input">
+                                <p>Address <span>*</span></p>
+                                <input type="text" name="address" id="address" placeholder="Street Address" required>
+                            </div>
+                            <div class="checkout__form__input">
+                                <p>Town/City <span>*</span></p>
+                                <input type="text" name="city" id="city" placeholder="City" required> 
+                            </div>
+                            <div class="checkout__form__input">
+                                <p>Postcode/Zip <span>*</span></p>
+                                <input type="text" name="zipcode" id="zipcode" placeholder="Postal/Zip" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <h5>Payment Details</h5>
+                            <div class="checkout__form__input">
+                                <p>Card Number <span>*</span></p>
+                                <input type="text" id="card-number" name="card-number">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="checkout__form__input">
+                                <p>Name on card <span>*</span></p>
+                                <input type="text" id="card-name" name="card-name">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="checkout__form__input">
+                                <p>Expiry Date <span>*</span></p>
+                                <input type="text" id="card-expiry" name="card-expiry">
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="checkout__form__input">
+                                <p>CVV <span>*</span></p>
+                                <input type="text" id="card-cvv" name="card-cvv">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="">
+                                <input type="checkbox" id="sameBillingAddress" name="same_billing_address" checked>
+                                <label for="sameBillingAddress">Billing address same as shipping address</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="billingAddressSection">
+                        <div class="col-lg-12">
+                            <h5>Billing Address</h5>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Street Address <span>*</span></p>
+                                        <input type="text" name="billing_address" class="billing-address-field" placeholder="Street Address">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Apartment, suite, etc. (optional)</p>
+                                        <input type="text" name="billing_address_optional"
+                                            class="billing-address-field" placeholder="Apartment, suite, etc. (optional)">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>City <span>*</span></p>
+                                        <input type="text" name="billing_city" class="billing-address-field" placeholder="City">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>State/Province <span>*</span></p>
+                                        <input type="text" name="billing_state" class="billing-address-field" placeholder="State/Province">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Postal/ZIP Code <span>*</span></p>
+                                        <input type="text" name="billing_zipcode" class="billing-address-field" placeholder="Postal/Zip">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Country <span>*</span></p>
+                                        <input type="text" name="billing_country" class="billing-address-field" placeholder="Country">
+                                    </div>
+                                </div>
+                                <!-- Other billing address fields go here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="checkout__order">
+                        <span class="cart__total" data-selected-currency="{{ request.session.currency_preference }}"></span>
+                        <h5>Your order</h5>
+                        <div class="checkout__order__product">
+                            <ul>
+                                <li>
+                                    <span class="top__text">Product</span>
+                                    <span class="top__text__right">Total</span>
+                                </li>
+                                {% for cart_item in cart_items %}
+                                <li>x {{ cart_item.quantity }} {{ cart_item.product.name }} <span><label class="currency"></label>
+                                        {{ cart_item.subtotal|intcomma }}</span></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="checkout__order__total">
+                            <ul>    
+                                <li>Shipping Fee <span><label class="currency"></label> {{ shipping_fee|floatformat:2|intcomma }}</span></li>
+                                <li>Subtotal <span><label class="currency"></label> {{ total_amount|floatformat:2|intcomma }}</span></li>
+                                <li>Total <span><label class="currency"></label> {{ total_amount_shipping|floatformat:2|intcomma }}</span></li>
+                            </ul>
+                        </div>
+                        <button type="submit" class="site-btn" id="checkout-btn">Place oder</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<!-- Checkout Section End -->
+
+{% endblock content %}
+
+{% block javascript %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#checkout-btn').click(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Disable the button
+            $('#checkout-btn').prop('disabled', true);
+            $("#checkout-btn").text("")
+            $("#checkout-btn").append("<i class='fa fa-spinner fa-spin'></i>")
+
+            // Retrieve the state and country details from the form
+            let phone = document.getElementById("phone").value;
+            let state = document.getElementById("state").value;
+            let country = document.getElementById("country").value;
+            let address = document.getElementById("address").value;
+            let city = document.getElementById("city").value;
+            let zipcode = document.getElementById("zipcode").value;
+
+            // Check if either the state or country field is empty
+            if (phone ==="" || state === "" || country === "" || address === "" || city === "" || zipcode === "") {
+                // At least one of the fields is empty, highlight them in red
+                if (state === "") {
+                    document.getElementById("state").style.borderColor = "red";
+                }
+                if (phone === "") {
+                    document.getElementById("phone").style.borderColor = "red";
+                }
+                if (address === "") {
+                    document.getElementById("address").style.borderColor = "red";
+                }
+                if (country === "") {
+                    document.getElementById("country").style.borderColor = "red";
+                }
+                if (city === "") {
+                    document.getElementById("city").style.borderColor = "red";
+                }
+                if (zipcode === "") {
+                    document.getElementById("zipcode").style.borderColor = "red";
+                }
+                return; // Do not proceed with the payment
+            }
+
+            // Retrieve the payment details from the form
+            var cardNumber = document.getElementById("card-number").value;
+            var cardName = document.getElementById("card-name").value;
+            var cardExpiry = document.getElementById("card-expiry").value;
+            var cardCVV = document.getElementById("card-cvv").value;
+
+            // Create a Paystack card object with the payment details
+            var card = {
+                number: cardNumber,
+                name: cardName,
+                expiry: cardExpiry,
+                cvv: cardCVV,
+            };
+
+            // Initialize Paystack with your public key
+            var handler = PaystackPop.setup({
+                key: '{{ PAYSTACK_PUBLIC_KEY }}',
+                email: '{{ user_email }}',
+                amount: '{{ total_amount_shipping }}' * 100,
+                card: card,
+                onClose: function () {
+                    console.log('Payment modal closed');
+                },
+                callback: function (response) {
+                    console.log("The response: ", response);
+
+                    if (response.status === 'success') {
+                        // Payment was successful; continue with the form submission
+                        var formData = $('#checkout__form').serialize(); // Serialize form data
+                        var url = "{% url 'app:checkout_page' %}"; // URL for the form submission
+
+                        // Add the Paystack response data to the form data
+                        formData += '&paystack_reference=' + response.reference;
+
+                        // AJAX request for the combined form and payment data
+                        $.ajax({
+                            type: 'POST',
+                            url: url,
+                            data: formData,
+                            success: function (response) {
+                                if (response.success) {
+                                    location.href = '/order-complete/' + response.order_id + '/complete/';
+                                } else {
+                                    $('#checkout-errors').text(response.message);
+                                    $("#checkout-btn").text("Register")
+                                    $("#checkout-btn").children().remove();
+                                }
+                            },
+                            error: function (xhr, status, errorThrown) {
+                                // Handle AJAX request error
+                                $('#checkout-errors').text('An error occurred. Please try again.');
+                                $("#checkout-btn").text("Register");
+                                $("#checkout-btn").children().remove();
+                            },
+                            complete: function () {
+                                // Re-enable the button after the request is complete
+                                $('#checkout-btn').prop('disabled', false);
+                            }
+                        });
+                    } else {
+                        // Payment failed; you may handle this as needed
+                        console.log('Payment failed: ' + response.message);
+                    }
+                }
+            });
+
+            // Open the Paystack payment modal
+            handler.openIframe();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to toggle visibility of billing address fields
+        function toggleBillingAddressFields() {
+            const sameBillingAddressCheckbox = document.getElementById("sameBillingAddress");
+            const billingAddressSection = document.getElementById("billingAddressSection");
+
+            billingAddressSection.style.display = sameBillingAddressCheckbox.checked ? "none" : "block";
+        }
+
+        // Add an event listener to the checkbox to toggle the fields on change
+        const sameBillingAddressCheckbox = document.getElementById("sameBillingAddress");
+        sameBillingAddressCheckbox.addEventListener("change", toggleBillingAddressFields);
+
+        // Initial call to set the initial state
+        toggleBillingAddressFields();
+    });
+</script>
+
+{% endblock javascript %}

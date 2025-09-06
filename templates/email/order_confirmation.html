@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+{% load humanize %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <style>
+        /*--------------------------- Color variations ----------------------*/
+/*--------------------------- Fonts ----------------------*/
+@import url("https://fonts.googleapis.com/css?family=Poppins:500,700|Roboto:400,500");
+
+.no-padding {
+  padding: 0;
+}
+
+.section_gap {
+  padding: 100px 0;
+}
+
+@media (max-width: 991px) {
+  .section_gap {
+    padding: 80px 0;
+  }
+}
+
+.section_gap_top_75 {
+  padding: 75px 0;
+}
+
+@media (max-width: 991px) {
+  .section_gap_top_75 {
+    padding: 70px 0;
+  }
+}
+
+.section_gap_75 {
+  padding: 75px 0;
+}
+
+@media (max-width: 991px) {
+  .section_gap_75 {
+    padding: 70px 0;
+  }
+}
+
+.section_gap_top {
+  padding-top: 100px;
+}
+
+@media (max-width: 991px) {
+  .section_gap_top {
+    padding-top: 80px;
+  }
+}
+
+.section_gap_bottom {
+  padding-bottom: 100px;
+}
+
+@media (max-width: 991px) {
+  .section_gap_bottom {
+    padding-bottom: 80px;
+  }
+}
+
+.gray-bg {
+  background: #f9f9ff;
+}
+
+/* Section title css
+============================================================================================ */
+.section-title {
+  margin-bottom: 50px;
+}
+
+.section-title h1 {
+  font-size: 36px;
+}
+
+.section-title p {
+  margin-bottom: 0;
+}
+
+/* Start primary btn css
+============================================================================================ */
+.primary-btn {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 0 30px;
+  line-height: 50px;
+  border-radius: 50px;
+  display: inline-block;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease 0s;
+  -moz-transition: all 0.3s ease 0s;
+  -o-transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s;
+}
+
+.primary-btn:before {
+  position: absolute;
+  left: -145px;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+  background: #000;
+  opacity: 0;
+  -webkit-transform: skew(40deg);
+  -moz-transform: skew(40deg);
+  -ms-transform: skew(40deg);
+  -o-transform: skew(40deg);
+  transform: skew(40deg);
+  -webkit-transition: all 0.3s ease 0s;
+  -moz-transition: all 0.3s ease 0s;
+  -o-transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s;
+}
+
+.primary-btn:hover {
+  color: #fff;
+}
+
+.primary-btn:hover:before {
+  left: 180px;
+  opacity: .3;
+}
+
+body {
+  line-height: 24px;
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  color: #777777;
+  background: #fff;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", sans-serif;
+  color: #222222;
+  font-weight: 500;
+  line-height: 1.2 !important;
+}
+
+.list {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+a {
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+a:hover,
+a:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.sample-text-area {
+  background: #fff;
+  padding: 100px 0 70px 0;
+}
+
+.text-heading {
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+b,
+sup,
+sub,
+u,
+del {
+  color: #ffba00;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+h4 {
+  font-size: 18px;
+}
+
+h5 {
+  font-size: 16px;
+}
+
+h6 {
+  font-size: 14px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.5em;
+}
+
+.typography h1,
+.typography h2,
+.typography h3,
+.typography h4,
+.typography h5,
+.typography h6 {
+  color: #777777;
+}
+
+.button-area {
+  background: #fff;
+}
+
+.button-area .border-top-generic {
+  padding: 70px 15px;
+  border-top: 1px dotted #eee;
+}
+
+.button-group-area .genric-btn {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.button-group-area .genric-btn:last-child {
+  margin-right: 0;
+}
+
+.genric-btn {
+  display: inline-block;
+  outline: none;
+  line-height: 40px;
+  padding: 0 30px;
+  font-size: .8em;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease 0s;
+  -moz-transition: all 0.3s ease 0s;
+  -o-transition: all 0.3s ease 0s;
+  transition: all 0.3s ease 0s;
+}
+
+.genric-btn:focus {
+  outline: none;
+}
+
+.genric-btn.e-large {
+  padding: 0 40px;
+  line-height: 50px;
+}
+
+.genric-btn.large {
+  line-height: 45px;
+}
+
+.genric-btn.medium {
+  line-height: 30px;
+}
+
+.genric-btn.small {
+  line-height: 25px;
+}
+
+.genric-btn.radius {
+  border-radius: 3px;
+}
+
+
+.order_details .title_confirmation {
+  text-align: center;
+  color: #28d500;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 80px;
+}
+
+.order_d_inner .details_item h4 {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  font-size: 18px;
+  color: #222222;
+  padding-left: 18px;
+}
+
+.order_d_inner .details_item .list {
+  padding-left: 18px;
+}
+
+@media (min-width: 767px) {
+  .order_d_inner .details_item .list {
+    margin-bottom: 30px;
+  }
+}
+
+.order_d_inner .details_item .list li {
+  margin-bottom: 8px;
+}
+
+.order_d_inner .details_item .list li:last-child {
+  margin-bottom: 0px;
+}
+
+.order_d_inner .details_item .list li a {
+  font-size: 14px;
+  color: #222222;
+  font-family: "Roboto", sans-serif;
+}
+
+.order_d_inner .details_item .list li a span {
+  width: 145px;
+  display: inline-block;
+  color: #777777;
+}
+
+.order_details_table {
+  background: #bda06a;
+  padding: 30px;
+  color: #fff !important;
+  margin-top: 75px;
+}
+
+@media (min-width: 767px) {
+  .order_details_table {
+    margin-top: 45px;
+  }
+}
+
+.order_details_table h2 {
+  color: #222222;
+  font-size: 18px;
+  padding-bottom: 15px;
+}
+
+.order_details_table .table {
+  margin-bottom: 0px;
+}
+
+.order_details_table .table thead tr th {
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  font-weight: normal;
+}
+
+.order_details_table .table tbody tr td p {
+  margin-bottom: 0px;
+}
+
+.order_details_table .table tbody tr td h5 {
+  color: #222222;
+  margin-bottom: 0px;
+}
+
+.order_details_table .table tbody tr td h4 {
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 0px;
+  color: #222222;
+}
+
+.order_details_table .table tbody tr:last-child td {
+  border-top: 1px solid #ddd;
+}
+
+.order_details_table .table tbody tr:last-child td p {
+  color: #222222;
+}
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body>
+    <!--================Order Details Area =================-->
+    <section class="order_details section_gap">
+        <div class="container">
+            <h3 class="title_confirmation">Thank you. Your order has been received.</h3>
+            <div class="row order_d_inner">
+                <div class="col-lg-6">
+                    <div class="details_item">
+                        <h4>Order Info</h4>
+                        <ul class="list">
+                            <li><a href="#"><span>Order number</span> : {{ order.order_number }}</a></li>
+                            <li><a href="#"><span>Date</span> : {{ order.created_at }}</a></li>
+                            <li><a href="#"><span>Total</span> : &#8358; {{ order.total_price|intcomma }}</a></li>
+                            <li><a href="#"><span>Payment method</span> : Card</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="details_item">
+                        <h4>Shipping Address</h4>
+                        <ul class="list">
+                            <li><a href="#"><span>Address</span> : {{ order.shipping_address.address|truncatechars:16 }}</a>
+                            </li>
+                            <li><a href="#"><span>City</span> : {{ order.shipping_address.city }}</li>
+                            <li><a href="#"><span>State</span> : {{ order.shipping_address.state }}</li>
+                            <li><a href="#"><span>Country</span> : {{ order.shipping_address.country }}</a></li>
+                            <li><a href="#"><span>Postcode </span> : {{ order.shipping_address.zipcode }}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="details_item">
+                    <p style="font-size: 1.1rem;">Billing Address</p>
+                    <ul class="list">
+                      <li><a href="#"><span>Address</span> : {{ order.billing_details.street_address }}</a></li>
+                      <li><a href="#"><span>Address</span> : {{ order.billing_details.apartment_suite }}</a></li>
+                      <li><a href="#"><span>City</span> : {{ order.billing_details.city }}</li>
+                      <li><a href="#"><span>State</span> : {{ order.billing_details.state_province }}</li>
+                      <li><a href="#"><span>Country</span> : {{ order.billing_details.postal_zip_code }}</a></li>
+                      <li><a href="#"><span>Postcode </span> : {{ order.billing_details.country }}</a></li>
+                    </ul>
+                  </div>
+                </div>
+            </div>
+            <div class="order_details_table">
+                <h2>Order Details</h2>
+                <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Product Details</th>
+                          <th scope="col">Quantity</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for order_item in order_items %}
+                        <tr>
+                          <td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
+                          <td>x {{ order_item.quantity }}</td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ order_item.subtotal|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ order_item.subtotal|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
+                          {% endif %}
+                        
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                          <td>SUBTOTAL</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                        <tr>
+                          <td>SHIPPING</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                        <tr>
+                          <td>TOTAL</td>
+                          <td>
+                            <h5></h5>
+                          </td>
+                          {% if request.session.currency_preference == 'USD' %}
+                          <td><span>$ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% elif request.session.currency_preference == 'EUR' %}
+                          <td><span>€ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% else %}
+                          <td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+                          {% endif %}
+                        </tr>
+                    
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>

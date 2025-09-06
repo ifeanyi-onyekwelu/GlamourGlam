@@ -1,0 +1,159 @@
+{% extends "_base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Order Detail{% endblock %}
+
+{% block customstyle %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock customstyle %}
+
+{% block cart_num %}
+
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+
+{% endblock cart_num %}
+
+{% block cart_num_offcanvas %}
+{% if total_items_in_cart == None %}
+0
+{% else %}
+{{ total_items_in_cart }}
+{% endif %}
+{% endblock cart_num_offcanvas %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="breadcrumb__links">
+					<a href="{% url 'app:home_page' %}"><i class="fa fa-home"></i> Home</a>
+					<span>Order Detail</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Breadcrumb End -->
+
+<!--================Order Details Area =================-->
+<section class="product spad order_details section_gap">
+	<div class="container">
+		<div class="row order_d_inner">
+			<div class="col-lg-6">
+				<div class="details_item">
+					<p style="font-size: 1.1rem;">Order Info</p>
+					<ul class="list">
+						<li><a href="#"><span>Order number</span> : {{ order.order_number }}</a></li>
+						<li><a href="#"><span>Date</span> : {{ order.created_at }}</a></li>
+						<li><a href="#"><span>Total</span> : &#8358; {{ order.total_price|intcomma }}</a></li>
+						<li><a href="#"><span>Payment method</span> : Card</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div class="details_item">
+					<p style="font-size: 1.1rem;">Shipping Address</p>
+					<ul class="list">
+						<li><a href="#"><span>Address</span> : {{ order.shipping_address.address }}</a></li>
+						<li><a href="#"><span>City</span> : {{ order.shipping_address.city }}</li>
+						<li><a href="#"><span>State</span> : {{ order.shipping_address.state }}</li>
+						<li><a href="#"><span>Country</span> : {{ order.shipping_address.country }}</a></li>
+						<li><a href="#"><span>Postcode </span> : {{ order.shipping_address.zipcode }}</a></li>
+					</ul>
+				</div>
+			</div>
+			
+			<div class="col-lg-12">
+				<div class="details_item">
+					<p style="font-size: 1.1rem;">Billing Address</p>
+					<ul class="list">
+						<li><a href="#"><span>Address</span> : {{ order.billing_details.street_address }}</a></li>
+						<li><a href="#"><span>Address</span> : {{ order.billing_details.apartment_suite }}</a></li>
+						<li><a href="#"><span>City</span> : {{ order.billing_details.city }}</li>
+						<li><a href="#"><span>State</span> : {{ order.billing_details.state_province }}</li>
+						<li><a href="#"><span>Country</span> : {{ order.billing_details.postal_zip_code }}</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="order_details_table">
+			<h2>Order Details</h2>
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">Product</th>
+							<th scope="col">Quantity</th>
+							<th scope="col">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for order_item in order_items %}
+						<tr>
+							<td>{{ order_item.product.name }}, Color: {{ order_item.color }}, Size: {{ order_item.size }}</td>
+							<td>x {{ order_item.quantity }}</td>
+							{% if request.session.currency_preference == 'USD' %}
+							<td><span>$ {{ order_item.subtotal|intcomma }}</span></td>
+							{% elif request.session.currency_preference == 'EUR' %}
+							<td><span>€ {{ order_item.subtotal|intcomma }}</span></td>
+							{% else %}
+							<td><span>&#8358; {{ order_item.subtotal|intcomma }}</span></td>
+							{% endif %}
+						
+						</tr>
+						{% endfor %}
+						<tr>
+							<td>SUBTOTAL</td>
+							<td>
+								<h5></h5>
+							</td>
+							{% if request.session.currency_preference == 'USD' %}
+							<td><span>$ {{ total_amount|floatformat:2|intcomma }}</span></td>
+							{% elif request.session.currency_preference == 'EUR' %}
+							<td><span>€ {{ total_amount|floatformat:2|intcomma }}</span></td>
+							{% else %}
+							<td><span>&#8358; {{ total_amount|floatformat:2|intcomma }}</span></td>
+							{% endif %}
+						</tr>
+						<tr>
+							<td>SHIPPING</td>
+							<td>
+								<h5></h5>
+							</td>
+							{% if request.session.currency_preference == 'USD' %}
+							<td><span>$ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+							{% elif request.session.currency_preference == 'EUR' %}
+							<td><span>€ {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+							{% else %}
+							<td><span>&#8358; {{ shipping_fee|floatformat:2|intcomma }}</span></td>
+							{% endif %}
+						</tr>
+						<tr>
+							<td>TOTAL</td>
+							<td>
+								<h5></h5>
+							</td>
+							{% if request.session.currency_preference == 'USD' %}
+							<td><span>$ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+							{% elif request.session.currency_preference == 'EUR' %}
+							<td><span>€ {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+							{% else %}
+							<td><span>&#8358; {{ total_amount_shipping|floatformat:2|intcomma }}</span></td>
+							{% endif %}
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</section>
+<!--================End Order Details Area =================-->
+{% endblock %}
