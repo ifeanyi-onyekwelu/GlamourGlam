@@ -8,3 +8,4 @@ python manage.py collectstatic --no-input
 python manage.py makemigrations glamourApp
 python manage.py makemigrations users
 python manage.py migrate
+python manage.py seed_data
