@@ -15,7 +15,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUGG').lower() == 'true'
 
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+=======
+ALLOWED_HOSTS = []
+>>>>>>> 5ee7169ee6e20bc1e373f9eb157eec50e07013a2
 
 SHIPPING_FEE = os.getenv('SHIPPING_FEE')
 SHIPPING_FEE_USD = os.getenv('SHIPPING_FEE_USD')
@@ -32,7 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 5ee7169ee6e20bc1e373f9eb157eec50e07013a2
     # 3rd Party apps
     'django.contrib.humanize',
 
@@ -76,6 +84,7 @@ WSGI_APPLICATION = 'glamourglam.wsgi.application'
 
 
 DATABASES = {
+<<<<<<< HEAD
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
     #     'NAME': os.getenv('DB_NAME'),
@@ -88,6 +97,20 @@ DATABASES = {
 
 database_url = os.getenv('DB_URL')
 DATABASES['default'] = dj_database_url.parse(database_url)
+=======
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+    }
+}
+
+# database_url = os.getenv('DB_URL')
+# DATABASES['default'] = dj_database_url.parse(database_url)
+>>>>>>> 5ee7169ee6e20bc1e373f9eb157eec50e07013a2
 
 
 AUTH_PASSWORD_VALIDATORS = [

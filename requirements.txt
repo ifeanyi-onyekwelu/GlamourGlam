@@ -8,7 +8,11 @@ gunicorn==21.2.0
 idna==3.4
 packaging==23.1
 paystack==1.5.0
+<<<<<<< HEAD
 Pillow==9.5.0
+=======
+Pillow==11.3.0
+>>>>>>> 5ee7169ee6e20bc1e373f9eb157eec50e07013a2
 psycopg2==2.9.7
 python-dotenv==0.21.1
 requests==2.31.0
@@ -17,4 +21,8 @@ sqlparse==0.4.4
 typing_extensions==4.7.1
 tzdata==2023.3
 urllib3==2.0.4
+<<<<<<< HEAD
 whitenoise==6.5.0
+=======
+whitenoise==6.5.0
+>>>>>>> 5ee7169ee6e20bc1e373f9eb157eec50e07013a2
