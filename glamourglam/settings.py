@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUGG").lower() == "true"
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 SHIPPING_FEE = os.getenv("SHIPPING_FEE")
 SHIPPING_FEE_USD = os.getenv("SHIPPING_FEE_USD")
@@ -74,18 +74,18 @@ WSGI_APPLICATION = "glamourglam.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-    }
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("DB_NAME"),
+    #     "USER": os.getenv("DB_USER"),
+    #     "PASSWORD": os.getenv("DB_PASSWORD"),
+    #     "HOST": os.getenv("DB_HOST"),
+    #     "PORT": os.getenv("DB_PORT"),
+    # }
 }
 
-# database_url = os.getenv('DB_URL')
-# DATABASES['default'] = dj_database_url.parse(database_url)
+database_url = os.getenv("DB_URL")
+DATABASES["default"] = dj_database_url.parse(database_url)
 
 
 AUTH_PASSWORD_VALIDATORS = [
